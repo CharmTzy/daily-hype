@@ -1,0 +1,28 @@
+ /* Name: Thu Htet San
+Admin No: 2235022
+Class: DIT/FT/2B/02
+Date: 18.11.2023
+Description: styles for loading */
+
+
+.loading-container {
+    gap:10px;
+    display: none; /* Initially hide the loading container */
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  .spinner {
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid #fb6050;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }

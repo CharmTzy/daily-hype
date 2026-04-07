@@ -1,0 +1,228 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap"); /*  POPPINS */
+@import url("https://fonts.googleapis.com/css2?family=Borel&display=swap");
+
+/* Name: Wai Yan Aung
+Admin No: 2234993
+Date: 2.11.2023
+Description: Login Page  */
+
+/*==================== Reusable ====================*/
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+:root {
+  --dark-blue: #141d26;
+  --white: #fff;
+  --white-hover: #e8e7e7;
+}
+
+.button {
+    background-color: var(--white);
+  outline: none;
+  border: none;
+  padding: 13px 40px;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.button:hover {
+  background-color: var(--white-hover);
+}
+
+.link {
+  font-size: 15px;
+  color: var(--white);
+}
+
+.link:hover {
+  color: var(--white-hover);
+}
+
+/*================================================*/
+
+.container-box{
+  width: 100%;
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 50% 50%;
+}
+
+.left {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 30px 20px;
+}
+
+.left-dark {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  background-color: var(--dark-blue);
+  color: #fff;
+}
+
+.logo-box {
+  width: auto;
+  display: flex;
+  justify-content: baseline;
+  gap: 20px;
+  color: var(--dark-blue);
+}
+
+.logo {
+  width: 300px;
+  height: 150px !important;
+  display: inline-block;
+}
+
+
+.logo-light{
+  width: 330px;
+  height: 150px !important;
+  display: inline-block;
+}
+.card1{
+    margin:0;
+    padding:0;
+}
+
+.right {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  background-color: #FB6050;
+  color: #fff;
+}
+
+
+
+h2 {
+  font-size: 30px;
+}
+
+label {
+  display: block;
+  font-size: 15px;
+  margin-bottom: 8px;
+}
+
+input {
+  width: 320px;
+  height: 40px;
+  outline: none;
+  border: none;
+  border-radius: 5px;
+  font-size: 15px;
+  padding-inline: 15px;
+  color: var(--dark-blue);
+  display: block;
+}
+
+.two-col {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.input-field {
+  margin-bottom: 20px;
+}
+
+.fb-login-btn {
+  padding: 10px 20px;
+  background-color: #4267B2;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 20px;
+}
+.fb-login-btn:hover {
+  background-color: #2a4887;
+}
+
+#additionalFields{
+  display: none;
+}
+
+.additional{
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 25vh;
+  gap:20px;
+}
+
+.input-field-additional{
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+.input-field-additional label {
+  display: block;
+}
+
+.checkbox-field {
+  display: flex;
+  width: 300px;
+  align-items: center;
+
+}
+
+.checkbox-field input[type="checkbox"] {
+  width: 30px; 
+  height: 30px; 
+  margin-right: 5px; 
+
+  
+}
+.checkbox-field label {
+  margin-right: 10px;
+  margin-top: 10px;
+}
+
+
+/*======================= MEDIA QUERY =======================*/
+@media only screen and (max-width: 800px) {
+
+  .container-box {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+
+  .left {
+    height: 30vh;
+  }
+
+  .right {
+    height: 80vh;
+  }
+
+  .left-dark {
+    height: 80vh;
+  }
+  .additional{
+    height: 10vh;
+  }
+}

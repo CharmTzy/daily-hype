@@ -1,0 +1,259 @@
+<!-- 
+Name: Wai Yan Aung
+Admin No: 2234993
+Date: 30.11.2023
+Description: User statistic 
+-->
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>DailyHype | User Statistics</title>
+    <link rel="icon" href="../user/img/logo.png" type="image/png">
+    <link rel="stylesheet" href="./css/sidebar.css">
+    <link rel="stylesheet" href="./css/userlist.css">
+    <link rel="stylesheet" href="./css/table.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/c45fbf7d3d.js" crossorigin="anonymous"></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+</head>
+
+<body>
+    <div class="main">
+        <div id="sidebar"></div>
+        <div class="main-content">
+            <div class="user-statistic">
+                <h1>User Statistic</h1><br><br>
+                <label for="startDate">Start Date:</label>
+                <input type="date" id="startDate" required>
+
+                <label for="endDate">End Date:</label>
+                <input type="date" id="endDate" required>
+
+                <button onclick="getTotalUsers()">Get Total Users</button>
+                <div id="result"></div>
+                <div id="userCreationChart" class="chart-container"></div>
+
+                <div id="genderChart" class="chart-container"></div>
+               
+            </div>
+        </div>
+        
+    </div>
+   
+
+    <script src="./js/sidebar.js"></script>
+    <script src="./js/table.js"></script>
+    <script src="./js/userlist.js"></script>
+    <script>
+          function getTotalUsers() {
+    const startDateInput = document.getElementById("startDate");
+    const endDateInput = document.getElementById("endDate");
+
+    const startDate = startDateInput.value;
+    const endDate = endDateInput.value;
+
+    if (new Date(endDate) < new Date(startDate)) {
+        alert("End date must be equal to or later than the start date.");
+        return;
+    }
+
+    const authToken = localStorage.getItem("token");
+    fetch(`/api/getTotalUserByAdmin?startDate=${startDate}&endDate=${endDate}`, {
+        method: "GET",
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("token"),
+    },
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);  
+            const resultContainer = document.getElementById("result");
+            if (data && data.users && data.users.length > 0) {
+                const count = data.users[0].count;
+                resultContainer.innerHTML = `<p>Total users created between ${startDate} and ${endDate}:<b> ${count}</b></p>`;
+                
+            } else {
+                resultContainer.innerHTML = `<p>No data available for the specified date range.</p>`;
+            }
+        })
+        .catch(error => {
+            console.error("Error fetching data:", error);
+        });
+
+            
+            renderUserCreationChart(startDate, endDate);
+        }
+
+
+        function initializeEmptyChart() {
+    const chartContainer = document.getElementById("userCreationChart");
+
+    // Options for an empty chart (you can customize as needed)
+    const options = {
+        chart: {
+            type: 'line',
+            height: 350,
+        },
+        series: [{
+            name: 'Number of Users Created',
+            data: [],
+        }],
+        xaxis: {
+            categories: [],
+            title: {
+            text: 'Date', 
+        },
+        },
+        yaxis: {
+            title: {
+            text: 'Number of Users', // Title for the y-axis
+            },
+        },
+    };
+
+    const chart = new ApexCharts(chartContainer, options);
+    chart.render();
+    chartContainer.chart = chart;
+}
+
+function renderUserCreationChart(startDate, endDate) {
+    const chartContainer = document.getElementById("userCreationChart");
+    const resultContainer = document.getElementById("result");
+
+    // Destroy existing chart if it exists
+    if (chartContainer.chart) {
+        chartContainer.chart.destroy();
+    }
+    if (!startDate || !endDate) {
+        initializeEmptyChart();
+        return;
+    }
+
+    fetch(`/api/getUserCreationData?startDate=${startDate}&endDate=${endDate}`, {
+        method: "GET",
+        headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Data from API:", data);  // Log the data to the console
+
+            if (data && data.length > 0) {
+                // Extract labels and counts from data
+                const labels = data.map(entry => moment(entry.creation_day).format('MM DD'));
+                const counts = data.map(entry => entry.user_count);
+
+                const options = {
+                    chart: {
+                        type: 'line',
+                        height: 350,
+                       
+                    },
+                    series: [{
+                        name: 'Number of Users Created',
+                        data: counts,
+                    }],
+                    xaxis: {
+                        categories: labels,
+                        title: {
+                            text: 'Date', 
+                        },
+                    },
+                    yaxis: {
+                        title: {
+                            text: 'Number of Users', // Title for the y-axis
+                        },
+                    },
+                };
+
+                const chart = new ApexCharts(chartContainer, options);
+                chart.render();
+                chartContainer.chart = chart;
+
+            } else {
+                // Display no data message
+                resultContainer.innerHTML = `<p>No data available for the specified date range.</p>`;
+                
+            }
+        })
+        .catch(error => {
+            console.error("Error fetching data:", error);
+        });
+}
+
+
+function renderGenderChart() {
+    const chartContainer = document.getElementById("genderChart");
+
+    fetch(`/api/getGenderStatistics`, {
+        method: "GET",
+        headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Gender Statistics from API:", data);
+
+            if (data && data.male && data.female) {
+                console.log(data.male,data.female);
+                const total = parseFloat(data.male) + parseFloat(data.female);
+               
+                const maleValue = parseFloat(((data.male / total) * 100).toFixed(2));
+                const femaleValue = parseFloat(((data.female / total) * 100).toFixed(2));
+                const options = {
+                    chart: {
+                        type: 'pie',
+                        height: 350,
+                    },
+                    series: [maleValue, femaleValue],
+                    labels: [`Male (${data.male})`, `Female (${data.female})`],
+                    responsive: [{
+                        breakpoint: 480,
+                        options: {
+                            chart: {
+                                width: 200
+                            },
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }],
+                };
+
+                const chart = new ApexCharts(chartContainer, options);
+                chart.render();
+                chartContainer.chart = chart;
+            } else {
+                // Display no data message
+                chartContainer.innerHTML = `<p>No gender statistics available.</p>`;
+            }
+        })
+        .catch(error => {
+            console.error("Error fetching gender statistics:", error);
+        });
+}
+
+
+        window.onload = function () {
+            loadSideBar("userstatistics");
+            getTotalUsers();
+            renderGenderChart();
+        };
+    </script>
+   
+</body>
+
+</html>

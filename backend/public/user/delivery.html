@@ -1,0 +1,641 @@
+<!--
+
+/ Name: Ang Wei Liang
+// Admin No: 2227791
+// Class: DIT/FT/2B/02
+// Date: 1.12.2023
+// Description: User HTML and JS for delivery
+// Ver 2
+
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DailyHype | Delivery Details</title>
+
+    <link rel="icon" href="./img/logo.png" type="image/png">
+    <link rel="stylesheet" href="./css/header.css" />
+    <link rel="stylesheet" href="./css/deliver.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
+    <!---<script src="script.js" defer></script>--->
+
+</head>
+
+<body>
+    <nav></nav>
+
+    <div class="container mt-5">
+        <h2 class="text-center mb-5">Delivery Details</h2>
+
+
+        <div class="row">
+
+            <div class="col-md-5"">
+                <div class=" card">
+                <div class="card-body">
+
+                    <h5 class="card-title">Selected Date and Time</h5>
+                    <!-- Replace the next line with an adjustable calendar component -->
+                    <!-- Replace the next line with an adjustable calendar component -->
+                    <!--<div id="calendar" class="table-responsive"></div>--->
+
+                    <div class="calendarbody">
+
+                        <div class="wrapper">
+                            <header>
+                                <p class="current-date"></p>
+                                <div class="icons">
+                                    <span id="prev" class="material-symbols-rounded">chevron_left</span>
+                                    <span id="next" class="material-symbols-rounded">chevron_right</span>
+                                </div>
+                            </header>
+                            <div class="calendar">
+                                <ul class="weeks">
+                                    <li>Sun</li>
+                                    <li>Mon</li>
+                                    <li>Tue</li>
+                                    <li>Wed</li>
+                                    <li>Thu</li>
+                                    <li>Fri</li>
+                                    <li>Sat</li>
+                                </ul>
+                                <ul class="days"></ul>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Right column with the list of delivery cards -->
+        <div class="col-md-6" style="height: 700px; overflow:auto; margin-left: 20px;">
+            <h2 id="cardsMainHeader"></h2>
+            <!-- Add overflow-auto class for scrollability -->
+            <div class="row" id="deliveryContainer">
+                <!-- Delivery cards will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+    <!-- End Two-column layout -->
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+    <footer></footer>
+
+
+    <script>
+        //https://bbbootstrap.com/snippets/order-tracking-template-all-details-34023037
+        document.addEventListener('DOMContentLoaded', () => {
+            window.onload = function () {
+                // loading header and footer html files
+                loadHeaderFooter();
+            }
+
+            const token = localStorage.getItem('token');
+            //console.log(token)
+
+
+            // Render Delivery Cards
+            fetch(`/api/Alldeliveries/user/1`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                    // Other headers as needed
+                },
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Handle the retrieved data here
+
+                    console.log(data);
+
+                    const cardsMainHeader = document.getElementById("cardsMainHeader");
+
+                    if (data.length == 0) {
+
+                        // Set the text content
+                        cardsMainHeader.textContent = "No Deliveries, come back later!";
+
+                    } else {
+
+                        cardsMainHeader.textContent = "";
+
+                    }
+
+                    data.sort((a, b) => {
+                        const dateA = new Date(a.deliveryTime);
+                        const dateB = new Date(b.deliveryTime);
+                        return dateA - dateB;
+                    });
+
+                    console.log(data);
+
+                    //GT61
+                    loadCalender(data);
+                    renderDeliveryCards(data, true);
+                })
+                .catch(error => {
+                    // Handle any errors that occur during the request
+                    console.error(error);
+                    document.body.innerHTML = '';
+
+                    window.location.href = '/user/product.html';
+                    alert("You have no pending deliveries, Go buy some items!");
+                });
+
+            $('#orderModal').on('shown.bs.modal', function () {
+                populateModal(deliveryData2[0]);
+            });
+
+            var deliveryDataOverall
+            var deliveryDataStart
+
+
+            // Function to dynamically populate the modal
+            function populateModal() {
+                const modalTitle = document.getElementById('orderModalLabel');
+                const modalBody = document.querySelector('.modal-body');
+
+
+
+                // Get the first order details from the deliveryData2 array
+                const orderDetails = deliveryData2[0];
+
+                // Set the modal title
+                modalTitle.textContent = 'Order Details';
+
+                console.log(orderDetails.status);
+                //orderDetails.status = "Picked by courier";
+                var a = 0;
+                if (orderDetails.status == "Order confirmed") {
+                    console.log("hee0")
+                    a = 1;
+                } else if (orderDetails.status == "Picked by the courier") {
+                    console.log("hee")
+                    a = 2;
+                } else if (orderDetails.status == "On the way") {
+                    a = 3;
+                } else if (orderDetails.status == "Product delivered") {
+                    a = 4;
+                }
+
+                // Create the HTML content for the modal body
+                const htmlContent = `
+    <div class="container">
+      <article class="card">
+        <header class="card-header"> My Orders / Tracking </header>
+        <div class="card-body">
+  
+          <h6>Order ID: ${orderDetails.orderId}</h6>
+    
+          <article class="card">
+            <div class="card-body row">
+              <div class="col"> <strong>Estimated Delivery time:</strong> <br>${orderDetails.deliveryTime} </div>
+              <div class="col"> <strong>Shipping BY:</strong> <br>${orderDetails.shipping.carrier}, | <i class="fa fa-phone"></i> ${orderDetails.shipping.phone} </div>
+              <div class="col"> <strong>Status:</strong> <br>${orderDetails.status} </div>
+              <div class="col"> <strong>Tracking #:</strong> <br>${orderDetails.trackingNumber} </div>
+            </div>
+          </article>
+          <div class="track">
+        ${Array.from({ length: 4 }, (_, index) => {
+                    console.log("a is " + a);
+                    const stepNumber = index + 1;
+                    const stepClass = stepNumber <= a ? "step active" : "step";
+                    let stepText = "";
+
+                    switch (stepNumber) {
+                        case 1:
+                            stepText = "Order confirmed";
+                            break;
+                        case 2:
+                            stepText = "Picked by courier";
+                            break;
+                        case 3:
+                            stepText = "On the way";
+                            break;
+                        case 4:
+                            stepText = "Product delivered";
+                            break;
+                        default:
+                            break;
+                    }
+
+                    return `
+            <div class="${stepClass}">
+                <span class="icon"> <i class="fa fa-check"></i> </span>
+                <span class="text">${stepText}</span>
+            </div>
+          `;
+                }).join('')}
+    </div>
+
+          <hr>
+          <ul class="row">
+            ${orderDetails.items.map(item => `
+              <li class="col-md-4">
+                <figure class="itemside mb-3">
+                  <div class="aside"><img src="${item.image}" class="img-sm border"></div>
+                  <figcaption class="info align-self-center">
+                    <p class="title">${item.name} <br> ${item.description}</p> <span class="text-muted">${item.price} </span>
+                  </figcaption>
+                </figure>
+              </li>
+            `).join('')}
+          </ul>
+          <hr>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-warning" data-dismiss="modal" data-abc="true"><i class="fa fa-chevron-left"></i>Back to orders</button>
+          </div>
+        </div>
+      </article>
+    </div>
+  `;
+
+                modalBody.innerHTML = htmlContent;
+            }
+
+            //const userId = '14'; // Replace with the actual user ID
+            //const url = `/deliveries/user/${userId}`;
+
+            function formatDateString(dateString) {
+                const date = new Date(dateString);
+                const options = {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    second: 'numeric',
+                    timeZoneName: 'short'
+                };
+                return date.toLocaleDateString('en-US', options);
+            }
+
+            // Function to render delivery cards dynamically
+            function renderDeliveryCards(deliveryData, status) {
+
+                if (status) {
+                    deliveryDataStart = deliveryData
+
+                    deliveryDataOverall = deliveryData
+
+                    //console.log("rendered cards, " + deliveryDataOverall.length)
+                    console.log("At start, start was " + deliveryDataStart.length + "overall was" + deliveryDataOverall.length)
+
+                }
+                const deliveryContainer = document.getElementById('deliveryContainer');
+
+
+                deliveryContainer.innerHTML = '';
+
+
+                if (deliveryData) {
+                    var numcount = 1;
+                    deliveryData.forEach(delivery => {
+                        const productNames = delivery.items.map(item => item.name).join(', ');
+
+                        const card = document.createElement('div');
+                        var formattedDate = formatDateString(delivery.deliveryTime);
+                        card.className = 'col-md-12 mb-4'; // Full width for each card in the right column
+                        card.innerHTML = `
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Delivery #${numcount}</h5>
+                        <!---<p><strong>Product Bought Date:</strong> ${delivery.productBoughtDate}</p>---->
+                        <p><strong>Estimated Delivery Date:</strong> ${formattedDate}</p>
+                        <p class="card-text">Address: ${delivery.deliveryAddress}</p>
+                        <p class="card-text">Status: ${delivery.status}</p>
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modal${numcount}">
+                            View Details
+                        </button>
+                    </div>
+                </div>
+            `;
+
+                        const modal = document.createElement('div');
+                        // Set the modal title
+                        //modalTitle.textContent = 'Order Details';
+
+                        //console.log(orderDetails.status);
+                        //orderDetails.status = "Picked by courier";
+                        var a = 3;
+                        if (delivery.deliveryStatusDetail == "Order confirmed") {
+                            console.log("hee0")
+                            a = 1;
+                        } else if (delivery.deliveryStatusDetail == "Picked by the courier") {
+                            console.log("hee")
+                            a = 2;
+                        } else if (delivery.deliveryStatusDetail == "On the way") {
+                            a = 3;
+                        } else if (delivery.deliveryStatusDetail == "Product delivered") {
+                            a = 4;
+                        }
+                        modal.className = 'modal fade';
+                        modal.id = `modal${numcount}`;
+                        modal.innerHTML = `
+                <div class="modal-dialog modal-xl" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Order Details - ${numcount}</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <article class="card">
+                            <header class="card-header"> My Orders / Tracking </header>
+                            <br>
+                            <!-- Include the details you want to show in the modal -->
+                            <h6>&nbsp;&nbsp;Order ID: ${delivery.orderId}</h6>
+                            <br>
+          <article class="card m-3">
+            <div class="card-body row ">
+              <div class="col"> <strong>Estimated Delivery time:</strong> <br>${formattedDate} </div>
+              <div class="col"> <strong>Shipping BY:</strong> <br>${delivery.shipping.carrier}, | <i class="fa fa-phone"></i> ${delivery.shipping.phone} </div>
+              <div class="col"> <strong>Status:</strong> <br>${delivery.status} </div>
+              <div class="col"> <strong>Tracking #:</strong> <br>${delivery.trackingNumber} </div>
+            </div>
+          </article>
+                            <div class="track">
+                                ${Array.from({ length: 4 }, (_, index) => {
+                            console.log("a is " + a);
+                            const stepNumber = index + 1;
+                            const stepClass = stepNumber <= a ? "step active" : "step";
+                            let stepText = "";
+
+                            switch (stepNumber) {
+                                case 1:
+                                    stepText = "Order confirmed";
+                                    break;
+                                case 2:
+                                    stepText = "Ready for pickup by company";
+                                    break;
+                                case 3:
+                                    stepText = "On the way";
+                                    break;
+                                case 4:
+                                    stepText = "Product delivered";
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            return `
+                                        <div class="${stepClass}">
+                                            <span class="icon"> <i class="fa fa-check"></i> </span>
+                                            <span class="text">${stepText}</span>
+                                        </div>
+                                    `;
+                        }).join('')}
+                            </div>
+                            </article>
+                        </div>
+                       
+                        <hr>
+                 
+          <ul class="row">
+            ${delivery.items.map(item => `
+              <li class="col-md-4">
+                <figure class="itemside mb-3">
+                  <div class="aside mx-auto"><img src="${item.image}" class="img-sm border"></div>
+                  <figcaption class="info align-self-center">
+                    <p class="title">${item.name} <br> ${item.description}</p> <span class="text-muted">${item.price} </span>
+                  </figcaption>
+                </figure>
+              </li>
+            `).join('')}
+          </ul>
+          <hr>
+          
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-warning" data-dismiss="modal"><i class="fa fa-chevron-left"></i> Back to orders</button>
+                        </div>
+                    </div>
+                </article>
+                </div>
+            `;
+
+                        deliveryContainer.appendChild(card);
+                        document.body.appendChild(modal);
+                        numcount++;
+                    });
+
+                } else {
+                    deliveryContainer.innerHTML = '<p>No deliveries for the selected date</p>';
+                }
+            }
+
+
+
+            function loadCalender(deliveryData) {
+
+                deliveryDataDate = deliveryData.map(item => ({
+                    deliveryTime: item.deliveryTime.split('T')[0] // Extract date part
+                }));
+
+
+                // Function to get delivery details for a specific date
+                function getDeliveryDetails(year, month, day) {
+                    const formattedDate = `${year}-${month}-${day}`;
+                    const deliveries = deliveryData.filter(item =>
+                        item.deliveryTime === formattedDate
+                    );
+
+                    return deliveries || [];
+                }
+
+                // Function to check if a date has a delivery
+                function hasDeliveryOnDate(year, month, day) {
+
+                    //const formattedDate = selectedDate.split('-').map(part => (part.length === 1 ? `0${part}` : part)).join('-');
+
+
+                    const formattedDate = `${year}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+                    console.log("inside loadCalender: " + JSON.stringify(deliveryDataDate));
+
+                    //console.log("formatted date is " + formattedDate)
+                    return deliveryDataDate.some(delivery =>
+                        delivery.deliveryTime === formattedDate
+                    );
+                }
+
+                const selectedDates = []; // Array to store selected dates
+
+
+
+                function handleSelectedDates(datesArr) {
+                    //console.log("All: " + JSON.stringify(deliveryDataOverall))
+                    console.log("Item Count0 " + deliveryDataOverall.length)
+                    if (datesArr.length == 0) {
+                        console.log("Delivery start length is" + deliveryDataStart.length)
+                        renderDeliveryCards(deliveryDataStart, false); // Return the original array if datesArr is empty
+                    } else {
+
+                        // Filter deliveryDataOverall based on datesArr
+                        const filteredData = deliveryDataOverall.filter(item => {
+                            const deliveryTime = new Date(item.deliveryTime).toISOString().split('T')[0];
+                            return datesArr.includes(deliveryTime);
+                        });
+
+                        //console.log("Filtered: " + JSON.stringify(filteredData) + "END")
+                        console.log("Item Count " + filteredData.length)
+
+                        renderDeliveryCards(filteredData, false); // Return the original array if datesArr is empty
+
+                    }
+                }
+
+
+                const daysTag = document.querySelector(".days"),
+                    currentDate = document.querySelector(".current-date"),
+                    prevNextIcon = document.querySelectorAll(".icons span");
+                // getting new date, current year and month
+                let date = new Date(),
+                    currYear = date.getFullYear(),
+                    currMonth = date.getMonth();
+                // storing full name of all months in array
+                const months = ["January", "February", "March", "April", "May", "June", "July",
+                    "August", "September", "October", "November", "December"];
+                const renderCalendar = () => {
+                    let firstDayofMonth = new Date(currYear, currMonth, 1).getDay(), // getting first day of month
+                        lastDateofMonth = new Date(currYear, currMonth + 1, 0).getDate(), // getting last date of month
+                        lastDayofMonth = new Date(currYear, currMonth, lastDateofMonth).getDay(), // getting last day of month
+                        lastDateofLastMonth = new Date(currYear, currMonth, 0).getDate(); // getting last date of previous month
+
+                    let liTag = "";
+
+                    for (let i = firstDayofMonth; i > 0; i--) { // creating li of previous month last days
+                        liTag += `<li class="inactive">${lastDateofLastMonth - i + 1}</li>`;
+                    }
+
+                    for (let i = 1; i <= lastDateofMonth; i++) { // creating li of all days of current month
+                        let isToday = i === date.getDate() && currMonth === new Date().getMonth()
+                            && currYear === new Date().getFullYear() ? "active" : "";
+
+                        // Check if the day has a delivery
+                        if (hasDeliveryOnDate(currYear, currMonth, i)) {
+                            isToday += " has-delivery";
+                        }
+
+                        // Check if the date is already selected (blue)
+                        if (i < 10) {
+                            i = "0" + i
+                        }
+                        var currMonthAppend
+                        if (currMonth < 9) {
+                            currMonthAppend = "0" + (currMonth + 1)
+                            console.log(currMonthAppend)
+                        } else {
+                            currMonthAppend++
+                        }
+                        const isSelected = selectedDates.includes(`${currYear}-${currMonthAppend}-${i}`);
+                        if (isSelected) {
+                            isToday += " selected";
+                        }
+
+                        liTag += `<li class="${isToday}" data-date="${currYear}-${currMonth + 1}-${i}">${i}</li>`;
+                    }
+
+                    for (let i = lastDayofMonth; i < 6; i++) { // creating li of next month first days
+                        liTag += `<li class="inactive">${i - lastDayofMonth + 1}</li>`;
+                    }
+
+                    currentDate.innerText = `${months[currMonth]} ${currYear}`; // passing current mon and yr as currentDate text
+                    daysTag.innerHTML = liTag;
+
+                    // New Code: Add event listeners to the days with the "has-delivery" class
+                    const daysElements = daysTag.querySelectorAll("li.has-delivery");
+
+                    daysElements.forEach(dayElement => {
+                        dayElement.addEventListener("click", () => {
+                            const selectedDateNotFormat = dayElement.dataset.date;
+
+                            const selectedDate = selectedDateNotFormat.split('-').map(part => (part.length === 1 ? `0${part}` : part)).join('-');
+
+
+                            // Toggle between blue and green
+                            dayElement.classList.toggle("selected");
+
+                            // Add or remove the selected date from the array
+                            if (dayElement.classList.contains("selected")) {
+                                selectedDates.push(selectedDate);
+                            } else {
+                                const index = selectedDates.indexOf(selectedDate);
+                                if (index !== -1) {
+                                    selectedDates.splice(index, 1);
+                                }
+                            }
+
+                            // Log the array of selected dates (for testing purposes)
+                            console.log(selectedDates);
+                            console.log("List Updated")
+                            handleSelectedDates(selectedDates);
+                        });
+                    });
+                }
+
+
+                renderCalendar();
+                prevNextIcon.forEach(icon => { // getting prev and next icons
+                    icon.addEventListener("click", () => { // adding click event on both icons
+                        // if clicked icon is previous icon then decrement current month by 1 else increment it by 1
+                        currMonth = icon.id === "prev" ? currMonth - 1 : currMonth + 1;
+                        if (currMonth < 0 || currMonth > 11) { // if current month is less than 0 or greater than 11
+                            // creating a new date of current year & month and pass it as date value
+                            date = new Date(currYear, currMonth, new Date().getDate());
+                            currYear = date.getFullYear(); // updating current year with new date year
+                            currMonth = date.getMonth(); // updating current month with new date month
+                        } else {
+                            date = new Date(); // pass the current date as date value
+                        }
+                        renderCalendar(); // calling renderCalendar function
+                    });
+                });
+
+
+            }
+
+
+        });
+    </script>
+    <script src="./js/headerFooter.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,80 @@
+<!-- 
+Name: Angie Toh Anqi
+Admin No: 2227915
+Class: DIT/FT/2B/02
+Date: 19.11.2023
+Description: Page for users to create reviews
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DailyHype | Create Review</title>
+
+  <link rel="icon" href="./img/logo.png" type="image/png">
+  <link rel="stylesheet" href="./css/review.css">
+  <link rel="stylesheet" href="./css/header.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"></script>
+</head>
+
+<body>
+  <nav></nav>
+  <form id="reviewForm">
+    <input type="hidden" id="id" name="id">
+
+    <label for="rating">Rating:</label>
+    <select id="rating" name="rating">
+      <option value="5">5 Stars</option>
+      <option value="4">4 Stars</option>
+      <option value="3">3 Stars</option>
+      <option value="2">2 Stars</option>
+      <option value="1">1 Star</option>
+    </select>
+
+    <br><br>
+
+    <label for="reviewDescription">Review Description:</label><br>
+    <textarea id="reviewDescription" name="reviewDescription" rows="4" cols="50"></textarea>
+    <br><br>
+
+    <label for="image">Upload Image:</label>
+    <input type="file" id="image" name="image">
+    <br><br>
+
+    <input type="submit" value="Submit" onclick="submitReview()">
+  </form>
+  <footer></footer>
+
+  <script src="./js/headerFooter.js"></script>
+  <script src="./js/review.js"></script>
+  <script>
+    window.onload = function () {
+      // loading header and footer html files
+      const token = localStorage.getItem('token');
+      if (!token) {
+        window.location = "login.html";
+        alert("Please log in first!");
+        return;
+      }
+
+      loadHeaderFooter();
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const id = urlParams.get('id');
+      console.log(id)
+      document.getElementById('id').value = id;
+
+      fillFormIfReviewExists(id);
+    };
+
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,92 @@
+<!-- 
+Name: Zay Yar Tun
+Admin No: 2235035
+Class: DIT/FT/2B/02
+Date: 6.11.2023
+Description: Shopping cart page
+-->
+
+<!-- shopping cart design is referenced from the following websites -->
+<!-- https://assets-global.website-files.com/6009ec8cda7f305645c9d91b/637bb924b52597f849e9a38e_burton%20shopping%20cart.png -->
+<!-- https://cdn.dribbble.com/users/2015010/screenshots/5531581/dribbble_shopping_cart_ifrha.png?resize=400x300&vertical=center -->
+<!-- https://www.behance.net/gallery/112421559/Empty-Shopping-Cart -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DailyHype | Cart</title>
+
+    <link rel="icon" href="./img/logo.png" type="image/png">
+    <link rel="stylesheet" href="./css/header.css">
+    <link rel="stylesheet" href="./css/cart.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/c45fbf7d3d.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <nav></nav>
+
+    <div class="container no-cart">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 mx-auto text-center">
+                <p class="emoji">🥺</p>
+                <p class="first-text">Your cart is empty. Time to Shop!</p>
+                <a class="btncontinue" href="product.html">Continue Shopping</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container cart">
+        <div class="row">
+            <div class="col-lg-9">
+                <h3>Cart</h3>
+                <div id="cart-item-div">
+                </div>
+            </div>
+            <div class="col-lg-3">
+                <div class="payment">
+                    <h4>Summary</h4>
+                    <div class="payment-item">
+                        <label>Total Qty</label>
+                        <label id="total-qty">5</label>
+                    </div>
+                    <div class="payment-item">
+                        <label>Total Amount</label>
+                        <label id="total-price">$150</label>
+                    </div>
+                    <div class="payment-item">
+                        <a href="checkout.html">Check Out</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer></footer>
+
+    <script src="./js/headerFooter.js"></script>
+    <script src="./js/cart.js"></script>
+    <script>
+        window.onload = function () {
+            // loading header and footer html files
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location = "login.html";
+                alert("Please log in first!");
+                return;
+            }
+
+            loadHeaderFooter();
+            getCartItems();
+        };
+    </script>
+</body>
+
+</html>

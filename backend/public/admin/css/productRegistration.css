@@ -1,0 +1,119 @@
+/* Global Styles */
+.main-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.main-content {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+}
+
+/* Input, Select, QtyInput Styles */
+input, select,
+.qtyInput {
+    width: calc(100% - 16px);
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin-top: 10px;
+}
+
+.input-group {
+    margin: 10px;
+}
+
+/* Color Box Styles */
+#colorSection {
+    margin-top: 20px;
+}
+
+.colorBox {
+    border: 1px solid #ccc;
+    padding: 15px;
+    margin-bottom: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+}
+
+/* Size Box Styles */
+.sizeBox {
+    display: flex;
+    align-items: center;
+    margin: 5px 65px;
+    padding: 10px;
+}
+
+.sizeLabel {
+    margin-right: 15px;
+}
+
+/* Quantity Box Styles */
+.qtyBox {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    padding: 10px;
+}
+
+.qtyLabel {
+    margin-right: 15px;
+}
+
+/* Button Styles */
+button {
+    background-color: #fb6050;
+    color: #fff;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #e8543e;
+    /* Slightly lighter shade on hover */
+}
+
+.deleteBtn {
+    background-color: #fff;
+    /* White background */
+    border: 1px solid #fb6050;
+    color: #fb6050;
+    padding: 10px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.deleteBtn:hover {
+    background-color: #fb6050;
+    /* Your logo color on hover */
+    color: #fff;
+    /* White text on hover */
+}
+
+#productImagesContainer img {
+    max-width: 200px;
+    /* Adjust as needed */
+    max-height: 150px;
+    /* Adjust as needed */
+    margin: 5px;
+    /* Add margin between images if desired */
+}

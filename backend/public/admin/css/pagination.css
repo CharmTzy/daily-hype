@@ -1,0 +1,28 @@
+.pagination {
+    display: none;
+    flex-direction: row;
+    justify-content: flex-end;
+    margin-top: 16px;
+    margin-bottom: 16px;
+    user-select: none;
+}
+
+.pagination>button {
+    margin-left: 8px;
+    background-color: #fff;
+    outline: none;
+    border: 0.5px solid #ddd;
+    padding: 4px 12px;
+    border-radius: 4px;
+}
+
+.pagination>button.active {
+    background-color: rgb(251, 97, 80);
+    border: none;
+    color: white;
+}
+
+.pagination button.dot {
+    border: none;
+    cursor: default;
+}

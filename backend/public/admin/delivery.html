@@ -1,0 +1,519 @@
+<!--
+
+// Name: Ang Wei Liang
+// Admin No: 2227791
+// Class: DIT/FT/2B/02
+// Date: 1.12.2023
+// Description: Admin HTML and JS for delivery update
+// Ver 2
+
+-->
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DailyHype | Delivery Details</title>
+
+  <link rel="icon" href="../user/img/logo.png" type="image/png">
+  <link rel="stylesheet" href="./css/sidebar.css">
+
+  <!--<link rel="stylesheet" href="./css/header.css" />
+    <link rel="stylesheet" href="./css/deliver.css" />---->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"></script>
+
+  <script src="https://kit.fontawesome.com/c45fbf7d3d.js" crossorigin="anonymous"></script>
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
+  <!---<script src="script.js" defer></script>--->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="./css/sidebar.css">
+  <link rel="stylesheet" href="./css/deliveryform.css">
+</head>
+
+<body>
+
+  <div class="main">
+    <div id="sidebar"></div>
+    <div class="main-content">
+
+
+
+
+      <div class="container mt-5 delivery-form">
+        <h2>Delivery Status Update</h2>
+        <div id="deliveryList">
+          <!-- Delivery list will be populated here dynamically -->
+        </div>
+        <div class="form-group mt-3">
+          <input type="text" id="searchInput" class="form-control" placeholder="Search...">
+          <select id="newDeliveryId" class="form-control">
+            <!-- Options will be populated dynamically -->
+          </select>
+          <button id="addDeliveryButton" class="btn btn-success mt-2">+</button>
+        </div>
+        <button id="updateStatusButton" class="btn btn-primary mt-3">Update Status</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bootstrap JS and dependencies -->
+  <footer></footer>
+
+
+
+  <script src="./js/sidebar.js"></script>
+  <script>
+
+    window.onload = function () {
+      loadSideBar("deliveryform");
+      //getOrderDetail(2, "orderdetailtable", headers, loadTable);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const token = localStorage.getItem('token');
+      //console.log(token)
+
+      let deliveries = [
+        /*{ id: 1, status: 'Pending' },
+        { id: 2, status: 'Pending' },*/
+        // ...more deliveries
+      ];
+
+      var trackNumbersOutside = [];
+
+      const searchInput = document.getElementById('searchInput');
+      searchInput.addEventListener('input', populateTrackingNumberDropdown);
+
+      renderDeliveryList();
+
+      // Function to render delivery list
+      function renderDeliveryList() {
+        console.log("rendering...")
+        const deliveryListContainer = document.getElementById('deliveryList');
+
+
+        // Check if deliveries exist in localStorage
+        if (localStorage.getItem('deliveriesList')) {
+          // Retrieve the deliveries array from localStorage
+          deliveriesList = JSON.parse(localStorage.getItem('deliveriesList'));
+
+          console.log(localStorage.getItem('deliveriesList'))
+
+          const newDeliveryItem = document.createElement('div');
+          newDeliveryItem.innerHTML = '';
+
+          // Iterate over the deliveries and display them on the page
+          deliveriesList.forEach(delivery => {
+            console.log("Passed-1")
+            const selectedValue = delivery.deliverytrackingNum;
+            const selectedDeliveryId = delivery.deliveryid;
+            const originalDeliverystatus = delivery.newDeliveryStatus;
+            const originalDeliverystatusdetail = delivery.deliverystatusdetail;
+            const dateDelivery = delivery.selectedDateDelivery;
+
+            console.log("Passed0")
+            appendUIDelivery(selectedValue, originalDeliverystatus, selectedDeliveryId, originalDeliverystatusdetail, dateDelivery)
+
+            console.log("Passed")
+
+            deliveries.push({ deliveryid: selectedDeliveryId, trackingNumber: selectedValue });
+
+          });
+        }
+
+
+
+      }
+
+      document.getElementById('addDeliveryButton').addEventListener('click', async function () {
+        const newDeliveryIdSelect = document.getElementById('newDeliveryId');
+        const selectedValue = newDeliveryIdSelect.value;
+
+        console.log("deliveryid selected to add0: " + selectedValue)
+
+        const foundItem = trackNumbersOutside.find(item => item.trackingnumber === selectedValue);
+
+        if (foundItem) {
+          var selectedDeliveryId = foundItem.deliveryid;
+
+          // Fetch the original deliverystatus and deliverystatusdetail
+          try {
+            const response = await fetch(`/api/deliveries/${selectedDeliveryId}`, {
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',  // You can include other headers if needed
+              },
+            });
+            if (!response.ok) {
+              throw new Error('Failed to retrieve delivery information');
+            }
+
+            const deliveryData = await response.json();
+
+            console.log(JSON.stringify(deliveryData))
+
+            console.log(deliveryData.deliverystatusdetail)
+
+            // Extract deliverystatus and deliverystatusdetail from the fetched data
+            const originalDeliverystatus = deliveryData.deliverystatus;
+            const originalDeliverystatusdetail = deliveryData.deliverystatusdetail;
+            const originalDateTime = deliveryData.deliverydate;
+
+            console.log(originalDeliverystatus + originalDeliverystatusdetail);
+
+            const formattedOriginalDateTime = originalDateTime.replace(' ', 'T').slice(0, -3);
+
+            appendUIDelivery(selectedValue, originalDeliverystatus, selectedDeliveryId, originalDeliverystatusdetail, formattedOriginalDateTime)
+
+            deliveries.push({ deliveryid: selectedDeliveryId, trackingNumber: selectedValue });
+
+            selectedDeliveresForSave = getSelectedDeliveryStatuses()
+            localStorage.setItem('deliveriesList', JSON.stringify(selectedDeliveresForSave));
+
+          } catch (error) {
+            console.error('Error fetching delivery information:', error);
+
+          }
+        } else {
+          console.log(trackNumbersOutside);
+          alert('Please enter a valid Delivery ID.');
+        }
+      });
+
+      function appendUIDelivery(selectedValue, originalDeliverystatus, deliveryid, originalDeliverystatusdetail, formattedOriginalDateTime) {
+
+        console.log("selectedDeliveryId0 is " + deliveryid)
+
+        const deliveryDetailOptionsUnFiltered = [
+          { value: 'Order confirmed', label: 'Order confirmed', num: 1 },
+          { value: 'Ready for pickup by company', label: 'Ready for pickup by company', num: 2 },
+          { value: 'On the way', label: 'On the way', num: 3 },
+          { value: 'Product delivered', label: 'Product delivered', num: 4 },
+
+        ];
+
+        // Find the index of the option with value equal to 'a'
+        const index = deliveryDetailOptionsUnFiltered.findIndex(option => option.value === originalDeliverystatusdetail);
+
+        const deliveryDetailOptions = index !== -1
+          ? deliveryDetailOptionsUnFiltered.slice(index, index + 2)
+          : [];
+
+        const deliveryListContainer = document.getElementById('deliveryList');
+
+        const newDeliveryItem = document.createElement('div');
+        newDeliveryItem.id = `deliveryRow-${selectedValue}`;
+
+        selectedDeliveryId = deliveryid;
+
+
+
+        newDeliveryItem.innerHTML = `
+<div class="form-group row">
+<div class="col-4">
+<label for="additionalStatus${selectedValue}">ID: ${selectedValue} - Main Status</label>
+<select class="form-control" id="additionalStatus${selectedValue}" data-delivery-id="${deliveryid}">
+    <option value="UnDelivered" ${originalDeliverystatus === 'UnDelivered' ? 'selected' : ''}>UnDelivered</option>
+    <option value="Delivered" ${originalDeliverystatus === 'Delivered' ? 'selected' : ''}>Delivered</option>
+    <!-- Add other options as needed -->
+</select>
+</div>
+<div class="col-4">
+<label for="delivery${selectedValue}">ID: ${selectedValue} - Detailed Status</label>
+<select class="form-control" id="delivery${selectedValue}" data-delivery-id="${deliveryid}">
+    <!-- Set default value based on the fetched data -->
+
+
+
+    ${deliveryDetailOptions.map((option, index) =>
+
+          `
+        <option value="${option.value}" ${originalDeliverystatusdetail === option.value ? 'selected' : ''}>
+            ${option.label}
+        </option>
+      
+        
+    `).join('')}
+</select>
+</div>
+<div class="col-4">
+<label for="deliveryDateTime${selectedValue}">ID: ${selectedValue} - Target Delivery</label>
+<input type="datetime-local" class="form-control" id="deliveryDateTime${selectedValue}" data-delivery-id="${deliveryid}" value="${formattedOriginalDateTime}">
+</div>
+</div>
+
+<div class="mx-auto mb-2">
+<button class="btn btn-danger delete-button" data-selected-value="${selectedValue}">Delete</button>
+<button class="btn btn-danger delete-db-button" data-selected-value="${selectedValue}" data-selected-db-value="${selectedDeliveryId}">Delete From Database</button>
+</div>
+`;
+
+
+
+        deliveryListContainer.appendChild(newDeliveryItem);
+
+        // Add an event listener for the delete button
+        const deleteButton = newDeliveryItem.querySelector('.delete-button');
+        if (deleteButton) {
+          deleteButton.addEventListener('click', function () {
+            const selectedValueBtn = this.getAttribute('data-selected-value');
+            removeDeliveryRow(selectedValueBtn);
+          });
+        }
+
+        // Add an event listener for the delete button
+        const deleteButtonDatabase = newDeliveryItem.querySelector('.delete-db-button');
+        if (deleteButtonDatabase) {
+          deleteButtonDatabase.addEventListener('click', function () {
+            const deliveryidBtn = this.getAttribute('data-selected-db-value')
+            const selectedValueBtn = this.getAttribute('data-selected-value');
+
+            console.log("SelectedID: " + deliveryidBtn)
+
+            removeDeliveryRow(selectedValueBtn)
+
+            //deleteDelivery(deliveryidBtn);
+            performSequentialDeleteRequests(deliveryidBtn)
+            populateTrackingNumberDropdown();
+
+
+          });
+        }
+
+        function removeDeliveryRow(selectedValue) {
+          const elementToRemove = document.getElementById(`deliveryRow-${selectedValue}`);
+          if (elementToRemove) {
+            elementToRemove.remove();
+            // Remove the entry from the deliveries array based on trackingNumber
+            deliveries = deliveries.filter(delivery => delivery.trackingNumber !== selectedValue);
+
+            selectedDeliveresForSave = getSelectedDeliveryStatuses()
+            localStorage.setItem('deliveriesList', JSON.stringify(selectedDeliveresForSave));
+          }
+        }
+
+      }
+
+      // Function to get selected delivery statuses
+      function getSelectedDeliveryStatuses() {
+        const selectedDeliveries = [];
+        console.log("deliverylength id " + deliveries.length)
+        deliveries.forEach(delivery => {
+          const deliverySelect = document.getElementById(`additionalStatus${delivery.trackingNumber}`);
+          const selectedStatusDelivery = deliverySelect.options[deliverySelect.selectedIndex].value;
+
+          const deliveryDetailSelect = document.getElementById(`delivery${delivery.trackingNumber}`);
+          const selectedDetailStatusDelivery = deliveryDetailSelect.options[deliveryDetailSelect.selectedIndex].value;
+
+          const deliveryDateSelect = document.getElementById(`deliveryDateTime${delivery.trackingNumber}`);
+          const selectedDateDelivery = deliveryDateSelect.value;
+
+          selectedDeliveries.push({ deliverytrackingNum: delivery.trackingNumber, deliveryid: delivery.deliveryid, newDeliveryStatus: selectedStatusDelivery, deliverystatusdetail: selectedDetailStatusDelivery, selectedDateDelivery: selectedDateDelivery });
+        });
+
+        console.log(selectedDeliveries)
+        return selectedDeliveries;
+      }
+
+  
+      async function updateDeliveryStatus() {
+        const selectedDeliveries = getSelectedDeliveryStatuses();
+
+        if (selectedDeliveries.length < 1) {
+          alert("You did not update any deliveries yet")
+          return;
+        }
+
+        try {
+          const response = await fetch('/api/updateDeliveryStatusBatch', {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(selectedDeliveries),
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to update delivery statuses');
+          }
+
+          localStorage.removeItem('deliveriesList');
+
+          const updatedDeliveries = await response.json();
+          console.log('Updated deliveries:', updatedDeliveries);
+        } catch (error) {
+          console.error('Error updating delivery status:', error);
+        }
+      }
+
+
+      // changing to null
+      const removeDeliveryIDFromOrder = async (deliveryid) => {
+        console.log("turning delivery id to null");
+        try {
+          const response = await fetch(`/api/removeDeliveryIDFromOrder/${deliveryid}`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (!response.ok) {
+            const errorMessage = await response.text();
+            throw new Error(`Remove Delivery ID Error: ${errorMessage}`);
+          }
+
+          const result = await response.json();
+          console.log(result.message);
+        } catch (error) {
+          console.error(error.message);
+          alert("Deletion stopped, changing deliveryID to null in orders table had an error");
+          throw error; 
+        }
+      };
+
+      // checking if cancelled
+      const checkOrderIsCancelled = async (deliveryId) => {
+        console.log("checking if order is cancelled");
+        try {
+          const response = await fetch(`/api/checkIfOrderCancelled/${deliveryId}`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (!response.ok) {
+            alert("Deletion stopped, order is not cancelled");
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+
+          const data = await response.json();
+          console.log(data.message); // This will log the message from the server
+
+        } catch (error) {
+          console.error("Error checking if order is cancelled:", error);
+          throw error; 
+        }
+      };
+
+      // official delete
+      const deleteDelivery = async (deliveryId) => {
+        console.log("deliveryid for delete is " + deliveryId);
+        console.log("official cancelling");
+        try {
+          const response = await fetch(`/api/deliveries/${deliveryId}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            console.log(data.message);
+            alert("Successfully deleted");
+          } else {
+            const errorData = await response.json();
+            console.error(`Error: ${errorData.error}`);
+            alert(errorData.error);
+            throw new Error(`Error: ${errorData.error}`);
+          }
+        } catch (error) {
+          console.error('An error occurred:', error);
+          throw error;
+        }
+      };
+
+      async function performSequentialDeleteRequests(deliveryId) {
+        const deliveryid = deliveryId;
+
+        try {
+
+          console.log(deliveryid);
+          await checkOrderIsCancelled(deliveryid);
+          await removeDeliveryIDFromOrder(deliveryid);
+          console.log("Found it");
+          //await deleteDelivery(deliveryid);
+        } catch (error) {
+          console.error('An error occurred:', error);
+
+        }
+      }
+
+
+      // Attach the event listener
+      document.getElementById('updateStatusButton').addEventListener('click', updateDeliveryStatus);
+
+      // Function to populate the new delivery dropdown with tracking numbers
+      async function populateTrackingNumberDropdown() {
+        const newDeliveryIdDropdown = document.getElementById('newDeliveryId');
+        const searchInput = document.getElementById('searchInput');
+
+        try {
+          const response = await fetch('/api/trackingnumbers', {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',  // You can include other headers if needed
+            },
+          });
+          if (!response.ok) {
+            throw new Error('Failed to retrieve tracking numbers');
+          }
+
+          const trackingNumbersAndDelivery = await response.json();
+
+
+          trackNumbersOutside = trackingNumbersAndDelivery.map(item => ({
+            deliveryid: item.deliveryid,
+            trackingnumber: item.trackingnumber
+          }));
+
+          newDeliveryIdDropdown.innerHTML = ''; // Clear existing options
+
+          trackNumbersOutside.forEach(({ deliveryid, trackingnumber }) => {
+            if (trackingnumber.includes(searchInput.value)) {
+              const option = document.createElement('option');
+              option.value = trackingnumber;
+              option.text = trackingnumber;
+
+              option.id = `delivery-${deliveryid}`; // Include deliveryid in the option's id
+              newDeliveryIdDropdown.appendChild(option);
+            }
+          });
+        } catch (error) {
+          console.error('Error retrieving tracking numbers:', error);
+        }
+      }
+
+      populateTrackingNumberDropdown();
+
+
+
+    });
+  </script>
+  <!--<script src="./js/headerFooter.js"></script>--->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+
+</html>

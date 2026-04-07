@@ -1,0 +1,58 @@
+/* Chatroom.css */
+
+// Name: Ang Wei Liang
+// Admin No: 2227791
+// Class: DIT/FT/2B/02
+// DeliveryVer: 2.4
+
+.chatroom-container {
+  width: 400px;
+  margin: 50px auto;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.chatroom-header {
+  background-color: #3498db;
+  color: #fff;
+  padding: 10px;
+  text-align: center;
+}
+
+.chatroom-messages {
+  padding: 10px;
+  max-height: 300px;
+  color: black;
+  overflow-y: auto;
+}
+
+.message {
+  margin-bottom: 8px;
+  padding: 8px;
+  background-color: #f1f1f1;
+  border-radius: 4px;
+}
+
+.chatroom-input {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+}
+
+input {
+  flex: 1;
+  padding: 8px;
+  margin-right: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+button {
+  padding: 8px 16px;
+  background-color: #3498db;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}

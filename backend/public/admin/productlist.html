@@ -1,0 +1,66 @@
+<!-- 
+order list design is referenced from the following websites:
+https://uibundle.s3.amazonaws.com/images/product-cover-1650458445-product-cover-1650443384-customer-list-table-ui-design-1-png-1-png
+ -->
+
+ <!DOCTYPE html>
+ <html lang="en">
+ 
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>DailyHype | Order List</title>
+     <link rel="icon" href="../user/img/logo.png" type="image/png">
+     <link rel="stylesheet" href="./css/sidebar.css">
+     <link rel="stylesheet" href="./css/orderlist.css">
+     <link rel="stylesheet" href="./css/table.css">
+     <link rel="stylesheet" href="./css/pagination.css">
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+         integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+         integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+         crossorigin="anonymous"></script>
+     <script src="https://kit.fontawesome.com/c45fbf7d3d.js" crossorigin="anonymous"></script>
+ </head>
+ 
+ <body>
+     <div class="main">
+         <div id="sidebar"></div>
+         <div class="main-content">
+             <div class="order-list">
+                 <h1>Product List</h1>
+                 <div class="custom-table-container">
+                     <table class="custom-table producttable">
+                     </table> 
+                 </div>
+                 <div class="pagination">
+                 </div>
+             </div>
+         </div>
+     </div>
+ 
+     <script src="./js/sidebar.js"></script>
+     <script src="./js/table.js"></script>
+     <script src="./js/productlist.js"></script>
+     <script src="./js/pagination.js"></script>
+     <script>
+         let headers = ["Image", "Product ID", "Product Name", "Unit Price", "Description", "CategoryName", "Action"];
+ 
+         window.onload = function () {
+             loadSideBar("productlist");
+             Promise.all([getProductData(0), getProductCount()])
+                 .then(([productData, productCount]) => {
+                     // data example => [["#1", "27.11.2023"], ["#2", "28.11.2023"], [], ...]
+                     // the first parameter takes the table class name which you can give anything
+                     loadTable("producttable", headers, productData);
+                     loadPagination(productCount, 1, getNewProductData);
+                 })
+                 .catch((error) => {
+                     console.error(error);
+                     alert("Unknown Error");
+                 });
+         }
+     </script>
+ </body>
+ 
+ </html>

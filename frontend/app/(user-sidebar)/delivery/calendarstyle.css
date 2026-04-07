@@ -1,0 +1,58 @@
+/* Name: Ang Wei Liang
+ Admin No: 2227791
+ Class: DIT/FT/2B/02
+ DeliveryVer: 2.4*/
+
+.App {
+  font-family: sans-serif;
+  text-align: center;
+}
+.react-calendar {
+  margin: 0 auto;
+}
+
+/*.dropdownoptions {
+    margin: 0 auto;
+  }*/
+
+h2 {
+  margin-bottom: 60px;
+}
+
+.green-circle {
+  width: 15px;
+  height: 15px;
+  background-color: green;
+  border-radius: 50%;
+  margin: auto;
+}
+
+.blue-circle {
+  width: 15px;
+  height: 15px;
+  background-color: blue;
+  border-radius: 50%;
+  margin: auto;
+}
+
+/* .progress {
+    height: 20px;
+    margin-top: 10px;
+  }
+  
+  .progress-bar {
+    background-color: #007bff; 
+  }
+  
+
+  .react-calendar {
+    color: black; 
+  }*/
+
+.react-calendar .react-calendar__tile--active {
+  background-color: #4a5568;
+}
+
+/*.greyColor {
+  color: 1px solid #888888;
+}*/

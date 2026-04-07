@@ -1,0 +1,75 @@
+<!-- 
+Name: Angie Toh Anqi
+Admin No: 2227915
+Class: DIT/FT/2B/02
+Date: 30.11.2023
+Description: Page to view review detail
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DailyHype | Review Detail</title>
+    <link rel="icon" href="../user/img/logo.png" type="image/png">
+    <link rel="stylesheet" href="./css/sidebar.css">
+    <link rel="stylesheet" href="./css/orderlist.css">
+    <link rel="stylesheet" href="./css/table.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/c45fbf7d3d.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div class="main">
+        <div id="sidebar"></div>
+        <div class="main-content">
+            <div class="order-list">
+                <h1>Review Detail</h1>
+                <div class="order-detail">
+                    <div class="column">
+                        <div class="label-div">
+                            <label>Review ID:</label>
+                            <label>Cutomer Name:</label>
+                            <label>Product Name:</label>
+                        </div>
+                        <div class="value-div">
+                            <label id="reviewid"></label>
+                            <label id="customername"></label>
+                            <label id="productname"></label>
+                        </div>
+                    </div>
+                </div>
+                <div id="button-group">
+                </div>
+                <div style="margin-bottom: 16px;" class="custom-table-container">
+                    <table class="custom-table reviewdetailtable">
+                    </table>
+                </div>
+                <a style="text-decoration: none; float: right;" href="reviewlist.html">Back to Review List</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="./js/sidebar.js"></script>
+    <script src="./js/table.js"></script>
+    <script src="./js/reviewdetail.js"></script>
+    <script>
+        let headers = ["Rating", "Description", "Action"];
+        const urlSearchParams = new URLSearchParams(window.location.search);
+        const params = Object.fromEntries(urlSearchParams.entries());
+        const reviewid = params.id;
+
+        window.onload = function () {
+            loadSideBar("reviewlist");
+            getReviewDetail(reviewid, "reviewdetailtable", headers, loadTable);
+        }
+    </script>
+</body>
+
+</html>

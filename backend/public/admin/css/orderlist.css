@@ -1,0 +1,128 @@
+.order-list {
+    display: block;
+    width: 99%;
+    margin-top: 12px;
+}
+
+.order-list h1 {
+    font-size: 25px;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.status-delivered {
+    font-size: 13px;
+    background-color: green;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 8px;
+}
+
+.status-confirmed {
+    font-size: 13px;
+    background-color: rgba(19, 51, 237, 0.7);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 8px;
+}
+
+.status-in-progress {
+    font-size: 13px;
+    background-color: rgb(250, 200, 0);
+    padding: 4px 12px;
+    border-radius: 8px;
+}
+
+.status-received {
+    background-color: #999999;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+.status-cancelled {
+    background-color: rgba(200, 30, 50, 0.8);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+.btn-confirm {
+    padding: 8px 12px;
+    background-color: rgba(19, 51, 237, 0.7);
+    outline: none;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    margin: 4px;
+    box-shadow: 1px 1px 5px 0px rgba(0, 0, 0, 0.2);
+}
+
+.btn-cancel {
+    background-color: rgba(200, 30, 50, 0.8);
+    outline: none;
+    border: none;
+    font-size: 13px;
+    margin: 4px;
+    padding: 8px 12px;
+    color: white;
+    border-radius: 8px;
+    box-shadow: 1px 1px 5px 0px rgba(0, 0, 0, 0.2);
+}
+
+.btn-view {
+    background-color: #999999;
+    outline: none;
+    border: none;
+    font-size: 13px;
+    margin: 4px;
+    padding: 8px 12px;
+    color: white;
+    border-radius: 8px;
+    box-shadow: 1px 1px 5px 0px rgba(0, 0, 0, 0.2);
+}
+
+.order-detail {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+}
+
+.order-detail .column {
+    display: flex;
+    min-width: 25%;
+    justify-content: space-around;
+}
+
+.order-detail .label-div {
+    display: flex;
+    flex-direction: column;
+}
+
+.order-detail .label-div label {
+    margin-bottom: 12px;
+}
+
+.order-detail .value-div {
+    display: flex;
+    flex-direction: column;
+    margin-left: 8px;
+}
+
+.order-detail .value-div label {
+    margin-bottom: 12px;
+}
+
+#button-group {
+    display: flex;
+    justify-content: flex-end;
+    margin-right: 16px;
+    align-items: center;
+}
+
+#button-group button {
+    margin-right: 16px;
+}

@@ -1,0 +1,48 @@
+<nav class="navbar navbar-expand-lg text-bg-dark px-5 py-1">
+  <div class="container-fluid">
+    <a class="navbar-brand text-white" href="/index">
+      <img src="./img/logo-light.png" width="160" height="45" />
+    </a>
+    <button class="navbar-toggler bg-white" type="button" data-bs-toggle="collapse"
+      data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+      aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon text-white"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ms-auto me-3 mb-2 mb-lg-0">
+        <li id="home" class="nav-item">
+          <a class="nav-link text-white" aria-current="page" href="index.html">Home</a>
+        </li>
+        <li id="product" class="nav-item">
+          <a class="nav-link text-white" href="product.html">Product</a>
+        </li>
+        <li id="cart" class="nav-item">
+          <a class="nav-link text-white" href="cart.html">Your Cart (0)</a>
+        </li>
+        <li id="profile" class="nav-item">
+          <a class="nav-link text-white" href="profile.html">Profile</a>
+        </li>
+
+        <li id="profile" class="nav-item">
+          <a class="nav-link text-white" href="order.html">Order</a>
+        </li>
+
+        <!--For testing purposes, this will be included when person is not signed in-->
+        <li id="delivery" class="nav-item">
+          <a class="nav-link text-white" href="delivery.html">Delivery</a>
+        </li>
+
+        <li id="signout" class="nav-item">
+          <a class="nav-link text-white" onclick="localStorage.removeItem('token'); location = 'login.html';">Sign
+            Out</a>
+        </li>
+        <li id="signin" class="nav-item">
+          <a class="nav-link text-white" href="login.html">Sign In</a>
+        </li>
+        <li id="signup" class="nav-item">
+          <a class="nav-link text-white" href="signup.html">Sign Up</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>

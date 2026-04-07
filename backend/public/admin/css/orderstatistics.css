@@ -1,0 +1,78 @@
+.order-statistics {
+    display: block;
+    width: 99%;
+    margin-top: 12px;
+}
+
+.order-statistics h1 {
+    font-size: 25px;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.order-statistics .statistics-options {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    margin-top: 20px;
+    border-radius: 8px;
+    padding: 40px 0;
+    width: 80%;
+    box-shadow: 1px 1px 5px 0px #aaa;
+}
+
+.statistics-options>div {
+    display: flex;
+    flex: row;
+    justify-content: space-around;
+    margin-left: 120px;
+}
+
+.statistics-options>div:first-of-type {
+    margin-left: 0px;
+}
+
+.statistics-options .column {
+    display: flex;
+    flex-direction: column;
+}
+
+.statistics-options .column .detail-options {
+    margin-bottom: 16px;
+}
+
+.statistics-options .column .detail-options label {
+    min-width: 150px;
+    letter-spacing: 1px;
+}
+
+.statistics-options .column .detail-options input,
+.statistics-options .column .detail-options select,
+.statistics-options .column .detail-options select optgroup {
+    min-width: 200px;
+    max-width: 200px;
+    border-radius: 8px;
+    outline: none;
+    border: none;
+    font-size: 14px;
+    padding: 4px;
+    border-right: 12px solid transparent;
+    border-left: 5px solid transparent;
+    box-shadow: 1px 1px 6px 0px rgba(0, 0, 0, 0.2);
+}
+
+.btn-generate {
+    padding: 8px 16px;
+    margin: auto;
+    border-radius: 8px;
+    padding: 8px 12px;
+    background-color: rgba(19, 51, 237, 0.7);
+    outline: none;
+    color: white;
+    border: none;
+    box-shadow: 1px 1px 5px 0px rgba(0, 0, 0, 0.2);
+}
+
+#orderChart {
+    margin: 48px 0 40px 0;
+}

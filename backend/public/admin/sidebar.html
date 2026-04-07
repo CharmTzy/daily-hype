@@ -1,0 +1,75 @@
+<!-- 
+// Name: Zay Yar Tun
+// Admin No: 2235035
+// Class: DIT/FT/2B/02
+// Date: 1.12.2023
+sidebar ui is referenced from the following websites:
+https://dribbble.com/shots/23121089-Sidebar-User-Interface
+ -->
+<div id="sidebar">
+    <div class="sidebar-top">
+        <a href="./index.html">DailyHype</a>
+    </div>
+    <button class="toggle-menu" title="Open/Close Sidebar" onclick="toggleMenu()"><i
+            class="fa-solid fa-bars"></i></button>
+    <hr class="line-breaker">
+    <div class="sidebar-items">
+        <div class="item" id="dashboard" onclick="location = 'index.html';">
+            <i class="fa-solid fa-house"></i>
+            <a>Dashboard</a>
+        </div>
+        <div class="item" id="userform" onclick="location = 'userform.html';">
+            <i class="fa-regular fa-file"></i>
+            <a>User Form</a>
+        </div>
+        <div class="item" id="productform" onclick="location = 'productRegistration.html';">
+            <i class="fa-regular fa-file"></i>
+            <a>Product Form</a>
+        </div>
+        <div class="item" id="deliveryform" onclick="location = 'delivery.html';">
+            <i class="fa-regular fa-file"></i>
+            <a>Delivery Form</a>
+        </div>
+        <div class="item" id="userlist" onclick="location = 'userlist.html';">
+            <i class="fa-regular fa-user"></i>
+            <a>User List</a>
+        </div>
+        <div class="item" id="productlist" onclick="location = 'productlist.html';">
+            <i class="fa-solid fa-shirt"></i>
+            <a>Product List</a>
+        </div>
+        <div class="item" id="orderlist" onclick="location = 'orderlist.html';">
+            <i class="fa-solid fa-list"></i>
+            <a>Order List</a>
+        </div>
+
+        <div class="item" id="deliverylist" onclick="location = 'deliverystats.html';">
+            <i class="fa-solid fa-bicycle"></i>
+            <a>Delivery List</a>
+        </div>
+        <div class="item" id="reviewlist" onclick="location = 'reviewlist.html';">
+            <i class="fa-regular fa-star"></i>
+            <a>Review List</a>
+        </div>
+        <div class="item" id="userstatistics" onclick="location = 'userstatistic.html';">
+            <i class="fa-solid fa-list"></i>
+            <a>User Statistics</a>
+        </div>
+        <div class="item" id="productstatistics" onclick="location = 'productstatistics.html';">
+            <i class="fa-solid fa-list"></i>
+            <a>Product Statistics</a>
+        </div>
+        <div class="item" id="orderstatistics" onclick="location = 'orderstatistics.html';">
+            <i class="fa-solid fa-chart-simple"></i>
+            <a>Order Statistics</a>
+        </div>
+        <div class="item" id="deliverystatistics" onclick="location = 'deliverychart.html';">
+            <i class="fa-solid fa-list"></i>
+            <a>Delivery Statistics</a>
+        </div>
+        <div class="item" onclick="localStorage.removeItem('token'); location = '../user/login.html';">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            <a>Sign Out</a>
+        </div>
+    </div>
+</div>

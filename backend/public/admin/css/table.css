@@ -1,0 +1,33 @@
+.custom-table-container {
+    width: 100%;
+    margin-top: 20px;
+    border: 1px dotted #777;
+    border-radius: 8px;
+    cursor: default;
+    overflow-y: hidden;
+    overflow-x: auto;
+}
+
+.custom-table {
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 100%;
+}
+
+.custom-table tr th {
+    font-weight: 600;
+    color: #333;
+    padding: 16px 8px;
+    min-width: 100px;
+    text-align: center;
+}
+
+.custom-table tr td {
+    text-align: center;
+    padding: 12px;
+    font-size: 15px;
+}
+
+.custom-table tr:nth-of-type(n+2):hover {
+    background-color: rgba(50, 50, 50, 0.1);
+}

@@ -1,0 +1,140 @@
+body {
+    margin: 0;
+    font-family: "poynter-oldstyle-display", 'Arial', sans-serif;
+}
+
+.page-title {
+    color: #333;
+    text-align: center;
+    padding: 20px;
+}
+
+.page-title h1 {
+    margin: 0;
+    font-size: 2em;
+}
+
+.product-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 15px; /* Adjust margin as needed */
+}
+
+.product-item {
+    width: calc(25% - 30px); /* Adjust width and margin as needed */
+    margin: 15px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    padding: 15px;
+}
+
+.product-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.product-details {
+    text-align: left;
+    margin-left: 10px; 
+}
+
+.category {
+    text-transform: uppercase; /* Convert text to uppercase */
+    opacity: 0.6; /* Add fade effect (adjust opacity as needed) */
+    margin: 5px 0px; /* Add some bottom margin for spacing */
+}
+
+.rating-icon {
+    color: #FFD700; /* Golden yellow color for stars */
+    font-size: 1.2em;
+    margin-right: 5px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px;
+}
+
+
+
+.total-pages {
+    display: flex;
+    align-items: center;
+}
+
+.page-info {
+    margin-right: 10px;
+}
+
+.current-page {
+    font-weight: bold;
+    text-align: center;
+}
+
+.current-page span {
+    font-size: 1.2em;
+    margin: 0 5px;
+}
+
+.sf-pagination {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  padding: 0;
+}
+
+.left-arrows,
+.right-arrows {
+  display: flex;
+}
+
+.sf-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.sf-pagination-item,
+.sf-pagination-item-current {
+  margin: 0 5px;
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  text-decoration: none;
+  color: #333;
+  border-radius: 5px;
+}
+
+.sf-pagination-item-current {
+  background-color: #333;
+  color: #fff;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+    .product-item {
+        width: calc(33.33% - 30px); /* Adjust width for medium screens */
+    }
+}
+
+@media (max-width: 768px) {
+    .product-item {
+        width: calc(50% - 30px); /* Adjust width for small screens */
+    }
+}
+
+@media (max-width: 576px) {
+    .product-item {
+        width: 100%; /* Full width for extra small screens */
+    }
+}
+
+.product-item:hover .product-image,
+.product-item:hover .product-details {
+  cursor: pointer;
+}

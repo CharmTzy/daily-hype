@@ -1,0 +1,52 @@
+{
+  "dependencies": {
+    "axios": "^1.6.7",
+    "bcrypt": "^5.1.1",
+    "cloudinary": "^1.41.3",
+    "cookie": "^0.6.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.1",
+    "express": "^4.18.2",
+    "fs-extra": "^11.2.0",
+    "http": "^0.0.1-security",
+    "http-errors": "^2.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^1.4.5-lts.1",
+    "next-auth": "^4.24.5",
+    "nodemailer": "^6.9.8",
+    "path": "^0.12.7",
+    "pg": "^8.11.3",
+    "redis": "^4.6.12",
+    "request-ip": "^3.3.0",
+    "sharp": "^0.33.2",
+    "socket.io": "^4.7.3",
+    "stripe": "^14.14.0"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "eslint": "eslint ."
+  },
+  "devDependencies": {
+    "eslint": "^8.38.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-import": "^2.27.5",
+    "nodemon": "^2.0.19"
+  },
+  "name": "ades-ca1",
+  "description": "1. P2235035 Zay Yar Tun\r 2. P2234993 Wai Yan Aung\r 3. P2227791 Ang Wei Liang\r 4. P2235022 Thu Htet San\r 5. P2227915 Angie Toh Anqi",
+  "version": "1.0.0",
+  "main": ".eslintrc.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CharmTzy/assignment-ay2324s2-ay2324s2-class-2b02-team-1.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CharmTzy/assignment-ay2324s2-ay2324s2-class-2b02-team-1/issues"
+  },
+  "homepage": "https://github.com/CharmTzy/assignment-ay2324s2-ay2324s2-class-2b02-team-1#readme"
+}

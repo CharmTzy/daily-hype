@@ -1,0 +1,180 @@
+import KeyboardArrowDown from "@mui/icons-material/KeyboardArrowDown";
+import { ErrorMessage, URL } from "@/enums/global-enums";
+import { getAdminReviewStat } from "@/functions/review-functions";
+import Select, { selectClasses } from "@mui/joy/Select";
+import Option from "@mui/joy/Option";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
+import BarChart from "@/components/charts/bar-chart";
+
+const LineChart = dynamic(() => import("@/components/charts/line-chart"));
+const PieChart = dynamic(() => import("@/components/charts/pie-chart"));
+
+const yearOptions: number[] = [];
+for (let i = 0; i < 10; i++) {
+  yearOptions.push(new Date().getFullYear() - i);
+}
+
+export default function UserReport() {
+  const [year, setYear] = useState(new Date().getFullYear());
+  const [chart, setChart] = useState<"bar" | "line" | "pie">("bar");
+  const router = useRouter();
+
+  const [data, setData] = useState([
+    { data: [0, 0, 0, 0, 0], label: "Rating 1" },
+    { data: [0, 0, 0, 0, 0], label: "Rating 2" },
+    { data: [0, 0, 0, 0, 0], label: "Rating 3" },
+    { data: [0, 0, 0, 0, 0], label: "Rating 4" },
+    { data: [0, 0, 0, 0, 0], label: "Rating 5" },
+  ]);
+
+  const ratingColors = [
+  "rgba(255, 99, 132, 0.5)",
+  "rgba(255, 206, 86, 0.5)",
+  "rgba(75, 192, 192, 0.5)",
+  "rgba(54, 162, 235, 0.5)",
+  "rgba(153, 102, 255, 0.5)",
+];
+
+// Update barChartData
+const [barChartData, setBarChartData] = useState([
+  { data: [0, 0, 0, 0], label: "Rating 1", backgroundColor: ratingColors[0] },
+  { data: [0, 0, 0, 0], label: "Rating 2", backgroundColor: ratingColors[1] },
+  { data: [0, 0, 0, 0], label: "Rating 3", backgroundColor: ratingColors[2] },
+  { data: [0, 0, 0, 0], label: "Rating 4", backgroundColor: ratingColors[3] },
+  { data: [0, 0, 0, 0], label: "Rating 5", backgroundColor: ratingColors[4] },
+]);
+
+// Update lineChartData
+const [lineChartData, setLineChartData] = useState([
+  { data: [0, 0, 0, 0], label: "Rating 1", backgroundColor: ratingColors[0], borderColor: "rgb(255, 99, 132)" },
+  { data: [0, 0, 0, 0], label: "Rating 2", backgroundColor: ratingColors[1], borderColor: "rgb(255, 206, 86)" },
+  { data: [0, 0, 0, 0], label: "Rating 3", backgroundColor: ratingColors[2], borderColor: "rgb(75, 192, 192)" },
+  { data: [0, 0, 0, 0], label: "Rating 4", backgroundColor: ratingColors[3], borderColor: "rgb(54, 162, 235)" },
+  { data: [0, 0, 0, 0], label: "Rating 5", backgroundColor: ratingColors[4], borderColor: "rgb(153, 102, 255)" },
+]);
+
+// Update pieChartData
+const [pieChartData, setPieChartData] = useState([
+  { data: [0, 0, 0, 0], label: "Rating 1", backgroundColor: ratingColors, borderColor: ratingColors.map(color => color.replace('0.5', '1')), borderWidth: 1 },
+  { data: [0, 0, 0, 0], label: "Rating 2", backgroundColor: ratingColors, borderColor: ratingColors.map(color => color.replace('0.5', '1')), borderWidth: 1 },
+]);
+
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      // Replace the user-related function with the one for fetching review statistics
+      // Adjust the function to fetch review statistics based on your application's logic
+      getAdminReviewStat(year).then((result) => {
+        if (result.error) {
+          // Handle errors if needed
+        } else {
+          const tempData = result.data || [];
+          const tempData2 = [
+            { data: [0, 0, 0, 0, 0], label: "Rating 1" },
+            { data: [0, 0, 0, 0, 0], label: "Rating 2" },
+            { data: [0, 0, 0, 0, 0], label: "Rating 3" },
+            { data: [0, 0, 0, 0, 0], label: "Rating 4" },
+            { data: [0, 0, 0, 0, 0], label: "Rating 5" },
+          ];
+          tempData.forEach((item) => {
+            // Adjust the logic to populate the data based on your review data structure
+            // tempData2[item.rating - 1].data[parseInt(item.quarter) - 1] += 1;
+          });
+          setData(tempData2);
+        }
+      });
+    }, 500);
+  
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [year]);
+
+  useEffect(() => {
+    if (chart === "bar") {
+      setBarChartData(data.map((d) => ({
+        ...d,
+        backgroundColor: d.label === "Male" ? "rgba(255, 99, 132, 0.5)" : "rgba(53, 162, 235, 0.5)",
+      })));
+    } else if (chart === "pie") {
+      setPieChartData(data.map((d) => ({
+        ...d,
+        backgroundColor: ["rgba(255, 99, 132, 0.2)", "rgba(54, 162, 235, 0.2)", "rgba(255, 206, 86, 0.2)", "rgba(75, 192, 192, 0.2)"],
+        borderColor: ["rgba(255, 99, 132, 1)", "rgba(54, 162, 235, 1)", "rgba(255, 206, 86, 1)", "rgba(75, 192, 192, 1)"],
+        borderWidth: 1,
+      })));
+    } else {
+      setLineChartData(data.map((d) => ({
+        ...d,
+        backgroundColor: d.label === "Male" ? "rgba(255, 99, 132, 0.5)" : "rgba(53, 162, 235, 0.5)",
+        borderColor: d.label === "Male" ? "rgb(255, 99, 132)" : "rgb(53, 162, 235)",
+      })));
+    }
+  }, [data, chart]);
+  
+
+  return (
+    <div>
+      <div className="flex justify-center mt-8">
+        <div className="flex items-center mr-8">
+          <label className="mr-4 text-[14px]">Year: </label>
+          <Select
+            indicator={<KeyboardArrowDown />}
+            size="sm"
+            value={year}
+            onChange={(e, newValue) => {
+              if (typeof newValue !== "number") {
+                return;
+              }
+              setYear(newValue);
+            }}
+            sx={{
+              width: "250px",
+              [`& .${selectClasses.indicator}`]: {
+                transition: "0.2s",
+                [`&.${selectClasses.expanded}`]: {
+                  transform: "rotate(-180deg)",
+                },
+              },
+            }}
+          >
+            {yearOptions.map((item, index) => (
+              <Option value={item} key={index}>
+                {item}
+              </Option>
+            ))}
+          </Select>
+        </div>
+        <div className="flex items-center ms-8">
+          <label className="mr-4 text-[14px]">Chart: </label>
+          <Select
+            indicator={<KeyboardArrowDown />}
+            size="sm"
+            value={chart}
+            onChange={(e, newValue) => {
+              if (newValue === "bar" || newValue === "line" || newValue === "pie") setChart(newValue);
+            }}
+            sx={{
+              width: "250px",
+              [`& .${selectClasses.indicator}`]: {
+                transition: "0.2s",
+                [`&.${selectClasses.expanded}`]: {
+                  transform: "rotate(-180deg)",
+                },
+              },
+            }}
+          >
+            <Option value="bar">Bar Chart</Option>
+            <Option value="line">Line Chart</Option>
+            <Option value="pie">Pie Chart</Option>
+          </Select>
+        </div>
+      </div>
+      {chart === "bar" && <BarChart className="mt-2" chartTitle="Revenue by Quarter" labels={["Quarter 1", "Quarter 2", "Quarter 3", "Quarter 4"]} datasets={barChartData} onClick={(value) => alert(value)} />}
+      {chart === "line" && <LineChart className="mt-2" chartTitle="Revenue by Quarter" labels={["Quarter 1", "Quarter 2", "Quarter 3", "Quarter 4"]} datasets={lineChartData} onClick={(value) => alert(value)} />}
+      {chart === "pie" && <PieChart chartTitle="Revenue by Quarter" labels={["Quarter 1", "Quarter 2", "Quarter 3", "Quarter 4"]} datasets={pieChartData} onClick={(value) => alert(value)} />}
+    </div>
+  );
+}

@@ -1,0 +1,90 @@
+<!-- 
+// Name: Zay Yar Tun
+// Admin No: 2235035
+// Class: DIT/FT/2B/02
+// Date: 1.12.2023
+ -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DailyHype | Order Detail List</title>
+    <link rel="icon" href="../user/img/logo.png" type="image/png">
+    <link rel="stylesheet" href="./css/sidebar.css">
+    <link rel="stylesheet" href="./css/orderlist.css">
+    <link rel="stylesheet" href="./css/table.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/c45fbf7d3d.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div class="main">
+        <div id="sidebar"></div>
+        <div class="main-content">
+            <div class="order-list">
+                <h1>Order Detail</h1>
+                <div class="order-detail">
+                    <div class="column">
+                        <div class="label-div">
+                            <label>Order No:</label>
+                            <label>Customer Name:</label>
+                            <label>Total Qty:</label>
+                            <label>Payment Method:</label>
+                        </div>
+                        <div class="value-div">
+                            <label id="orderid"></label>
+                            <label id="name"></label>
+                            <label id="totalqty"></label>
+                            <label id="paymentmethod"></label>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="label-div">
+                            <label>Order Date:</label>
+                            <label>Delivery Address:</label>
+                            <label>Total Amount:</label>
+                            <label>Order Status:</label>
+                        </div>
+                        <div class="value-div">
+                            <label id="createdat"></label>
+                            <label id="deliveryaddress"></label>
+                            <label id="totalamount"></label>
+                            <label id="orderstatus"></label>
+                        </div>
+                    </div>
+                </div>
+                <div id="button-group">
+                </div>
+                <div style="margin-bottom: 16px;" class="custom-table-container">
+                    <table class="custom-table orderdetailtable">
+                    </table>
+                </div>
+                <a style="text-decoration: none; float: right;" href="orderlist.html">Back to Order List</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="./js/sidebar.js"></script>
+    <script src="./js/table.js"></script>
+    <script src="./js/orderdetail.js"></script>
+    <script>
+        let headers = ["Image", "Product ID", "Product Name", "Qty", "Unit Price", "Colour", "Size"];
+        const urlSearchParams = new URLSearchParams(window.location.search);
+        const params = Object.fromEntries(urlSearchParams.entries());
+        const orderid = params.id;
+
+        window.onload = function () {
+            loadSideBar("orderlist");
+            getOrderDetail(orderid, "orderdetailtable", headers, loadTable);
+        }
+    </script>
+</body>
+
+</html>

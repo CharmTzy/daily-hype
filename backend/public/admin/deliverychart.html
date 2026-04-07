@@ -1,0 +1,787 @@
+<!--
+
+/ Name: Ang Wei Liang
+// Admin No: 2227791
+// Class: DIT/FT/2B/02
+// Date: 1.12.2023
+// Description: Admin HTML and JS for delivery statistics
+// Ver 2
+
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DailyHype | Delivery Statistics</title>
+    <link rel="icon" href="../user/img/logo.png" type="image/png">
+    <link rel="stylesheet" href="./css/sidebar.css">
+    <link rel="stylesheet" href="./css/deliveryform.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+
+    <script src="https://kit.fontawesome.com/c45fbf7d3d.js" crossorigin="anonymous"></script>
+
+
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <!-- Bootstrap Datepicker CSS -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./css/sidebar.css">
+</head>
+
+<body>
+
+    <div class="main">
+        <div id="sidebar"></div>
+        <div class="main-content">
+
+            <div class="container mt-5">
+
+                <div class="container mt-5">
+                    <div class="card">
+                        <div class="card-header">
+                            <ul class="nav nav-tabs card-header-tabs">
+                                <li class="nav-item">
+                                    <a class="nav-link active" id="broadSearchTab" data-toggle="tab"
+                                        href="#broadSearch">Broad
+                                        Search</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="shirtTypeSearchTab" data-toggle="tab"
+                                        href="#shirtTypeSearch">Shirt
+                                        Type Search</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="userLocationSearchTab" data-toggle="tab"
+                                        href="#userLocationSearch">User Location Area</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" id="deliveryTimeSearchTab" data-toggle="tab"
+                                        href="#daypartSearch">Delivery Day Part</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="card-body tab-content">
+                            <!-- Broad Search Tab Content -->
+                            <div class="tab-pane fade show active" id="broadSearch">
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-md-6 mx-auto">
+                                            <label for="searchInput1">Broad Search:</label>
+                                            <input type="text" id="searchInput1" class="form-control mb-3"
+                                                oninput="populateBroadDropdown()">
+
+                                            <label for="newBroadId">Broad Type:</label>
+                                            <select id="newBroadId" class="form-control"></select>
+                                        </div>
+
+                                        <div class="col-md-6 mx-auto">
+                                            <div class="form-group">
+                                                <label for="deliveryDateRangePickerA1">Delivery Time Pick (Range):
+                                                    From</label>
+                                                <input type="text" id="deliveryDateRangePickerA1"
+                                                    class="form-control mb-3" data-provide="datepicker"
+                                                    data-date-format="yyyy-mm-dd" data-date-autoclose="true"
+                                                    data-date-today-highlight="true" data-date-clear-btn="true"
+                                                    data-date-multidate="2">
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="deliveryDateRangePickerB1">To</label>
+                                                <input type="text" id="deliveryDateRangePickerB1"
+                                                    class="form-control mb-3" data-provide="datepicker"
+                                                    data-date-format="yyyy-mm-dd" data-date-autoclose="true"
+                                                    data-date-today-highlight="true" data-date-clear-btn="true"
+                                                    data-date-multidate="2">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-12 text-center">
+                                            <button class="btn btn-primary"
+                                                onclick="submitForm('broadSearch')">Submit</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <!-- Shirt Type Search Tab Content -->
+                            <div class="tab-pane fade" id="shirtTypeSearch">
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-md-6 mx-auto">
+                                            <label for="searchInput">Shirt Type Search:</label>
+                                            <input type="text" id="searchInput" class="form-control mb-3"
+                                                oninput="populateProductCatDropdown()">
+
+                                            <label for="newCategoryId">Select Shirt Type Search:</label>
+                                            <select id="newCategoryId" class="form-control"></select>
+                                        </div>
+
+                                        <div class="col-md-6 mx-auto">
+                                            <div class="form-group">
+                                                <label for="deliveryDateRangePickerA2">Delivery Time Pick (Range):
+                                                    From</label>
+                                                <input type="text" id="deliveryDateRangePickerA2"
+                                                    class="form-control mb-3" data-provide="datepicker"
+                                                    data-date-format="yyyy-mm-dd" data-date-autoclose="true"
+                                                    data-date-today-highlight="true" data-date-clear-btn="true"
+                                                    data-date-multidate="2">
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="deliveryDateRangePickerB2">To</label>
+                                                <input type="text" id="deliveryDateRangePickerB2"
+                                                    class="form-control mb-3" data-provide="datepicker"
+                                                    data-date-format="yyyy-mm-dd" data-date-autoclose="true"
+                                                    data-date-today-highlight="true" data-date-clear-btn="true"
+                                                    data-date-multidate="2">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-12 text-center">
+                                            <button class="btn btn-primary"
+                                                onclick="submitForm('shirtTypeSearch')">Submit</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <!-- User Location Area Tab Content -->
+                            <div class="tab-pane fade" id="userLocationSearch">
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-md-6 mx-auto">
+                                            <label for="searchInput3">Search User Location Area:</label>
+                                            <input type="text" id="searchInput3" class="form-control mb-3"
+                                                oninput="populateUserRegionDropdown()">
+
+                                            <label for="newUserRegionId">Select User Location Area:</label>
+                                            <select id="newUserRegionId" class="form-control"></select>
+                                        </div>
+
+                                        <div class="col-md-6 mx-auto">
+                                            <div class="form-group">
+                                                <label for="deliveryDateRangePickerA3">Delivery Time Pick (Range):
+                                                    From</label>
+                                                <input type="text" id="deliveryDateRangePickerA3"
+                                                    class="form-control mb-3" data-provide="datepicker"
+                                                    data-date-format="yyyy-mm-dd" data-date-autoclose="true"
+                                                    data-date-today-highlight="true" data-date-clear-btn="true"
+                                                    data-date-multidate="2">
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="deliveryDateRangePickerB3">To</label>
+                                                <input type="text" id="deliveryDateRangePickerB3"
+                                                    class="form-control mb-3" data-provide="datepicker"
+                                                    data-date-format="yyyy-mm-dd" data-date-autoclose="true"
+                                                    data-date-today-highlight="true" data-date-clear-btn="true"
+                                                    data-date-multidate="2">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-12 text-center">
+                                            <button class="btn btn-primary"
+                                                onclick="submitForm('userLocationSearch')">Submit</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <!-- Delivery Time Pick Tab Content -->
+                            <div class="tab-pane fade" id="daypartSearch">
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-md-6 mx-auto">
+                                            <label for="searchInput4">Daypart Search:</label>
+                                            <input type="text" id="searchInput4" class="form-control mb-3"
+                                                oninput="populateDaypartDropdown()">
+
+                                            <label for="newDaypartId">Daypart Type:</label>
+                                            <select id="newDaypartId" class="form-control"></select>
+                                        </div>
+
+                                        <div class="col-md-6 mx-auto">
+                                            <div class="form-group">
+                                                <label for="deliveryDateRangePickerA4">Delivery Time Pick (Range):
+                                                    From</label>
+                                                <input type="text" id="deliveryDateRangePickerA4"
+                                                    class="form-control mb-3" data-provide="datepicker"
+                                                    data-date-format="yyyy-mm-dd" data-date-autoclose="true"
+                                                    data-date-today-highlight="true" data-date-clear-btn="true"
+                                                    data-date-multidate="2">
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="deliveryDateRangePickerB4">To</label>
+                                                <input type="text" id="deliveryDateRangePickerB4"
+                                                    class="form-control mb-3" data-provide="datepicker"
+                                                    data-date-format="yyyy-mm-dd" data-date-autoclose="true"
+                                                    data-date-today-highlight="true" data-date-clear-btn="true"
+                                                    data-date-multidate="2">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-12 text-center">
+                                            <button class="btn btn-primary"
+                                                onclick="submitForm('daypartSearch')">Submit</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+
+                <div class="row">
+                    <div class="col-md-8 mx-auto mt-5">
+                        <h2 id="chart1Title" class="text-center mx-auto mb-3">Delivery Service Total Hours: </h2>
+                        <canvas id="deliveryStatisticsChart1"></canvas>
+                    </div>
+                </div>
+                <div class="row">
+
+                    <div class="col-md-8 mx-auto mt-5 mb-3">
+                        <h2 id="chart2Title" class="text-center mx-auto mb-3">Late Hours After Delivery Deadline: </h2>
+                        <canvas id="deliveryStatisticsChart2"></canvas>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Chart.js Library -->
+    <script src="./js/sidebar.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Bootstrap JS (and Popper.js, if needed) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Bootstrap Datepicker JS -->
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+
+    <script>
+
+        window.onload = function () {
+            loadSideBar("deliverystatistics");
+            //getOrderDetail(2, "orderdetailtable", headers, loadTable);
+        }
+
+        const token = localStorage.getItem('token');
+
+        // Example Stacked Bar Chart Data
+        const allData = {
+            labels: [],
+            datasets: []
+        };
+
+        // Chart Options
+        const options = {
+            scales: {
+                x: {
+                    stacked: true,
+                    title: {
+                        display: true,
+                        text: "Delivery Duration (hours)"
+                    }
+                },
+                y: {
+                    stacked: true,
+                    beginAtZero: true
+                }
+            }
+        };
+
+        // Create Stacked Bar Chart
+        const ctx = document.getElementById("deliveryStatisticsChart1").getContext("2d");
+        const myBarChart = new Chart(ctx, {
+            type: "bar",
+            data: allData,
+            options: options
+        });
+
+        //---------------------------Second Chart-------------------------------------------
+
+        // Example Bar Chart Data
+        const allData2 = {
+            labels: [],
+            datasets: []
+        };
+
+        // Chart Options
+        const options2 = {
+            scales: {
+                x: {
+                    stacked: false,
+                    title: {
+                        display: true,
+                        text: "Delivery Duration (hours)"
+                    }
+                },
+                y: {
+                    stacked: false,
+                    beginAtZero: true
+                }
+            }
+        };
+
+        // Create Bar Chart (non-stacked)
+        const ctx2 = document.getElementById("deliveryStatisticsChart2").getContext("2d");
+        const myBarChart2 = new Chart(ctx2, {
+            type: "bar",
+            data: allData2, // Use allData2 for the data
+            options: options2 // Use options2 for the options
+        });
+
+        if (localStorage.getItem('additionalDataPart2')) {
+            var initaliseChartOne = JSON.parse(localStorage.getItem('additionalDataPart2'))
+            const updatedChartDataOne = processDataForChartOne(initaliseChartOne);
+            allData.labels = updatedChartDataOne.labels;
+            allData.datasets = updatedChartDataOne.datasets;
+
+            myBarChart.data = allData;
+            myBarChart.update();
+        }
+
+        if (localStorage.getItem('additionalDataPart2Title')) {
+            var initaliseChartOneTitle = localStorage.getItem('additionalDataPart2Title');
+            const chart1Title = document.getElementById('chart1Title');
+            chart1Title.textContent = 'Delivery Service Total Hours: ' + initaliseChartOneTitle;
+        }
+
+        if (localStorage.getItem('additionalDataPart3')) {
+            var initaliseChartTwo = JSON.parse(localStorage.getItem('additionalDataPart3'))
+
+            // Extract labels and data for additional data
+            const additionalLabels = initaliseChartTwo.map(item => item.name);
+            const additionalData = initaliseChartTwo.map(item => item.hour_difference);
+
+            // Update allData2 with the additional data
+            myBarChart2.data.labels = additionalLabels;
+            myBarChart2.data.datasets = [{
+                label: 'Late Hours',
+                data: additionalData,
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }];
+
+            // Update the chart with the new data
+            myBarChart2.update();
+
+        }
+
+        if (localStorage.getItem('additionalDataPart3Title')) {
+            var initaliseChartTwoTitle = localStorage.getItem('additionalDataPart3Title');
+            const chart2Title = document.getElementById('chart2Title');
+            chart2Title.textContent = 'Hours After Delivery Deadline: ' + initaliseChartTwoTitle;
+        }
+
+        // handle form submut
+
+        function submitForm(searchDesc) {
+            console.log("submitting")
+
+            var date1, date2
+
+            selectedDropdownValueForm = "";
+
+            if (searchDesc == "broadSearch") {
+                selectedDropdownValueForm = document.getElementById("newBroadId").value
+
+                date1 = document.getElementById("deliveryDateRangePickerA1").value
+                date2 = document.getElementById("deliveryDateRangePickerB1").value
+
+                console.log("date1: " + date1 + "a")
+
+
+
+                if (date1 == "" && date2 == "") {
+                    date1 = "2000-01-01"
+                    date2 = "2050-01-01"
+                }
+
+                if (isDate2Later(date1, date2, 3)) {
+
+                    retrieveArrayChartJS(selectedDropdownValueForm, 1, date1, date2)
+                } else {
+                    alert("Second Date must be at least 3 days later than the First")
+                    return
+                }
+
+
+            } else if (searchDesc == "shirtTypeSearch") {
+                selectedDropdownValueForm = document.getElementById("newCategoryId").value
+
+                date1 = document.getElementById("deliveryDateRangePickerA2").value
+                date2 = document.getElementById("deliveryDateRangePickerB2").value
+
+                if (date1 == "" && date2 == "") {
+                    date1 = "2000-01-01"
+                    date2 = "2050-01-01"
+                }
+
+
+                if (isDate2Later(date1, date2, 3)) {
+                    retrieveArrayChartJS(selectedDropdownValueForm, 2, date1, date2)
+                } else {
+                    alert("Second Date must be at least 3 days later than the First")
+                    return
+                }
+
+            } else if (searchDesc == "userLocationSearch") {
+                selectedDropdownValueForm = document.getElementById("newUserRegionId").value
+
+                date1 = document.getElementById("deliveryDateRangePickerA3").value
+                date2 = document.getElementById("deliveryDateRangePickerB3").value
+
+                if (date1 == "" && date2 == "") {
+                    date1 = "2000-01-01"
+                    date2 = "2050-01-01"
+                }
+
+
+                if (isDate2Later(date1, date2, 3)) {
+                    retrieveArrayChartJS(selectedDropdownValueForm, 3, date1, date2)
+                } else {
+                    alert("Second Date must be at least 3 days later than the First")
+                    return
+                }
+
+            } else if (searchDesc == "daypartSearch") {
+
+                selectedDropdownValueForm = document.getElementById("newDaypartId").value
+
+
+                date1 = document.getElementById("deliveryDateRangePickerA4").value;
+                date2 = document.getElementById("deliveryDateRangePickerB4").value;
+
+                if (date1 == "" && date2 == "") {
+                    date1 = "2000-01-01"
+                    date2 = "2050-01-01"
+                }
+
+
+                if (isDate2Later(date1, date2, 3)) {
+                    retrieveArrayChartJS(selectedDropdownValueForm, 4, date1, date2)
+                } else {
+                    alert("Second Date must be at least 3 days later than the First")
+                    return
+                }
+
+            } else {
+                alert("An Error Occured");
+                return;
+            }
+
+            //const dropdownId = `new${tabId.charAt(0).toUpperCase() + tabId.slice(1)}Id`;
+            //const searchInputId = `searchInput${tabId.charAt(tabId.length - 1)}`;
+            //const selectedValue = document.getElementById(dropdownId).value;
+            //const searchInputValue = document.getElementById(searchInputId).value;
+            // Use the selectedValue and searchInputValue as needed for form submission
+
+            console.log(`Selected Dropdown Value: ${selectedDropdownValueForm}`);
+            //console.log(`Search Input Value: ${selectedDropdownValueForm}`);
+        }
+
+        async function retrieveArrayChartJS(selectedDropdownValueForm, choiceNum, date1, date2) {
+            console.log("selectedDropdownValueForm: " + selectedDropdownValueForm)
+            try {
+                const url = `/api/chartJS1?selectedDropdownValueForm=${selectedDropdownValueForm}&choiceNum=${choiceNum}&date1=${date1}&date2=${date2}`;
+
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',  // You can include other headers if needed
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to retrieve data');
+                }
+
+                // Process the response as needed
+                // ** includes the deliveryid toegther with the chart "header"
+                const data = await response.json();
+
+                // Extract deliveryids from the data object
+                const deliveryIds = data.map(item => item.deliveryid);
+                const chartHeader = data.map(item => item.chartHeaderValue);
+
+                console.log("Delivery string list is" + deliveryIds);
+
+                deliveryIdsString = encodeURIComponent(JSON.stringify(deliveryIds));
+                chartHeaderString = encodeURIComponent(JSON.stringify(chartHeader));
+
+                //deliveryIdsString = encodeURIComponent(JSON.stringify(ids));
+
+
+
+
+                const getChartPart2URL = `/api/chartJSPart2?deliveryIds=${deliveryIdsString}&chartHeaderString=${chartHeaderString}`;
+
+                const getChartPart2URLResponse = await fetch(getChartPart2URL, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',  // You can include other headers if needed
+                    },
+                });
+
+                if (!getChartPart2URLResponse.ok) {
+                    throw new Error('Failed to retrieve additional data');
+                }
+
+                const additionalDataPart2and3 = await getChartPart2URLResponse.json();
+
+                const additionalDataPart2 = additionalDataPart2and3.averagedDiffHours;
+                const additionalDataPart3 = additionalDataPart2and3.summedLateHours;
+
+                //const savedAdditionalDataPart2 = localStorage.getItem('additionalDataPart2');
+
+                localStorage.setItem('additionalDataPart2', JSON.stringify(additionalDataPart2));
+                localStorage.setItem('additionalDataPart3', JSON.stringify(additionalDataPart3));
+
+                console.log("OFFICAL STRING")
+
+                console.log('Data:', additionalDataPart2);
+                console.log('DataNo2:', additionalDataPart3);
+
+                // Usage
+                //const savedAdditionalDataPart2 = localStorage.getItem('additionalDataPart2');
+                const updatedChartData = processDataForChartOne(additionalDataPart2);
+                allData.labels = updatedChartData.labels;
+                allData.datasets = updatedChartData.datasets;
+
+                myBarChart.data = allData;
+                myBarChart.update();
+
+                // Extract labels and data for additional data
+                const additionalLabels = additionalDataPart3.map(item => item.name);
+                const additionalData = additionalDataPart3.map(item => item.hour_difference);
+
+                // Update allData2 with the additional data
+                myBarChart2.data.labels = additionalLabels;
+                myBarChart2.data.datasets = [{
+                    label: 'Late Hours',
+                    data: additionalData,
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }];
+
+                // Update the chart with the new data
+                myBarChart2.update();
+
+                const chart1Title = document.getElementById('chart1Title');
+                const chart2Title = document.getElementById('chart2Title');
+
+                localStorage.setItem('additionalDataPart2Title', selectedDropdownValueForm);
+                localStorage.setItem('additionalDataPart3Title', selectedDropdownValueForm);
+                chart1Title.textContent = 'Delivery Service Total Hours: ' + selectedDropdownValueForm;
+                chart2Title.textContent = 'Late Hours After Delivery Deadline: ' + selectedDropdownValueForm;
+
+            } catch (error) {
+                console.error('Error retrieving data:', error);
+            }
+        }
+
+        function processDataForChartOne(additionalData) {
+            // Parse additionalData if it's a string
+            const additionalDataObject = typeof additionalData === 'string' ? JSON.parse(additionalData) : additionalData;
+
+            // Log the data
+            console.log('Data:', additionalDataObject);
+
+            // Extract labels and datasets from additionalDataObject
+            const labels = additionalDataObject.map(item => item.name);
+            const datasets = [
+                {
+                    label: "Order Confirmed to Picked by Courier",
+                    backgroundColor: "rgba(255, 99, 132, 0.7)",
+                    data: additionalDataObject.map(item => item.diff_ab_hours)
+                },
+                {
+                    label: "Picked by Courier to On the Way",
+                    backgroundColor: "rgba(54, 162, 235, 0.7)",
+                    data: additionalDataObject.map(item => item.diff_bc_hours)
+                },
+                {
+                    label: "On the Way to Product delivered",
+                    backgroundColor: "rgba(255, 206, 86, 0.7)",
+                    data: additionalDataObject.map(item => item.diff_cd_hours)
+                }
+            ];
+
+            // Return the updated chart data
+            return {
+                labels: labels,
+                datasets: datasets
+            };
+        }
+
+
+
+        function isDate2Later(date1, date2, daysApart) {
+            // Parse the input strings into Date objects
+            const parsedDate1 = new Date(date1);
+            const parsedDate2 = new Date(date2);
+
+            // Calculate the difference in milliseconds
+            const timeDifference = parsedDate2 - parsedDate1;
+
+            // Convert the difference to days
+            const daysDifference = timeDifference / (1000 * 60 * 60 * 24);
+
+            // Return true if the difference is at least daysApart
+            return daysDifference >= daysApart;
+
+            // Compare the dates and return true if date2 is later than date1
+            return (parsedDate2 > parsedDate1 && daysDifference >= daysApart);
+        }
+
+        async function populateDropdowns() {
+            const newCategoryIdDropdown = document.getElementById('newCategoryId');
+            const searchInput = document.getElementById('searchInput');
+            const newUserRegionIdDropdown = document.getElementById('newUserRegionId');
+            const searchInput3 = document.getElementById('searchInput3');
+            const newBroadIdDropdown = document.getElementById('newBroadId');
+            const searchInput1 = document.getElementById('searchInput1');
+            const newDaypartIdDropdown = document.getElementById('newDaypartId');
+            const searchInput4 = document.getElementById('searchInput4');
+
+            try {
+                const [categoriesResponse, userRegionsResponse] = await Promise.all([
+                    fetch('/api/categoriesForDelivery', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json',
+                        },
+                    }),
+                    fetch('/api/userRegionsForDelivery', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json',
+                        },
+                    }),
+                ]);
+
+                if (!categoriesResponse.ok) {
+                    throw new Error('Failed to retrieve categories');
+                }
+
+                if (!userRegionsResponse.ok) {
+                    throw new Error('Failed to retrieve user regions');
+                }
+
+                const [categories, userRegions] = await Promise.all([
+                    categoriesResponse.json(),
+                    userRegionsResponse.json(),
+                ]);
+
+                newCategoryIdDropdown.innerHTML = '';
+                newUserRegionIdDropdown.innerHTML = '';
+                newBroadIdDropdown.innerHTML = '';
+                newDaypartIdDropdown.innerHTML = '';
+
+                categories.forEach(({ categoryid, categoryname }) => {
+                    if (categoryname.includes(searchInput.value)) {
+                        const option = document.createElement('option');
+                        option.value = categoryname;
+                        option.text = categoryname;
+                        option.id = `category-${categoryid}`;
+                        newCategoryIdDropdown.appendChild(option);
+                    }
+                });
+
+                userRegions.forEach(({ region }) => {
+                    if (searchInput3.value != null && region.includes(searchInput3.value)) {
+                        const option = document.createElement('option');
+                        option.value = region;
+                        option.text = region;
+                        option.id = `region-${region}`;
+                        newUserRegionIdDropdown.appendChild(option);
+                    }
+                });
+
+                const manuallyConfiguredBroads = [
+                    { broad: 'Region' },
+                    { broad: 'Category' },
+                    { broad: 'Gender' },
+     
+                ];
+
+                manuallyConfiguredBroads.forEach(({ broad }) => {
+                    if (searchInput1.value != null && broad.includes(searchInput1.value)) {
+                        const option = document.createElement('option');
+                        option.value = broad;
+                        option.text = broad;
+                        option.id = `broad-${broad}`;
+                        newBroadIdDropdown.appendChild(option);
+                    }
+                });
+
+                const manuallyConfiguredDayparts = [
+                    { daypart: 'By Delivery Target Date at (Morn, Aft, Eve)' },
+
+                ];
+
+                manuallyConfiguredDayparts.forEach(({ daypart }) => {
+                    if (searchInput4.value != null && daypart.toLowerCase().includes(searchInput4.value.toLowerCase())) {
+                        const option = document.createElement('option');
+                        option.value = daypart;
+                        option.text = daypart;
+                        option.id = `daypart-${daypart}`;
+                        newDaypartIdDropdown.appendChild(option);
+                    }
+                });
+            } catch (error) {
+                console.error('Error retrieving data:', error);
+            }
+        }
+
+        populateDropdowns();
+
+
+
+
+    </script>
+
+</body>
+
+</html>

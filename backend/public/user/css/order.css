@@ -1,0 +1,324 @@
+body {
+    scroll-behavior: smooth;
+}
+
+.full-star:before {
+    content: '\2605';
+}
+
+.full-star {
+    font-weight: bold;
+    color: gold;
+}
+
+.order {
+    display: flex;
+    width: 80vw;
+    margin: 40px auto;
+    flex-direction: column;
+}
+
+.order h3 {
+    letter-spacing: 1px;
+}
+
+.order-options {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    margin-bottom: 32px;
+    font-size: 14px;
+}
+
+.order-options .order-search-bar {
+    min-height: 38px;
+    min-width: 25vw;
+    text-indent: 8px;
+    border-radius: 8px;
+    outline: none;
+    border: none;
+    font-size: 14px;
+    box-shadow: 1px 1px 6px 0px rgba(0, 0, 0, 0.2);
+}
+
+.order-filter {
+    display: flex;
+}
+
+.order-filter select {
+    padding: 10px 20px;
+    font-size: 14px;
+    margin-right: 24px;
+    border-radius: 8px;
+    outline: none;
+    border: none;
+    box-shadow: 1px 1px 6px 0px rgba(0, 0, 0, 0.2);
+    border-right: 12px solid transparent;
+    cursor: pointer;
+}
+
+.order-filter select:last-of-type {
+    margin-right: 0;
+}
+
+.order-body {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    margin-top: 24px;
+    width: 100%;
+}
+
+.order-body .order-header {
+    display: flex;
+    justify-content: space-evenly;
+    background-color: rgba(230, 230, 230, 0.3);
+    padding: 16px 0;
+    font-size: 14px;
+    font-weight: bold;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.order-header label {
+    width: 10vw;
+    text-align: center;
+    display: inline-block;
+    text-align: center;
+}
+
+.order-body #order-result {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 40px;
+}
+
+.order-item {
+    display: flex;
+    flex-direction: column;
+    border: 0.5px solid #ddd;
+    border-top: none;
+}
+
+.order-item .order-detail {
+    display: flex;
+    justify-content: space-evenly;
+    font-size: 14px;
+    align-items: center;
+    padding: 16px 0;
+    background-color: rgba(240, 240, 240, 0.3);
+    margin-bottom: 16px;
+}
+
+.order-item .order-detail label {
+    width: 10vw;
+    text-align: center;
+    display: inline-block;
+}
+
+.order-item .order-detail .order-detail-button {
+    display: flex;
+    flex-direction: column;
+    width: 10vw;
+    align-items: center;
+}
+
+.order-detail-button button {
+    width: 100px;
+    height: 40px;
+    background: rgba(251, 97, 80, 0.9);
+    font-family: Arial, sans-serif;
+    color: #fff;
+    border-radius: 8px;
+    border: 0;
+    padding: 10px 14px;
+    letter-spacing: 1px;
+    font-size: 12px;
+    cursor: pointer;
+    display: block;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0px 2px 5.5px 0px rgba(0, 0, 0, 0.2);
+}
+
+.product-wrap {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #666;
+}
+
+.product-wrap:last-of-type {
+    padding-bottom: 16px;
+}
+
+.product-wrap img {
+    border-radius: 8px;
+}
+
+.product-wrap .product-info {
+    display: flex;
+    justify-content: flex-start;
+    width: 50%;
+    padding-left: 32px;
+    padding-bottom: 16px;
+    letter-spacing: 1px;
+}
+
+.product-wrap .product-info:last-of-type {
+    border-left: 1px solid #ddd;
+}
+
+.product-wrap .product-info:first-of-type {
+    border-left: none;
+}
+
+.product-info .column-wrap {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-left: 16px;
+}
+
+.product-info .column-wrap a {
+    text-decoration: none;
+    margin-bottom: 8px;
+    max-width: max-content;
+}
+
+.product-info .column-wrap .row-wrap {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.row-wrap div:first-of-type {
+    display: flex;
+    width: 50%;
+    font-size: 13px;
+    flex-direction: column;
+}
+
+.row-wrap div:first-of-type label:first-of-type {
+    margin-bottom: 8px;
+}
+
+.row-wrap div:last-of-type {
+    display: flex;
+    width: 50%;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.btn-delivery {
+    height: 40px;
+    background: #fff;
+    font-family: Arial, sans-serif;
+    color: #000;
+    border-radius: 8px;
+    border: 0;
+    padding: 10px 14px;
+    letter-spacing: 1px;
+    font-size: 12px;
+    cursor: pointer;
+    display: block;
+    border: 1px solid #ddd;
+    align-self: center;
+    transition: all 0.2s ease;
+    box-shadow: 0px 4px 5.5px 0px rgba(0, 0, 0, 0.07);
+}
+
+.product-detail div div .btn-primary {
+    background: rgb(251, 97, 80);
+    font-family: Arial, sans-serif;
+    color: #ffffff;
+    border-radius: 8px;
+    border: 0;
+    padding: 10px 14px;
+    letter-spacing: 1px;
+    font-size: 12px;
+    cursor: pointer;
+    display: block;
+    height: auto;
+    transition: all 0.2s ease;
+    box-shadow: 0px 4px 5.5px 0px rgba(0, 0, 0, 0.07);
+}
+
+.product-detail div div button {
+    margin-left: 16px;
+}
+
+.product-detail div div button:first-of-type {
+    margin-left: 0px;
+}
+
+.product-detail div div .btn-primary:hover,
+.btn-primary:hover {
+    filter: contrast(125%);
+}
+
+.product-detail div div .btn-primary:disabled,
+.btn-primary:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.product-detail>label {
+    margin-left: auto;
+    margin-right: 48px;
+    align-self: center;
+    font-size: 14px;
+}
+
+.product-detail>div>div {
+    display: flex;
+    flex-direction: row;
+}
+
+.btn-secondary {
+    background: #fff;
+    font-family: Arial, sans-serif;
+    color: #000;
+    border-radius: 8px;
+    border: 0;
+    padding: 10px 14px;
+    letter-spacing: 1px;
+    font-size: 12px;
+    cursor: pointer;
+    display: block;
+    border: 1px solid #ddd;
+    transition: all 0.2s ease;
+    box-shadow: 0px 4px 5.5px 0px rgba(0, 0, 0, 0.07);
+}
+
+.btn-cancel:hover {
+    filter: contrast(115%);
+}
+
+#pagination {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: flex-end;
+    user-select: none;
+}
+
+#pagination button {
+    margin-left: 8px;
+    background-color: #fff;
+    outline: none;
+    border: 0.5px solid #ddd;
+    padding: 4px 12px;
+    border-radius: 4px;
+}
+
+#pagination button.active {
+    background-color: rgb(251, 97, 80);
+    border: none;
+    color: white;
+}
+
+#pagination button.dot {
+    border: none;
+    cursor: default;
+}

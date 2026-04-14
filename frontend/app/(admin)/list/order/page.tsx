@@ -80,6 +80,9 @@ export default function Page() {
         <div className="flex justify-center" key={index}>
           {item.orderstatus === "in progress" && (
             <div className="flex flex-col justify-center items-center">
+              <Button className="mb-2" variant="bordered" size="sm" onClick={() => router.push(URL.AdminOrderDetail + item.orderid)}>
+                View
+              </Button>
               <Button
                 color="primary"
                 className="mb-2"
@@ -105,7 +108,11 @@ export default function Page() {
               </Button>
             </div>
           )}
-          {["cancelled", "confirmed", "delivered", "received"].includes(item.orderstatus) && <label className="text-center">-</label>}
+          {["cancelled", "confirmed", "delivered", "received"].includes(item.orderstatus) && (
+            <Button variant="bordered" size="sm" onClick={() => router.push(URL.AdminOrderDetail + item.orderid)}>
+              View
+            </Button>
+          )}
         </div>,
       ] as [string, ...React.ReactNode[]];
     });

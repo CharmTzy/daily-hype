@@ -1,11 +1,9 @@
 "use client";
 
-import { ChangeEvent, useEffect, useRef } from "react";
+import { ChangeEvent, useRef } from "react";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import Image from "next/image";
 import clsx from "clsx";
-import { useAppState } from "@/app/app-provider";
-import { SuccessMessage } from "@/enums/global-enums";
 
 interface IUploadedImages {
   imageid: string;
@@ -21,7 +19,6 @@ interface IFileInputProps {
 }
 
 export default function CloudinaryFileInput({ limit, className, uploadedImages, setUploadedImages }: IFileInputProps) {
-  const { userInfo } = useAppState();
   const fileRef = useRef<HTMLInputElement | null>(null);
 
   const handleUpload = (event: ChangeEvent<HTMLInputElement>) => {
@@ -55,6 +52,8 @@ export default function CloudinaryFileInput({ limit, className, uploadedImages, 
               if (fileRef.current) {
                 fileRef.current.value = "";
               }
+            } else {
+              alert(result.error || "Error in uploading images!");
             }
           })
           .catch((error) => {
@@ -94,7 +93,7 @@ export default function CloudinaryFileInput({ limit, className, uploadedImages, 
       <div className="flex max-w-full">
         {uploadedImages.map((item, index) => (
           <div key={index} className="flex mr-2 cursor-pointer relative flex-col items-center w-[100px] h-[100px] max-w-[100px] max-h-[100px] border-1 border-slate-700 dark:border-slate-300 border-dotted p-4">
-            {userInfo != null && <Image fill={true} src={item.url} alt={item.imagename} />}
+            <Image fill={true} src={item.url} alt={item.imagename} />
             <div onClick={() => handleDelete(index)} className={clsx("absolute cursor-pointer -right-2 -top-2 px-[7px] bg-[#eee] dark:bg-[#111] rounded-full border-1 border-slate-700 dark:border-slate-300", className)}>
               <label className="cursor-pointer select-none">x</label>
             </div>

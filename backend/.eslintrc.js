@@ -25,7 +25,6 @@ module.exports = {
               optionalDependencies: false,
               peerDependencies: false,
               packageDir: './',
-              allow: ['bcrypt'], 
             },
           ],
         

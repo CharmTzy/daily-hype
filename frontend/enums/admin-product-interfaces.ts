@@ -48,7 +48,11 @@ export interface IProduct {
   typeid: string;
   categoryid: string;
   productDetails: ISelectedDetails[];
-  images: string[];
+  images: {
+    imageid: string;
+    imagename: string;
+    url: string;
+  }[];
 }
 export interface IProductDetailSubmit {
   productid: string;

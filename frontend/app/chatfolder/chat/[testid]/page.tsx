@@ -195,8 +195,9 @@ const ChatRoomPage = () => {
 
   useEffect(() => {
     if (deliveryId) {
+      const socketUrl = process.env.NEXT_PUBLIC_APP_BACKEND_URL_SOCKET || process.env.BACKEND_URL || "";
       const newSocket = io(
-        `${process.env.NEXT_PUBLIC_APP_BACKEND_URL_SOCKET}/chat`,
+        `${socketUrl}/chat`,
         {
           transports: ["websocket"],
           query: { deliveryId },

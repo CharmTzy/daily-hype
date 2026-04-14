@@ -392,6 +392,55 @@ module.exports.getProductsByCategoryID = function getProductsByCategoryID(catego
     });
 };
 
+module.exports.getProductsByCategoryIDs = function getProductsByCategoryIDs(categoryIDs, limit, offset, isinstock) {
+  let sql = `
+      SELECT P.*
+      FROM product P
+      WHERE P.categoryid = ANY($1::int[])
+  `;
+
+  if (isinstock === "1" || isinstock === true || isinstock === "true") {
+    sql += `
+      AND P.productid IN (
+        SELECT PD.productid FROM productdetail PD WHERE qty > 0
+      )
+    `;
+  }
+
+  sql += `
+      ORDER BY P.productid DESC
+      LIMIT $2 OFFSET $3;
+  `;
+
+  return query(sql, [categoryIDs, limit, offset])
+    .then((result) => result.rows)
+    .catch((error) => {
+      throw new Error(`Error retrieving products by category ids: ${error.message}`);
+    });
+};
+
+module.exports.getProductCountByCategoryIDs = function getProductCountByCategoryIDs(categoryIDs, isinstock) {
+  let sql = `
+      SELECT COUNT(P.*) AS productcount
+      FROM product P
+      WHERE P.categoryid = ANY($1::int[])
+  `;
+
+  if (isinstock === "1" || isinstock === true || isinstock === "true") {
+    sql += `
+      AND P.productid IN (
+        SELECT PD.productid FROM productdetail PD WHERE qty > 0
+      )
+    `;
+  }
+
+  return query(sql, [categoryIDs])
+    .then((result) => result.rows)
+    .catch((error) => {
+      throw new Error(`Error retrieving product count by category ids: ${error.message}`);
+    });
+};
+
 //3.
 //get productcount by categoryid and isinstock
 module.exports.getProductCountByCategoryID = function getProductCountByCategoryID(categoryid, isinstock) {

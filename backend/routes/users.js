@@ -148,12 +148,8 @@ router.post("/loginVerificationCode", (req, res) => {
   console.log(generatedCode);
   const email = req.body.email;
   return Promise.all([mailFunctions.sendEmailVerificationCode(IPAddress, generatedCode, email), userModel.saveVerificationCode(generatedCode, email)])
-    .then(([result1, result2]) => {
-      if (result1.success && result2.success) {
-        return res.status(200).json({ success: true, message: "Verification code stored successfully." });
-      } else {
-        return res.status(500).json({ success: false, message: "Failed to send email or save verification code." });
-      }
+    .then(() => {
+      return res.status(200).json({ success: true, message: "Verification code stored successfully." });
     })
     .catch((error) => {
       console.error("Error in loginVerificationCode route:", error);
@@ -214,8 +210,15 @@ router.post("/signupGoogle", (req, res) => {
       } else {
         userModel
           .signupGoogle(id, name, email, verified_email, picture)
-          .then(function () {
-            const newUser = { email: email, id: id, role: "customer", url: picture, name: name, method: "google" };
+          .then(function (createdUser) {
+            const newUser = {
+              email: createdUser.email,
+              id: createdUser.userid,
+              role: "customer",
+              url: createdUser.url,
+              name: createdUser.name,
+              method: "google",
+            };
             const authToken = jwtFunctions.generateAuthToken({ email: newUser.email, userId: newUser.id, role: newUser.role }, process.env.JWT_SECRET_KEY);
             const refreshToken = jwtFunctions.generateRefreshToken({ lastcreatedat: new Date().toISOString() }, process.env.JWT_REFRESH_KEY);
             return userModel.storeRefreshToken(newUser.id, refreshToken).then((result) => {
@@ -256,8 +259,15 @@ router.post("/signupFacebook", (req, res) => {
       } else {
         userModel
           .signupFacebook(id, name, email, verified_email, picture)
-          .then(function () {
-            const newUser = { email: email, id: id, role: "customer", url: picture, name: name, method: "facebook" };
+          .then(function (createdUser) {
+            const newUser = {
+              email: createdUser.email,
+              id: createdUser.userid,
+              role: "customer",
+              url: createdUser.url,
+              name: createdUser.name,
+              method: "facebook",
+            };
             const authToken = jwtFunctions.generateAuthToken({ email: newUser.email, userId: newUser.id, role: newUser.role }, process.env.JWT_SECRET_KEY);
             const refreshToken = jwtFunctions.generateRefreshToken({ lastcreatedat: new Date().toISOString() }, process.env.JWT_REFRESH_KEY);
             return userModel.storeRefreshToken(newUser.id, refreshToken).then((result) => {

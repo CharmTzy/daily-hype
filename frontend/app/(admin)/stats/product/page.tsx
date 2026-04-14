@@ -22,7 +22,7 @@ export default function Page() {
   const [currentTabValue, setCurrentTabValue] = useState(0);
 
   useEffect(() => {
-    setCurrentActivePage(CurrentActivePage.OrderStat);
+    setCurrentActivePage(CurrentActivePage.ProductStat);
   }, []);
 
   return (

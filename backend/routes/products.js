@@ -15,9 +15,22 @@ const multer = require("multer");
 const cloudinary = require("../cloudinary");
 const refreshFn = require("../middlewares/refreshToken");
 const redis = require("../functions/redis-cache");
+const fileFn = require("../functions/file-functions");
 const path = require("path");
 
 // CA2
+
+function isUploadedImageRecord(image) {
+  return image && typeof image === "object" && image.imageid && image.imagename && image.url;
+}
+
+function buildProductImagePayload(uploadResults) {
+  return uploadResults.map((result) => ({
+    imageid: result.public_id,
+    imagename: result.original_filename,
+    url: result.secure_url,
+  }));
+}
 
 router.get("/product/admin", validationFn.validateToken, refreshFn.refreshToken, (req, res) => {
   const id = req.body.id;
@@ -307,6 +320,10 @@ const upload = multer({ storage: storage });
 
 //uplaod image to cloudinary and create product image
 router.post("/uploadProductPhoto", validationFn.validateToken, upload.single("photo"), (req, res) => {
+  if (!cloudinary.isConfigured) {
+    return res.status(503).json({ error: "Cloudinary is not configured" });
+  }
+
   const file = req.file;
 
   console.log("Received photo upload request:", { file });
@@ -318,10 +335,8 @@ router.post("/uploadProductPhoto", validationFn.validateToken, upload.single("ph
   return imageModel
     .uploadCloudinaryPhotos(file)
     .then((result) => {
-      var inputString = result.public_id;
-      var imageId = inputString.split("/")[1];
       return imageModel
-        .createProductImage(imageId, result.original_filename, result.url)
+        .createProductImage(result.public_id, result.original_filename, result.secure_url)
         .then((result1) => {
           console.log("IMAGE FINAL");
           console.log(result1);
@@ -614,6 +629,7 @@ router.put("/productAdmin", validationFn.validateToken, refreshFn.refreshToken, 
   }
 
   const { productid, name, description, unitprice, typeid, categoryid, images } = req.body;
+  const totalImages = Array.isArray(images) ? images.length : 0;
 
   // Array to hold promises for parallel execution
   const promises = [productsModel.updateProduct(productid, name, description, unitprice, typeid, categoryid)];
@@ -628,8 +644,8 @@ router.put("/productAdmin", validationFn.validateToken, refreshFn.refreshToken, 
   return Promise.all(promises)
     .then(([updateCount, ...results]) => {
       // Check if the update and image creation were successful
-      if (updateCount === 1 && results.every(result => result === images.length)) {
-        return res.json({ message: "Update and image creation success", productID: productID });
+      if (updateCount === 1 && results.every((result) => result === totalImages)) {
+        return res.json({ message: "Update and image creation success", productID: productid });
       } else {
         throw new Error("Update or image creation failed");
       }
@@ -818,6 +834,73 @@ router.get("/ProductsWithImageAndColour", function (req, res) {
     });
 });
 
+router.get("/productsByCategoryIDs", function (req, res) {
+  const categoryIDs = req.query.categoryIDs ? req.query.categoryIDs.split(",").filter((id) => !isNaN(id)).map((id) => parseInt(id, 10)) : [];
+  const limit = req.query.limit && !isNaN(req.query.limit) ? parseInt(req.query.limit, 10) : 20;
+  const offset = req.query.offset && !isNaN(req.query.offset) ? parseInt(req.query.offset, 10) : 0;
+  const isinstock = req.query.isinstock;
+
+  if (categoryIDs.length === 0 || limit < 1 || limit > 100 || offset < 0) {
+    return res.status(400).json({ error: "Invalid Request" });
+  }
+
+  return productsModel
+    .getProductsByCategoryIDs(categoryIDs, limit, offset, isinstock)
+    .then((product) => {
+      const getImageExecute = [];
+      const getProductColourExecute = [];
+
+      product.forEach((item) => {
+        getImageExecute.push(productsModel.getImageByProductID(item.productid));
+        getProductColourExecute.push(productsModel.getColourByProductID(item.productid));
+      });
+
+      return Promise.all([...getImageExecute, ...getProductColourExecute]).then((result) => {
+        result.forEach((itemArr) => {
+          itemArr.forEach((item) => {
+            const index = product.findIndex((p) => p.productid === item.productid);
+            if (index === -1) return;
+
+            if (item && item.imageid) {
+              const imageData = { imageid: item.imageid, imagename: item.imagename, url: item.url };
+              product[index].image = product[index].image ? [...product[index].image, imageData] : [imageData];
+            }
+
+            if (item && item.colourid) {
+              const colourData = { colourid: item.colourid, colourname: item.colourname, hex: item.hex };
+              product[index].colour = product[index].colour ? [...product[index].colour, colourData] : [colourData];
+            }
+          });
+        });
+
+        return res.json({ product: product });
+      });
+    })
+    .catch((error) => {
+      console.log(error);
+      return res.status(500).json({ error: "Unknown Error" });
+    });
+});
+
+router.get("/productsCountByCategoryIDs", function (req, res) {
+  const categoryIDs = req.query.categoryIDs ? req.query.categoryIDs.split(",").filter((id) => !isNaN(id)).map((id) => parseInt(id, 10)) : [];
+  const isinstock = req.query.isinstock;
+
+  if (categoryIDs.length === 0) {
+    return res.status(400).json({ error: "Invalid Request" });
+  }
+
+  return productsModel
+    .getProductCountByCategoryIDs(categoryIDs, isinstock)
+    .then((productCount) => {
+      return res.json({ productCount: productCount[0].productcount });
+    })
+    .catch((error) => {
+      console.log(error);
+      return res.status(500).json({ error: "Unknown Error" });
+    });
+});
+
 //4.
 //search product by name and filter
 router.post("/searchProduct", function (req, res) {
@@ -909,83 +992,73 @@ router.post("/productAdmin", validationFn.validateToken, refreshFn.refreshToken,
   const id = req.body.id;
   const email = req.body.email;
   const role = req.body.role;
+
   // Check if the user token is valid
   if (!id || isNaN(id) || !role || !email || (role !== "admin" && role !== "manager")) {
     return res.status(403).send({ error: "Unauthorized Access" });
   }
 
   const { name, description, unitPrice, categoryid, typeid, productDetails, images } = req.body;
+  const hasUploadedImageRecords = Array.isArray(images) && images.every(isUploadedImageRecord);
+  const hasLocalTempImages = Array.isArray(images) && images.every((image) => typeof image === "string");
 
-  // Define expected structure
   const product = {
-    name: name,
-    description: description,
-    unitPrice: unitPrice,
-    categoryid: categoryid,
-    typeid: typeid
+    name,
+    description,
+    unitPrice,
+    categoryid,
+    typeid,
   };
 
-  if (!(Object.values(product).every(value => value !== undefined && value !== null)) || !productDetails || !productDetails[0] || !images || !images[0]) {
+  if (!(Object.values(product).every((value) => value !== undefined && value !== null)) || !productDetails || !productDetails[0] || !images || !images[0] || (!hasUploadedImageRecords && !hasLocalTempImages)) {
     return res.status(400).json({ error: "Invalid Input" });
   }
 
-  const filePaths = images.map((image) => path.join(__dirname, "../uploads/" + id + "/" + image));
   return productsModel
     .createProductAndGetID(product)
-    .then(function (productID) {
-
-      const insertProductDetail = [];
-      productDetails.forEach((item) => {
-        pdstatus = "out of stock"
-        if (item.quantity > 0) {
-          pdstatus = "in stock"
-        } else {
-          pdstatus = "out of stock"
-        }
-        insertProductDetail.push(productsModel.createProductDetail(productID, item.colourid, item.sizeid, item.quantity, pdstatus));
+    .then(async function (productID) {
+      const insertProductDetail = productDetails.map((item) => {
+        const pdstatus = Number(item.quantity) > 0 ? "in stock" : "out of stock";
+        return productsModel.createProductDetail(productID, item.colourid, item.sizeid, item.quantity, pdstatus);
       });
 
-      return Promise.all([insertProductDetail, imageModel.uploadMultipleImagesToCloudinary(filePaths)])
-        .then(([detailResult, imageResult]) => {
+      try {
+        await Promise.all(insertProductDetail);
 
-          const imageArr = imageResult.map((r) => ({ imageid: r.public_id, imagename: r.original_filename, url: r.secure_url }));
-          return Promise.all([imageModel.createBatchImage(imageArr), productsModel.createBatchProductImage(productID, imageArr)])
-            .then(([imageCount, productImageCount]) => {
-              if (imageCount == imageArr.length && productImageCount == imageArr.length) {
-                return res.json({ message: "Product submitted successfully", productID: productID });
-              } else {
+        let imageArr = images;
 
-                return Promise.all([
-                  productsModel.deleteProductImage(productID),
-                  imageModel.deleteMultipleImagesFromCloudinary(imageResult.map((r) => r.public_id)),
-                  productsModel.deleteProductDetail(productID),
-                  productsModel.deleteProduct(productID)
-                ])
-                  .then((deleteCloudinaryImageResult, deleteProductResult, deleteProductDetailResult) => {
-                    return res.status(500).json({ error: errorMessages.INTERNAL_SERVER_ERROR });
-                  });
-              }
+        if (hasLocalTempImages) {
+          if (!cloudinary.isConfigured) {
+            throw new Error("Cloudinary is not configured");
+          }
 
-            });
-        })
-        .catch((error) => {
+          const userFolder = path.join(__dirname, "../uploads/" + id);
+          const filePaths = images.map((image) => path.join(userFolder, image));
+          const imageResult = await imageModel.uploadMultipleImagesToCloudinary(filePaths);
 
-          console.error(error);
-          //delete the product if error inserting product detail or image to cloudinary
-          return Promise.all([
-            productsModel.deleteProductImage(productID),
-            productsModel.deleteProductDetail(productID),
-            productsModel.deleteProduct(productID),
-          ])
-            .then(() => {
-              throw error;
-            })
-            .catch(() => {
-              return res.status(500).json({ error: errorMessages.INTERNAL_SERVER_ERROR });
-            });
-        });
+          imageArr = buildProductImagePayload(imageResult);
 
+          await fileFn.deleteFolder(userFolder).catch(() => {});
+        }
 
+        const [imageCount, productImageCount] = await Promise.all([imageModel.createBatchImage(imageArr), productsModel.createBatchProductImage(productID, imageArr)]);
+
+        if (imageCount === imageArr.length && productImageCount === imageArr.length) {
+          return res.json({ message: "Product submitted successfully", productID });
+        }
+
+        throw new Error("Image persistence failed");
+      } catch (error) {
+        console.error(error);
+
+        if (hasLocalTempImages) {
+          await fileFn.deleteFolder(path.join(__dirname, "../uploads/" + id)).catch(() => {});
+        }
+
+        await Promise.allSettled([productsModel.deleteProductImage(productID), productsModel.deleteProductDetail(productID), productsModel.deleteProduct(productID)]);
+
+        return res.status(500).json({ error: errorMessages.INTERNAL_SERVER_ERROR });
+      }
     });
 });
 

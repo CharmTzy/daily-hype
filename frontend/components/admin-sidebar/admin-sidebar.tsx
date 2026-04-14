@@ -40,7 +40,7 @@ export default function AdminSideBar() {
 
   return (
     <div className="w-[250px] z-10 bg-slate-100 fixed h-screen min-w-[250px] flex flex-col pt-4">
-      <Link href={URL.Dashboard} className="text-xl ms-5 font-bold my-2">
+      <Link href={URL.Dashboard} className={clsx("text-xl ms-5 font-bold my-2 hover:text-logo-color", currentActivePage === CurrentActivePage.Dashboard && "text-logo-color")}>
         DailyHype
       </Link>
       <div style={{ overflowY: "auto" }} className="px-4 mt-4 pb-4">
@@ -215,7 +215,7 @@ export default function AdminSideBar() {
                 </FormControl>
 
                 <FormControl orientation="horizontal" sx={{ gap: 1 }}>
-                  <Link href={URL.OrderList} className={clsx("flex items-center hover:text-logo-color", currentActivePage === CurrentActivePage.ReviewStat && "text-logo-color")}>
+                  <Link href={URL.ReviewStat} className={clsx("flex items-center hover:text-logo-color", currentActivePage === CurrentActivePage.ReviewStat && "text-logo-color")}>
                     <StarRateIcon fontSize="small" sx={{ mx: 2, marginRight: 3 }} />
                     <label className="cursor-pointer text-[14px] font-medium">Review</label>
                   </Link>
@@ -235,16 +235,16 @@ export default function AdminSideBar() {
             <AccordionDetails>
               <Stack spacing={1.5}>
                 <FormControl orientation="horizontal" sx={{ gap: 1 }}>
-                  <Link href={URL.OrderList} className={clsx("flex items-center hover:text-logo-color", currentActivePage === CurrentActivePage.AdminProfile && "text-logo-color")}>
+                  <Link href={URL.AdminProfile} className={clsx("flex items-center hover:text-logo-color", currentActivePage === CurrentActivePage.AdminProfile && "text-logo-color")}>
                     <PersonIcon fontSize="small" sx={{ mx: 2, marginRight: 3, marginTop: 0.1 }} />
                     <label className="cursor-pointer text-[14px] font-medium">Profile</label>
                   </Link>
                 </FormControl>
 
                 <FormControl orientation="horizontal" sx={{ gap: 1 }}>
-                  <Link href={URL.SignOut} className={clsx("flex items-center hover:text-logo-color", currentActivePage === CurrentActivePage.AdminSetting && "text-logo-color")}>
+                  <Link href={URL.AdminSetting} className={clsx("flex items-center hover:text-logo-color", currentActivePage === CurrentActivePage.AdminSetting && "text-logo-color")}>
                     <SettingsIcon fontSize="small" sx={{ mx: 2, marginRight: 3, marginTop: 0.3 }} />
-                    <label className="cursor-pointer text-[14px] font-medium">Setting</label>
+                    <label className="cursor-pointer text-[14px] font-medium">Settings</label>
                   </Link>
                 </FormControl>
 

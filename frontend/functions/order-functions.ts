@@ -121,6 +121,28 @@ export function getOrderDetail(orderID: number): Promise<TGetOrderDetail> {
     });
 }
 
+export function getAdminOrderDetail(orderID: number): Promise<TGetOrderDetail> {
+  return fetch(`${process.env.BACKEND_URL}/api/orderDetailAdmin/${orderID}`, {
+    method: "GET",
+    credentials: "include",
+  })
+    .then((response) => response.json())
+    .then((result) => {
+      if (result.error) {
+        return { order: null, orderdetail: null, error: result.error } as TGetOrderDetail;
+      } else {
+        if (result.order && result.orderdetail) {
+          return { order: result.order, orderdetail: result.orderdetail, error: null } as TGetOrderDetail;
+        }
+        return { order: null, orderdetail: null, error: ErrorMessage.FetchError } as TGetOrderDetail;
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+      return { order: null, orderdetail: null, error: ErrorMessage.FetchError } as TGetOrderDetail;
+    });
+}
+
 /**
  * get admin order list
  * @param pageNo current page number (start from 0) - (number)

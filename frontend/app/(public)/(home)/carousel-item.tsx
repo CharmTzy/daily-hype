@@ -36,7 +36,7 @@ export default function CarouselItem({ data, currentActiveNo }: { data: any; cur
     sizeText = tempSize.join(", ");
   }
 
-  let colourRender = () => {
+  const colourRender = () => {
     const items: JSX.Element[] = [];
     colour.forEach((item, index) => {
       items.push(<div key={index} title={item.colour} className={`w-4 h-4 border-1 mr-3 rounded-full laptop-3xl:w-5 laptop-3xl:h-5`} style={{ backgroundColor: `#${item.hex}` }}></div>);

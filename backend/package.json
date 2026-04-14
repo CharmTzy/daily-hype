@@ -25,7 +25,9 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "eslint": "eslint ."
+    "eslint": "eslint .",
+    "db:init": "node scripts/bootstrap-db.js",
+    "db:reset": "node scripts/bootstrap-db.js --reset"
   },
   "devDependencies": {
     "eslint": "^8.38.0",

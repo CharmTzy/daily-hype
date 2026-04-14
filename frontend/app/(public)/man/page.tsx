@@ -71,12 +71,12 @@ const getSidebarCategoryByType = () => {
 
 //2.
 //get productcount by categoryid and isinstock
-const getTotalPages = (categoryid: number, isInStock: boolean, limit: number) => {
+const getTotalPages = (selectedCategoryIDs: Set<string>, isInStock: boolean, limit: number) => {
   const queryParams = new URLSearchParams();
-  queryParams.append("categoryid", categoryid.toString());
+  queryParams.append("categoryIDs", Array.from(selectedCategoryIDs).join(","));
   queryParams.append("isinstock", isInStock ? "1" : "0");
 
-  return fetch(`${process.env.BACKEND_URL}/api/productsCountByCategory?${queryParams}`)
+  return fetch(`${process.env.BACKEND_URL}/api/productsCountByCategoryIDs?${queryParams}`)
     .then((response) => {
       return response.json();
     })
@@ -137,7 +137,7 @@ export default function ManProduct() {
       setSidebarCategory(categoryResult);
       setSelectedCategoryID(new Set<string>([categoryResult[0].categoryid + ""]));
 
-      getTotalPages(categoryResult[0].categoryid, isInStock, noOfItems)
+      getTotalPages(new Set<string>([categoryResult[0].categoryid + ""]), isInStock, noOfItems)
         .then((totalPage: number) => {
           setTotalPages(totalPage);
         })
@@ -148,7 +148,8 @@ export default function ManProduct() {
   }, []);
 
   useEffect(() => {
-    getProductWithImageAndColour(selectedCategoryID.values().next().value, noOfItems, currentPage, isInStock)
+    if (selectedCategoryID.size === 0 || selectedCategoryID.has("")) return;
+    getProductWithImageAndColour(selectedCategoryID, noOfItems, currentPage, isInStock)
       .then((productDataArray: Product[]) => {
         if (productDataArray) setProductArr(productDataArray);
       })
@@ -158,7 +159,8 @@ export default function ManProduct() {
   }, [selectedCategoryID, currentPage, isInStock, noOfItems]);
 
   useEffect(() => {
-    getTotalPages(selectedCategoryID.values().next().value, isInStock, noOfItems)
+    if (selectedCategoryID.size === 0 || selectedCategoryID.has("")) return;
+    getTotalPages(selectedCategoryID, isInStock, noOfItems)
       .then((totalPage) => {
         console.log("HERE 1");
         console.log(totalPage);

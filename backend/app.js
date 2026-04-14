@@ -30,6 +30,10 @@ const uploadsFolder = path.join(__dirname, "uploads");
 fileFn.deleteAllFilesFolders(uploadsFolder);
 fileFn.createFolder(uploadsFolder);
 
+app.get("/health", function (req, res) {
+  return res.status(200).json({ status: "ok" });
+});
+
 // app.use(
 //   express.static(path.join(__dirname, "public"), {
 //     // Set the MIME type explicitly for .css and .js files

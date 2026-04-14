@@ -1,68 +1,65 @@
-/** @type {import('next').NextConfig} */
+/** @type {import("next").NextConfig} */
 
-const backendURLWithoutProtocol = process.env.BACKEND_URL.replace(/^https?:\/\//, "");
+const backendURL = process.env.BACKEND_URL || "http://localhost:5001";
+const stripeId =
+  process.env.STRIPE_ID ||
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ||
+  "pk_test_51OP59GDoGYotiWHLoyrEnu2W4W6XYmPk94V4iJw66c3h5YSZktk4JqLJEp59PVDbwOomBqDcfuiZ0PrZpWK8Oo4f00g0ioukHS";
+
+const parsedBackendUrl = new URL(backendURL);
 
 const nextConfig = {
   env: {
-    BACKEND_URL: process.env.BACKEND_URL || "http://localhost:5001",
-    STRIPE_ID: process.env.STRIPE_ID || "pk_test_51OP59GDoGYotiWHLoyrEnu2W4W6XYmPk94V4iJw66c3h5YSZktk4JqLJEp59PVDbwOomBqDcfuiZ0PrZpWK8Oo4f00g0ioukHS",
+    BACKEND_URL: backendURL,
+    STRIPE_ID: stripeId,
   },
   images: {
     remotePatterns: [
       {
-        protocol: "https",
-        hostname: backendURLWithoutProtocol,
-        pathname: "**",
+        protocol: parsedBackendUrl.protocol.replace(":", ""),
+        hostname: parsedBackendUrl.hostname,
+        port: parsedBackendUrl.port,
+        pathname: "/**",
       },
       {
         protocol: "https",
         hostname: "platform-lookaside.fbsbx.com",
-        pathname: "**",
+        pathname: "/**",
       },
       {
         protocol: "http",
         hostname: "res.cloudinary.com",
-        pathname: "**",
+        pathname: "/**",
       },
       {
         protocol: "https",
-        hostname: "platform-lookaside.fbsbx.com",
-        pathname: "**",
+        hostname: "res.cloudinary.com",
+        pathname: "/**",
       },
       {
         protocol: "http",
         hostname: "localhost",
-        pathname: "**",
+        pathname: "/**",
       },
       {
         protocol: "https",
-        hostname: "res.cloudinary.com",
-        pathname: "**",
+        hostname: "ssl.gstatic.com",
+        pathname: "/**",
       },
       {
         protocol: "http",
         hostname: "ssl.gstatic.com",
-        pathname: "**",
-      },
-      {
-        protocol: "https",
-        hostname: "ssl.gstatic.com",
-        pathname: "**",
+        pathname: "/**",
       },
       {
         protocol: "https",
         hostname: "i.ebayimg.com",
-        pathname: "**",
+        pathname: "/**",
       },
       {
         protocol: "https",
         hostname: "img.shein.com",
-        pathname: "**",
-      },
-      {
-        protocol: "http",
-        hostname: "ssl.gstatic.com",
-        pathname: "**",
+        pathname: "/**",
       },
       {
         protocol: "https",

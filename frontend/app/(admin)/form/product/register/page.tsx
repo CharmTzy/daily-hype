@@ -13,8 +13,7 @@ import { capitaliseWord } from "@/functions/formatter";
 import { getFilterOptions } from "@/functions/product-functions";
 import { Input, Textarea, Select, SelectItem, Button } from "@nextui-org/react";
 import { createProduct } from "@/functions/admin-product-functions";
-import  FileInput  from "@/components/ui/file-input";
-//import CloudinaryFileInput from "@/components/ui/cloudinary-file-input";
+import CloudinaryFileInput from "@/components/ui/cloudinary-file-input";
 
 interface IUploadedImages {
   imageid: string;
@@ -34,10 +33,7 @@ export default function Page() {
   const [categories, setCategories] = useState<ICategory[]>([]);
   const [colours, setColours] = useState<IColour[]>([]);
   const [sizes, setSizes] = useState<ISize[]>([]);
-
-  
-  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
-  //const [uploadedImages, setUploadedImages] = useState<IUploadedImages[]>([]);
+  const [uploadedImages, setUploadedImages] = useState<IUploadedImages[]>([]);
 
   const [productDetails, setProductDetails] = useState<ISelectedDetails[]>([]);
   const [selectedColour, setSelectedColour] = useState<string>("");
@@ -173,8 +169,7 @@ export default function Page() {
         </div>
 
         <div>
-          {/* <CloudinaryFileInput limit={9} uploadedImages={uploadedImages} setUploadedImages={setUploadedImages} /> */}
-          <FileInput limit={6} uploadedImages={uploadedImages} setUploadedImages={setUploadedImages} />
+          <CloudinaryFileInput limit={6} uploadedImages={uploadedImages} setUploadedImages={setUploadedImages} />
         </div>
       </div>
 

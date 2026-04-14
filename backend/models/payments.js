@@ -6,7 +6,14 @@
 
 const { query } = require("../database");
 const { DUPLICATE_ENTRY_ERROR, EMPTY_RESULT_ERROR, SQL_ERROR_CODE, TABLE_ALREADY_EXISTS_ERROR } = require("../errors");
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+
+const getStripe = () => {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error("Stripe is not configured");
+  }
+
+  return require("stripe")(process.env.STRIPE_SECRET_KEY);
+};
 
 // ca2
 module.exports.insertPayment = function insertPayment(orderid, paymentid, paymentmethod, paymentamount, paymentstatus, transactionid) {
@@ -24,7 +31,7 @@ module.exports.insertPayment = function insertPayment(orderid, paymentid, paymen
 };
 
 module.exports.getPaymentIntent = (amount) => {
-  return stripe.paymentIntents.create({
+  return getStripe().paymentIntents.create({
     payment_method_types: ["card"],
     amount: amount,
     currency: "sgd",
@@ -45,7 +52,7 @@ module.exports.checkPaymentSuccess = (orderID) => {
 };
 
 module.exports.retrievePaymentIntent = (paymentIntent) => {
-  return stripe.paymentIntents.retrieve(paymentIntent);
+  return getStripe().paymentIntents.retrieve(paymentIntent);
 };
 
 module.exports.getPaymentTransactionID = (userID, orderID) => {
@@ -68,7 +75,7 @@ module.exports.getPaymentTransactionID = (userID, orderID) => {
 
 module.exports.refundPayment = async (chargeID) => {
   if (chargeID) {
-    const refund = await stripe.refunds.create({
+    const refund = await getStripe().refunds.create({
       payment_intent: chargeID,
     });
     if(refund.status === 'succeeded') {

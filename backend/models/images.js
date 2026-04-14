@@ -2,6 +2,12 @@ const cloudinary = require("../cloudinary");
 const { query } = require("../database");
 const { EMPTY_RESULT_ERROR } = require("../errors");
 
+function ensureCloudinaryConfigured() {
+  if (!cloudinary.isConfigured) {
+    throw new Error("Cloudinary is not configured");
+  }
+}
+
 // this is an example of how to upload image to cloudinary, refer to ESDE cloudinary codes
 // function uploadFile(file) {
 //     cloudinary.uploader.upload(file.path, { upload_preset: 'upload_to_design' })
@@ -27,10 +33,12 @@ module.exports.createImage = (imageid, imagename, url) => {
 };
 
 module.exports.uploadCloudinaryPhoto = function uploadCloudinaryPhoto(email, file) {
+  ensureCloudinaryConfigured();
+
   return cloudinary.uploader
-    .upload("./uploads/" + file.originalname, { folder: "Design" })
+    .upload(file.path, { folder: cloudinary.getFolder("profiles") })
     .then((result) => {
-      if (result && result.public_id && result.url && result.original_filename) {
+      if (result && result.public_id && result.secure_url && result.original_filename) {
         return result;
       } else {
         throw new Error(`Image Upload Failed`);
@@ -43,10 +51,12 @@ module.exports.uploadCloudinaryPhoto = function uploadCloudinaryPhoto(email, fil
 };
 
 module.exports.uploadCloudinaryPhotos = function uploadCloudinaryPhotos(file) {
+  ensureCloudinaryConfigured();
+
   return cloudinary.uploader
-    .upload("./public/admin/js/uploads/" + file.originalname, { folder: "Design" })
+    .upload(file.path, { folder: cloudinary.getFolder("products") })
     .then((result) => {
-      if (result && result.public_id && result.url && result.original_filename) {
+      if (result && result.public_id && result.secure_url && result.original_filename) {
         return result;
       } else {
         throw new Error(`Image Upload Failed`);
@@ -105,6 +115,8 @@ module.exports.deleteProductImage = function deleteProductImage(productid) {
 };
 
 module.exports.deleteCloudinaryImage = function deleteCloudinaryImage(public_id) {
+  ensureCloudinaryConfigured();
+
   return cloudinary.uploader
     .destroy(public_id)
     .then((result) => {
@@ -203,7 +215,12 @@ module.exports.createBatchImage = (imageArr) => {
 
   const queryParams = imageArr.map((image) => [image.imageid, image.imagename, image.url]).flat();
 
-  return query(sql + queryValues, [...queryParams])
+  return query(
+    `${sql + queryValues}
+     ON CONFLICT (imageid)
+     DO UPDATE SET imagename = EXCLUDED.imagename, url = EXCLUDED.url`,
+    [...queryParams],
+  )
     .then((result) => result.rowCount)
     .catch((error) => {
       console.error(error);
@@ -212,6 +229,8 @@ module.exports.createBatchImage = (imageArr) => {
 };
 
 module.exports.deleteMultipleImagesFromCloudinary = async (publicIDArr) => {
+  ensureCloudinaryConfigured();
+
   const batchSize = 9;
   const batches = Math.ceil(publicIDArr.length / batchSize);
 
@@ -231,6 +250,8 @@ module.exports.deleteMultipleImagesFromCloudinary = async (publicIDArr) => {
 };
 
 module.exports.deleteSingleImageFromCloudinary = async (publicID) => {
+  ensureCloudinaryConfigured();
+
   return cloudinary.uploader
     .destroy(publicID)
     .then((result) => result)
@@ -241,6 +262,8 @@ module.exports.deleteSingleImageFromCloudinary = async (publicID) => {
 };
 
 module.exports.uploadMultipleImagesToCloudinary = async (filePaths) => {
+  ensureCloudinaryConfigured();
+
   const batchSize = 9;
   const batches = Math.ceil(filePaths.length / batchSize);
 
@@ -260,8 +283,10 @@ module.exports.uploadMultipleImagesToCloudinary = async (filePaths) => {
 };
 
 module.exports.uploadSingleImageToCloudinary = async (filePath) => {
+  ensureCloudinaryConfigured();
+
   return cloudinary.uploader
-    .upload(filePath, { folder: "Design" })
+    .upload(filePath, { folder: cloudinary.getFolder("uploads") })
     .then((result) => {
       if (result && result.public_id && result.secure_url && result.original_filename) {
         return result;

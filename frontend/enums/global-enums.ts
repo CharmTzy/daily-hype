@@ -6,6 +6,7 @@
  * enum used for current active page values
  */
 export enum CurrentActivePage {
+  Dashboard = "dashboard",
   Home = "home",
   Explore = "explore",
   Search = "search",
@@ -89,6 +90,8 @@ export enum URL {
   TermsNConditions = "/terms",
   SiteMap = "/sitemap",
   Dashboard = "/dashboard",
+  AdminProfile = "/dashboard/profile",
+  AdminSetting = "/dashboard/settings",
   UserForm = "/form/user",
   UserList = "/list/user",
   UserStat = "/stats/user",
@@ -106,6 +109,7 @@ export enum URL {
   SizeForm = "/form/size/register",
   ProductUpdate = "/form/product/update/",
   ProductStat = "/stats/product",
+  ReviewStat = "/stats/review",
   AddressBook = "/addressbook",
   CheckOut = "/checkout",
 }

@@ -8,6 +8,7 @@ const fs = require("fs");
 const path = require("path");
 const sharp = require("sharp");
 const imagesModel = require("../models/images");
+const cloudinary = require("../cloudinary");
 const validateFn = require("../middlewares/validateToken");
 const refreshFn = require("../middlewares/refreshToken");
 const fileFn = require("../functions/file-functions");
@@ -69,6 +70,10 @@ router.post("/image/upload/multiple/:width/:height", validateFn.validateToken, r
 });
 
 router.post("/image/upload/multiple/cloudinary/:width/:height", validateFn.validateToken, refreshFn.refreshToken, upload.array("image"), async (req, res) => {
+  if (!cloudinary.isConfigured) {
+    return res.status(503).json({ error: "Cloudinary is not configured" });
+  }
+
   const width = req.params.width;
   const height = req.params.height;
 
@@ -194,6 +199,10 @@ router.delete("/image/upload/:filename", validateFn.validateToken, refreshFn.ref
 });
 
 router.delete("/image/upload/cloudinary/*", validateFn.validateToken, refreshFn.refreshToken, (req, res) => {
+  if (!cloudinary.isConfigured) {
+    return res.status(503).json({ error: "Cloudinary is not configured" });
+  }
+
   const id = req.body.id;
   const email = req.body.email;
   const role = req.body.role;

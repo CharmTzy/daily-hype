@@ -1,22 +1,51 @@
 const { createClient } = require("redis");
 
-const client = createClient({
-  password: process.env.REDIS_PASSWORD,
-  socket: {
-    host: process.env.REDIS_HOST,
-    port: 16272,
-  },
-  legacyMode: true,
+const createNoopRedisClient = () => ({
+  isOpen: false,
+  isReady: false,
+  connect: async () => {},
+  get: async () => null,
+  setEx: async () => "OK",
+  del: async () => 0,
+  flushAll: async () => "OK",
 });
 
-client.on("error", (error) => {
-  console.error(error);
-});
+const redisUrl = process.env.REDIS_URL;
+const redisHost = process.env.REDIS_HOST;
 
-client.connect();
+if (!redisUrl && !redisHost) {
+  module.exports = createNoopRedisClient();
+} else {
+  const client = createClient(
+    redisUrl
+      ? {
+          url: redisUrl,
+          legacyMode: true,
+        }
+      : {
+          password: process.env.REDIS_PASSWORD,
+          socket: {
+            host: redisHost,
+            port: Number(process.env.REDIS_PORT || 16272),
+          },
+          legacyMode: true,
+        },
+  );
 
-client.flushAll("ASYNC", (error, succeeded) => {
-  console.log(succeeded); // will be true if successfull
-});
+  client.on("error", (error) => {
+    console.error("Redis error:", error.message);
+  });
 
-module.exports = client;
+  client
+    .connect()
+    .then(async () => {
+      if (process.env.REDIS_FLUSH_ON_BOOT === "true") {
+        await client.flushAll("ASYNC");
+      }
+    })
+    .catch((error) => {
+      console.error("Redis connection failed:", error.message);
+    });
+
+  module.exports = client;
+}

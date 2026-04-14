@@ -1,159 +1,149 @@
-// Name: Wai Yan Aung
-// Admin No: 2234993
-// Class: DIT/FT/2B/02
+// Name: Codex
+// Description: Improved admin user list page
 
 "use client";
 
-import { CurrentActivePage, ErrorMessage, URL } from "@/enums/global-enums";
-import { useEffect, useState } from "react";
-import { getAdminUser, getAdminUserCount, handleDeleteButton } from "@/functions/user-functions";
-import { formatDateByMonthDayYear24Hour } from "@/functions/formatter";
-
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
-import { useRouter } from "next/navigation";
-import CustomTable from "@/components/ui/table";
 import { useAppState } from "@/app/app-provider";
+import CustomTable from "@/components/ui/table";
+import { CurrentActivePage, ErrorMessage, URL } from "@/enums/global-enums";
+import { formatDateByMonthDayYear24Hour } from "@/functions/formatter";
+import { getAdminUser, getAdminUserCount, handleDeleteButton } from "@/functions/user-functions";
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from "@nextui-org/react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 
 const columns = ["User ID", "Profile Pic", "Email", "Customer Name", "Phone", "Account Created Time", "Default Address", "Default Region", "Role", "Status", "Action"];
 
+interface IAdminUserRow {
+  userid: string;
+  url: string;
+  email: string;
+  name: string;
+  createdat: string;
+  rolename: string;
+  phone: string;
+  building: string;
+  street: string;
+  unit_no: string;
+  postal_code: string;
+  region: string;
+  status: string;
+}
+
 export default function Page() {
   const { setCurrentActivePage } = useAppState();
+  const [users, setUsers] = useState<IAdminUserRow[]>([]);
   const [userData, setUserData] = useState<[string, ...React.ReactNode[]][]>([]);
   const [userCount, setUserCount] = useState<number>(1);
   const [pageNo, setPageNo] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [limit, setLimit] = useState<number>(10);
-  const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
+  const [selectedUser, setSelectedUser] = useState<IAdminUserRow | null>(null);
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const router = useRouter();
+
+  const handleUpdateButton = (userID: string) => {
+    router.push(`/list/user-update?userId=${userID}`);
+  };
+
+  const formatAddress = (item: IAdminUserRow) => {
+    const address = [item.building, item.street, item.unit_no, item.postal_code].filter((value) => value && value.trim() !== "").join(" ");
+    return address || "No default address";
+  };
+
+  const formatRows = (data: IAdminUserRow[]): [string, ...React.ReactNode[]][] => {
+    return data.map((item, index) => {
+      return [
+        item.userid.toString(),
+        <Image key={`image-${index}`} className="mx-auto" src={item.url ? item.url : "http://ssl.gstatic.com/accounts/ui/avatar_2x.png"} width={60} height={80} alt={item.name} />,
+        <label key={`email-${index}`} className="text-[14px] flex justify-center text-center">
+          {item.email}
+        </label>,
+        <label key={`name-${index}`} className="text-[14px] flex justify-center text-center">
+          {item.name}
+        </label>,
+        <label key={`phone-${index}`} className="text-[14px] flex justify-center">
+          {item.phone || "-"}
+        </label>,
+        <label key={`created-${index}`} className="text-[14px] flex justify-center text-center">
+          {formatDateByMonthDayYear24Hour(item.createdat)}
+        </label>,
+        <label key={`address-${index}`} className="text-[14px] flex justify-center text-center">
+          {formatAddress(item)}
+        </label>,
+        <label key={`region-${index}`} className="text-[14px] flex justify-center text-center">
+          {item.region || "-"}
+        </label>,
+        <label key={`role-${index}`} className="text-[14px] flex justify-center text-center capitalize">
+          {item.rolename}
+        </label>,
+        <label key={`status-${index}`} className="text-[14px] flex justify-center text-center capitalize">
+          {item.status}
+        </label>,
+        <div className="flex flex-col" key={`action-${index}`}>
+          <Button
+            color="primary"
+            className="mb-2"
+            size="sm"
+            onClick={(event) => {
+              event.stopPropagation();
+              handleUpdateButton(item.userid);
+            }}
+          >
+            Update
+          </Button>
+          <Button
+            color="danger"
+            size="sm"
+            onClick={(event) => {
+              event.stopPropagation();
+              handleDeleteButton(item.userid).then((result) => {
+                if (result.error) {
+                  alert(result.error);
+                  return;
+                }
+                void loadUsers(pageNo, limit);
+              });
+            }}
+          >
+            Delete
+          </Button>
+        </div>,
+      ] as [string, ...React.ReactNode[]];
+    });
+  };
+
+  const loadUsers = useCallback(async (currentPage: number, currentLimit: number) => {
+    const [countResult, userResult] = await Promise.all([getAdminUserCount(), getAdminUser(currentPage, currentLimit)]);
+
+    if (countResult.error) {
+      console.error(countResult.error);
+      if (countResult.error === ErrorMessage.UNAURHOTIZED) {
+        alert(ErrorMessage.UNAURHOTIZED);
+        router.push(URL.SignOut);
+      }
+      return;
+    }
+
+    if (userResult.error) {
+      console.error(userResult.error);
+      return;
+    }
+
+    const nextUsers = userResult.data || [];
+    setUserCount(countResult.data || 1);
+    setUsers(nextUsers);
+    setUserData(formatRows(nextUsers));
+  }, [router, pageNo, limit]);
 
   useEffect(() => {
     setCurrentActivePage(CurrentActivePage.UserList);
-    Promise.all([getAdminUserCount(), getAdminUser(0, limit)]).then(([result1, result2]) => {
-      if (result1.error) {
-        console.error(result1.error);
-        if (result1.error === ErrorMessage.UNAURHOTIZED) {
-          alert(ErrorMessage.UNAURHOTIZED);
-          router.push(URL.SignOut);
-        }
-      } else {
-        const data = result1.data || 1;
-        setUserCount(data);
-        if (result2.error) {
-        } else {
-          const data = result2.data || [];
-          setUserData(
-            data.map((item, index) => {
-              return [
-                item.userid.toString(),
-                <Image key={index} className="mx-auto" src={item.url ? item.url : "http://ssl.gstatic.com/accounts/ui/avatar_2x.png"} width={60} height={80} alt={item.name} />,
-                <label key={index} className="text-[14px] flex justify-center text-center">
-                  {item.email}
-                </label>,
-                <label key={index} className="text-[14px] flex justify-center text-center">
-                  {item.name}
-                </label>,
-                <label key={index} className="text-[14px] flex justify-center">
-                  {item.phone}
-                </label>,
-                <label key={index} className="text-[14px] flex justify-center text-center">
-                  {formatDateByMonthDayYear24Hour(item.createdat)}
-                </label>,
-                <label key={index} className="text-[14px] flex justify-center text-center">
-                  {item.postal_code}
-                </label>,
-                <label key={index} className="text-[14px] flex justify-center text-center">
-                  {item.region}
-                </label>,
-                <label key={index} className="text-[14px] flex justify-center text-center">
-                  {item.status}
-                </label>,
-                <label key={index} className="text-[14px] flex justify-center text-center capitalize">
-                  {item.rolename}
-                </label>,
-                <div className="flex flex-col" key={index}>
-                  <Button color="primary" className="mb-2" size="sm" onClick={() => {handleUpdateButton(item.userid)}}>
-                    Update
-                  </Button>
-
-                  <Button color="danger" size="sm" onClick={() => handleDeleteButton(item.userid)}>
-                    Delete
-                  </Button>
-                </div>,
-              ];
-            })
-          );
-        }
-      }
-    });
-  }, []);
+  }, [setCurrentActivePage]);
 
   useEffect(() => {
-    setIsLoading(true);
-  }, [pageNo]);
+    void loadUsers(pageNo, limit);
+  }, [pageNo, limit, loadUsers]);
 
-  useEffect(() => {
-    setPageNo(0);
-    setIsLoading(true);
-  }, [limit]);
-
-  useEffect(() => {
-    if (isLoading) {
-      getAdminUser(pageNo, limit).then((result) => {
-        const data = result.data || [];
-        console.log(data);
-        setUserData(
-          data.map((item, index) => {
-            return [
-              item.userid.toString(),
-              <Image key={index} className="mx-auto" src={item.url ? item.url : "http://ssl.gstatic.com/accounts/ui/avatar_2x.png"} width={60} height={80} alt={item.name} />,
-              <label key={index} className="text-[14px] flex justify-center text-center">
-                {item.email}
-              </label>,
-              <label key={index} className="text-[14px] flex justify-center text-center">
-                {item.name}
-              </label>,
-              <label key={index} className="text-[14px] flex justify-center">
-                {item.phone}
-              </label>,
-              <label key={index} className="text-[14px] flex justify-center text-center">
-                {formatDateByMonthDayYear24Hour(item.createdat)}
-              </label>,
-              <label key={index} className="text-[14px] flex justify-center text-center">
-                {item.building} {item.street} {item.unit_no} {item.postal_code}
-              </label>,
-              <label key={index} className="text-[14px] flex justify-center text-center">
-                {item.region}
-              </label>,
-              <label key={index} className="text-[14px] flex justify-center text-center capitalize">
-                {item.rolename}
-              </label>,
-              <label key={index} className="text-[14px] flex justify-center text-center">
-                {item.status}
-              </label>,
-              <div className="flex flex-col" key={index}>
-                <Button color="primary" className="mb-2" size="sm" onClick={() => {handleUpdateButton(item.userid)}}>
-                  Update
-                </Button>
-                <Button color="danger" size="sm" onClick={()=> {handleDeleteButton(item.userid); window.location.reload()}}>
-                  Delete
-                </Button>
-              </div>,
-            ];
-          })
-        );
-        setIsLoading(false);
-      });
-    }
-  }, [isLoading]);
-
-  const handleRowClick = (userID: string) => {
-    onOpen();
-  };
-
-  const handleUpdateButton = (userID:string) => {
-    router.push(`/list/user-update?userId=${userID}`);
-  }
   return (
     <>
       <div className="w-full max-w-full px-4 py-2">
@@ -161,22 +151,76 @@ export default function Page() {
           <label className="text-large font-semibold">User List</label>
         </div>
         <div className="mb-5">
-          <CustomTable columns={columns} onClick={(clickedValue) => handleRowClick(clickedValue)} rows={userData} setRowsPerPage={setLimit} page={pageNo} setPage={setPageNo} totalCount={userCount} />
+          <CustomTable
+            columns={columns}
+            onClick={(clickedValue) => {
+              const clickedUser = users.find((item) => item.userid.toString() === clickedValue);
+              if (clickedUser) {
+                setSelectedUser(clickedUser);
+                onOpen();
+              }
+            }}
+            rows={userData}
+            setRowsPerPage={setLimit}
+            page={pageNo}
+            setPage={setPageNo}
+            totalCount={userCount}
+          />
         </div>
       </div>
 
-      {isOpen && (
+      {selectedUser && (
         <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
           <ModalContent>
             {(onCloseModal) => (
               <>
-                <ModalHeader className="flex flex-col gap-1">Modal Title</ModalHeader>
+                <ModalHeader className="flex flex-col gap-1">User Summary</ModalHeader>
                 <ModalBody>
-                  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam pulvinar risus non risus hendrerit venenatis. Pellentesque sit amet hendrerit risus, sed porttitor quam.</p>
+                  <div className="space-y-3 text-sm text-slate-700">
+                    <div>
+                      <p className="font-semibold text-slate-900">{selectedUser.name}</p>
+                      <p>{selectedUser.email}</p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <p className="text-slate-500">Role</p>
+                        <p className="capitalize">{selectedUser.rolename}</p>
+                      </div>
+                      <div>
+                        <p className="text-slate-500">Status</p>
+                        <p className="capitalize">{selectedUser.status}</p>
+                      </div>
+                      <div>
+                        <p className="text-slate-500">Phone</p>
+                        <p>{selectedUser.phone || "-"}</p>
+                      </div>
+                      <div>
+                        <p className="text-slate-500">Region</p>
+                        <p>{selectedUser.region || "-"}</p>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-slate-500">Default Address</p>
+                      <p>{formatAddress(selectedUser)}</p>
+                    </div>
+                    <div>
+                      <p className="text-slate-500">Created</p>
+                      <p>{formatDateByMonthDayYear24Hour(selectedUser.createdat)}</p>
+                    </div>
+                  </div>
                 </ModalBody>
                 <ModalFooter>
-                  <Button color="danger" variant="light" onPress={onCloseModal}>
+                  <Button variant="light" onPress={onCloseModal}>
                     Close
+                  </Button>
+                  <Button
+                    color="primary"
+                    onPress={() => {
+                      onCloseModal();
+                      handleUpdateButton(selectedUser.userid);
+                    }}
+                  >
+                    Update user
                   </Button>
                 </ModalFooter>
               </>

@@ -146,18 +146,31 @@ module.exports.signupGoogle = function signupGoogle(id, name, email, verified_em
   }
   const currentDateTime = getCurrentDateTime();
   const defaultStatus = "active";
-  const method = 'google';
-  const sql = `WITH inserted_user AS (
-        INSERT INTO appuser(createdat, userid, name, email, verified_email, roleid, imageid,status,method)
-        VALUES(NOW(), $1, $2, $3, $4, 3 , $5 , $7 , $8)
-        RETURNING *
-      )
-      INSERT INTO image(imageid, imagename, url)
-      VALUES ($5, 'Google Photo' , $6)
-      RETURNING *;`;
-  return query(sql, [id, name, email, verified_email, currentDateTime, picture, defaultStatus,method]).catch(function (error) {
-    throw error;
-  });
+  const method = "google";
+  const sql = `
+    WITH role_info AS (
+      SELECT roleid FROM role WHERE rolename = 'customer'
+    ),
+    inserted_image AS (
+      INSERT INTO image (imageid, imagename, url)
+      VALUES ($1, 'Google Photo', $2)
+      RETURNING imageid, url
+    ),
+    inserted_user AS (
+      INSERT INTO appuser (createdat, name, email, verified_email, roleid, imageid, status, method)
+      SELECT NOW(), $3, $4, $5, role_info.roleid, inserted_image.imageid, $6, $7
+      FROM role_info, inserted_image
+      RETURNING userid, email, name, verified_email, method
+    )
+    SELECT inserted_user.userid, inserted_user.email, inserted_user.name, inserted_image.url
+    FROM inserted_user, inserted_image;
+  `;
+
+  return query(sql, [currentDateTime, picture, name, email, verified_email, defaultStatus, method])
+    .then((result) => result.rows[0])
+    .catch(function (error) {
+      throw error;
+    });
 };
 /* 
 module.exports.loginGoogle = function loginGoogle(email) {
@@ -193,19 +206,31 @@ module.exports.signupFacebook = function signupFacebook(id, name, email, verifie
   }
   const currentDateTime = getCurrentDateTime();
   const defaultStatus = "active";
-  const method = 'facebook';
+  const method = "facebook";
   const sql = `
-  WITH inserted_user AS (
-        INSERT INTO appuser(createdat, userid, name, email, verified_email, roleid, imageid,status, method)
-        VALUES(NOW(), $1, $2, $3, $4, 3 , $5 , $7, $8)
-        RETURNING *
-      )
-      INSERT INTO image(imageid, imagename, url)
-      VALUES ($5, 'Facebook Photo' , $6)
-      RETURNING *;`;
-  return query(sql, [id, name, email, verified_email, currentDateTime, picture, defaultStatus,method]).catch(function (error) {
-    throw error;
-  });
+    WITH role_info AS (
+      SELECT roleid FROM role WHERE rolename = 'customer'
+    ),
+    inserted_image AS (
+      INSERT INTO image (imageid, imagename, url)
+      VALUES ($1, 'Facebook Photo', $2)
+      RETURNING imageid, url
+    ),
+    inserted_user AS (
+      INSERT INTO appuser (createdat, name, email, verified_email, roleid, imageid, status, method)
+      SELECT NOW(), $3, $4, $5, role_info.roleid, inserted_image.imageid, $6, $7
+      FROM role_info, inserted_image
+      RETURNING userid, email, name, verified_email, method
+    )
+    SELECT inserted_user.userid, inserted_user.email, inserted_user.name, inserted_image.url
+    FROM inserted_user, inserted_image;
+  `;
+
+  return query(sql, [currentDateTime, picture, name, email, verified_email, defaultStatus, method])
+    .then((result) => result.rows[0])
+    .catch(function (error) {
+      throw error;
+    });
 };
 
 module.exports.checkExistingUser = function checkExistingUser(email, method) {

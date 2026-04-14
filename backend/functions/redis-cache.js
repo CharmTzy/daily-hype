@@ -3,6 +3,7 @@
 // Class: DIT/FT/2B/02
 
 const redis = require("../redis");
+const defaultExpiration = Number(process.env.DEFAULT_EXPIRATION_TIME || 3600);
 
 /**
  * get or set cache
@@ -32,7 +33,7 @@ module.exports.getOrSetCache = (key, callback) => {
         console.log("CACHE MISS");
         callback()
           .then((newData) => {
-            redis.setEx(key, process.env.DEFAULT_EXPIRATION_TIME, JSON.stringify(newData));
+            redis.setEx(key, defaultExpiration, JSON.stringify(newData));
             resolve(newData);
           })
           .catch((error) => {
@@ -45,7 +46,7 @@ module.exports.getOrSetCache = (key, callback) => {
     } else {
       callback()
         .then((newData) => {
-          redis.setEx(key, process.env.DEFAULT_EXPIRATION_TIME, JSON.stringify(newData));
+          redis.setEx(key, defaultExpiration, JSON.stringify(newData));
           resolve(newData);
         })
         .catch((error) => {
@@ -86,7 +87,7 @@ module.exports.deleteCache = (key) => {
  */
 module.exports.setCache = (key, data) => {
   console.log(`\nCACHE SET ${key}`);
-  return redis.setEx(key, process.env.DEFAULT_EXPIRATION_TIME, JSON.stringify(data));
+  return redis.setEx(key, defaultExpiration, JSON.stringify(data));
 };
 
 /**

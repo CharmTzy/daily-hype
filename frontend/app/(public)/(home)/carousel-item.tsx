@@ -1,78 +1,113 @@
 "use client";
-
 import { URL } from "@/enums/global-enums";
 import { capitaliseWord, formatMoney } from "@/functions/formatter";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function CarouselItem({ data, currentActiveNo }: { data: any; currentActiveNo: number }) {
-  let type = "",
-    category = "",
-    description = "",
-    colour: { colourid: number; colour: string; hex: string }[] = [],
-    size: { sizeid: number; size: string }[] = [],
-    sizeText = "",
-    price = "",
-    productName = "",
-    url = "";
+type CarouselItemProps = {
+    data: any[];
+    currentActiveNo: number;
+};
 
-  if (data && data.length > currentActiveNo) {
-    const currentItem = data[currentActiveNo];
-    type = capitaliseWord(currentItem.typename);
-    category = capitaliseWord(currentItem.categoryname);
-    price = formatMoney(currentItem.unitprice);
-    productName = currentItem.productname;
-    url = currentItem.url[0];
-    description = currentItem.description;
+export default function CarouselItem({ data, currentActiveNo }: CarouselItemProps) {
+    const currentItem = data && data.length > currentActiveNo ? data[currentActiveNo] : null;
 
-    colour = currentItem.detail.map((d: any) => ({ colourid: d.colourid, colour: capitaliseWord(d.colour), hex: d.hex }));
-    colour = colour.filter((item: { colourid: number; colour: string; hex: string }, index: number) => colour.findIndex((c) => c.colourid === item.colourid) === index);
+    if (!currentItem) {
+        return null;
+    }
 
-    size = currentItem.detail.map((d: any) => ({ sizeid: d.sizeid, size: d.size.toUpperCase() }));
-    size = size.filter((item: { sizeid: number; size: string }, index: number, arr) => {
-      return size.findIndex((s) => s.sizeid === item.sizeid) === index;
-    });
-    let tempSize = size.map((s) => s.size);
-    sizeText = tempSize.join(", ");
-  }
+    const type = capitaliseWord(currentItem.typename);
+    const category = capitaliseWord(currentItem.categoryname);
+    const price = formatMoney(currentItem.unitprice);
+    const productName = currentItem.productname;
+    const description = currentItem.description;
+    const url = currentItem.url?.[0] || "";
+    const colours = currentItem.detail
+        .map((detail: any) => ({
+            colourid: detail.colourid,
+            colour: capitaliseWord(detail.colour),
+            hex: detail.hex,
+        }))
+        .filter(
+            (item: { colourid: number }, index: number, arr: { colourid: number }[]) =>
+                arr.findIndex((colour) => colour.colourid === item.colourid) === index,
+        );
+    const sizes = currentItem.detail
+        .map((detail: any) => detail.size.toUpperCase())
+        .filter((size: string, index: number, arr: string[]) => arr.indexOf(size) === index);
 
-  const colourRender = () => {
-    const items: JSX.Element[] = [];
-    colour.forEach((item, index) => {
-      items.push(<div key={index} title={item.colour} className={`w-4 h-4 border-1 mr-3 rounded-full laptop-3xl:w-5 laptop-3xl:h-5`} style={{ backgroundColor: `#${item.hex}` }}></div>);
-    });
-    return items;
-  };
+    return (
+        <section className="mx-auto w-full max-w-7xl px-4 pt-5 sm:px-6 lg:px-8 lg:pt-8">
+            <div className="grid overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_24px_80px_-48px_rgba(15,23,42,0.45)] dark:border-slate-800 dark:bg-slate-900 lg:grid-cols-[1fr_0.9fr]">
+                <div className="order-2 flex flex-col justify-center px-5 py-6 sm:px-8 sm:py-8 lg:order-1 lg:px-10 lg:py-12">
+                    <div className="flex flex-wrap items-center gap-2">
+                        <span className="rounded-full bg-slate-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500 dark:bg-slate-800 dark:text-slate-300">
+                            {type}
+                        </span>
+                        <span className="rounded-full bg-slate-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500 dark:bg-slate-800 dark:text-slate-300">
+                            {category}
+                        </span>
+                    </div>
 
-  return (
-    <div className="flex w-full h-88 justify-center items-center my-8 px-16">
-      <div className="flex flex-col self-start mr-56">
-        <Link href={URL.Man} className="mt-2 h-16 min-w-[400px] max-w-[400px] text-lg font-semibold tracking-wider w-fit text-black dark:text-white laptop-3xl:text-2xl laptop-3xl:min-w-[500px] laptop-3xl:h-16 laptop-3xl:max-w-[500px] laptop-xl:h-12">
-          {productName}
-        </Link>
-        <div className="flex mt-6">
-          <div className="flex flex-col mr-8">
-            <label className="laptop-3xl:text-large">Type:</label>
-            <label className="mt-2 laptop-3xl:text-large">Category:</label>
-            <label className="mt-2 laptop-3xl:text-large">Colours:</label>
-            <label className="mt-2 laptop-3xl:text-large">Sizes:</label>
-            <label className="mt-2 laptop-3xl:text-large">Price:</label>
-          </div>
-          <div className="flex flex-col">
-            <label>{type}</label>
-            <label className="mt-2 laptop-3xl:text-large">{category}</label>
-            <div className="mt-3 flex items-center laptop-3xl:mt-4">{colourRender()}</div>
-            <label className="mt-3 laptop-3xl:text-large">{sizeText}</label>
-            <label className="mt-2 laptop-3xl:text-large">${price}</label>
-          </div>
-        </div>
-        <label className="mt-6 h-20 w-[450px] overflow-hidden text-justify laptop-3xl:text-large laptop-2xl:h-[78px] laptop-xl:h-[74px]">{description}</label>
-      </div>
-      <div className="flex justify-center">
-        <div className="w-[200px] h-[250px] overflow-hidden rounded-xl laptop-3xl:w-[230px] laptop-3xl:h-[280px]">
-          <Image priority={true} fetchPriority="high" className="w-full h-full" width={200} height={250} src={url} alt={productName} loading="eager" />
-        </div>
-      </div>
-    </div>
-  );
+                    <h1 className="mt-5 max-w-xl text-3xl font-semibold tracking-tight text-slate-950 dark:text-white sm:text-4xl lg:text-[2.8rem]">
+                        {productName}
+                    </h1>
+                    <p className="mt-4 max-w-xl text-sm leading-7 text-slate-600 dark:text-slate-300 sm:text-base">
+                        {description}
+                    </p>
+
+                    <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950">
+                            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Colours</p>
+                            <div className="mt-3 flex flex-wrap gap-2">
+                                {colours.map((item: { colourid: number; colour: string; hex: string }) => (
+                                    <span
+                                        key={item.colourid}
+                                        title={item.colour}
+                                        className="h-6 w-6 rounded-full border border-black/10"
+                                        style={{ backgroundColor: `#${item.hex}` }}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950">
+                            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Sizes</p>
+                            <p className="mt-3 text-sm font-medium text-slate-700 dark:text-slate-200">
+                                {sizes.join(", ")}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
+                        <div>
+                            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">From</p>
+                            <p className="mt-2 text-2xl font-semibold text-slate-950 dark:text-white">${price}</p>
+                        </div>
+                        <Link
+                            href={`${URL.ProductDetail}${currentItem.productid}`}
+                            className="inline-flex h-12 items-center justify-center rounded-full bg-slate-950 px-7 text-sm font-semibold text-white transition hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100"
+                        >
+                            Shop this look
+                        </Link>
+                    </div>
+                </div>
+
+                <div className="order-1 border-b border-slate-200 bg-slate-100 dark:border-slate-800 dark:bg-slate-950 lg:order-2 lg:border-b-0 lg:border-l">
+                    <div className="relative min-h-[300px] sm:min-h-[380px] lg:min-h-[560px]">
+                        {url ? (
+                            <Image
+                                priority
+                                fetchPriority="high"
+                                className="object-cover"
+                                fill
+                                src={url}
+                                alt={productName}
+                                sizes="(max-width: 1024px) 100vw, 42vw"
+                            />
+                        ) : null}
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
 }

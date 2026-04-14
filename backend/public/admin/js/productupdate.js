@@ -1,38 +1,25 @@
-// Name: Thu Htet San
-// Admin No: 2235022
-// Date: 30.11.2023
-// Description: fuctions to be called from productupdate.html
-
 const token = localStorage.getItem('token');
-
-
 function initializeProductUpdate(productid) {
-
     Promise.all([getCategoryOptions(), getProductByProductID(productid)])
         .then(([categoryResult, productResult]) => {
-            console.log(productResult);
-            renderProductUpdateUI(categoryResult, productResult.product);
-        })
+        console.log(productResult);
+        renderProductUpdateUI(categoryResult, productResult.product);
+    })
         .catch(error => {
-            console.error(error);
-            // Handle errors if any
-        });
+        console.error(error);
+    });
 }
-
 function renderProductUpdateUI(category, product) {
-    console.log(product)
+    console.log(product);
     const { productname, description, unitprice, categoryid, categoryname, urls } = product;
-    const imageSize = 100; // Set your desired image size
-
+    const imageSize = 100;
     const imageHtml = `
         <div class="input-group">
             ${urls && urls.length > 0
-            ? urls.map(imageUrl => `<img src="${imageUrl}" alt="Product Image" style="width: ${imageSize}px; height: ${imageSize}px; margin-right: 10px;">`).join('')
-            : 'No images available'
-        }
+        ? urls.map(imageUrl => `<img src="${imageUrl}" alt="Product Image" style="width: ${imageSize}px; height: ${imageSize}px; margin-right: 10px;">`).join('')
+        : 'No images available'}
         </div>
     `;
-
     const appElement = document.getElementById('app');
     appElement.innerHTML = `
             
@@ -65,7 +52,6 @@ function renderProductUpdateUI(category, product) {
 
     `;
 }
-
 function getCategoryOptions() {
     return fetch(`/api/categories`, {
         method: "GET",
@@ -75,16 +61,15 @@ function getCategoryOptions() {
         }
     }).
         then(function (response) {
-            return response.json();
-        })
+        return response.json();
+    })
         .then(function (result) {
-            return result.categories;
-        })
+        return result.categories;
+    })
         .catch(function (error) {
-            console.error(error);
-        })
+        console.error(error);
+    });
 }
-
 function getProductByProductID(productid) {
     if (!productid && isNaN(productid)) {
         alert("Invalid ProductID");
@@ -100,51 +85,45 @@ function getProductByProductID(productid) {
         })
             .then((response) => response.json())
             .then((data) => {
-                return data;
-            })
+            return data;
+        })
             .catch((error) => {
-                console.error(error);
-                alert(error);
-            })
+            console.error(error);
+            alert(error);
+        });
     }
 }
-
 function updateProduct(productid) {
     const newName = document.getElementById('productName').value;
     const newDescription = document.getElementById('productDescription').value;
     const newUnitPrice = document.getElementById('unitPrice').value;
     const newCategoryId = document.getElementById('productCategory').value;
-
-
     if (newName && newDescription && newUnitPrice && newCategoryId) {
-
-        const product ={ product : {
-            productName: newName,
-            description: newDescription,
-            unitPrice: parseFloat(newUnitPrice), // Convert to float if needed
-            categoryId: parseInt(newCategoryId), // Convert to integer if needed
-            // Add other properties as needed
-        }};
-        fetch(`/api/productAdmin/${productid}`,
-            {
-                method: 'PUT',
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                }, 
-                body: JSON.stringify(product)
-            })
+        const product = { product: {
+                productName: newName,
+                description: newDescription,
+                unitPrice: parseFloat(newUnitPrice),
+                categoryId: parseInt(newCategoryId),
+            } };
+        fetch(`/api/productAdmin/${productid}`, {
+            method: 'PUT',
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(product)
+        })
             .then((response) => response.json())
             .then((result) => {
-                if (result && result.message === "Update Success") {
-                    alert(`Product ${productid} Product is updated!`);
-                    location.reload();
-                }
-            })
+            if (result && result.message === "Update Success") {
+                alert(`Product ${productid} Product is updated!`);
+                location.reload();
+            }
+        })
             .catch((error) => {
-                console.error(error);
-                alert("Error in updating quantity!");
-            })
+            console.error(error);
+            alert("Error in updating quantity!");
+        });
     }
     else {
         txtQty.style.border = "1px solid red";

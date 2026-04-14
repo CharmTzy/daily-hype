@@ -1,13 +1,6 @@
 const jwt = require("jsonwebtoken");
-
-module.exports.generateRefreshToken = (obj, secretKey) => {
-  return jwt.sign(obj, secretKey, { expiresIn: "7d" });
-};
-
-module.exports.generateAuthToken = (obj, secretKey) => {
-  return jwt.sign(obj, secretKey, { expiresIn: "30m" });
-};
-
+module.exports.generateRefreshToken = (obj, secretKey) => jwt.sign(obj, secretKey, { expiresIn: "7d" });
+module.exports.generateAuthToken = (obj, secretKey) => jwt.sign(obj, secretKey, { expiresIn: "30m" });
 module.exports.verifyJWTToken = (token, secretKey, callback) => {
   jwt.verify(token, secretKey, (err, data) => {
     if (err) {
@@ -17,7 +10,4 @@ module.exports.verifyJWTToken = (token, secretKey, callback) => {
     }
   });
 };
-
-module.exports.decodeJWTToken = (token) => {
-  return jwt.decode(token);
-};
+module.exports.decodeJWTToken = (token) => jwt.decode(token);

@@ -1,23 +1,15 @@
-// Name: Codex
-// Description: Admin profile landing page
-
 "use client";
-
 import { useAppState } from "@/app/app-provider";
 import { CurrentActivePage, URL } from "@/enums/global-enums";
 import { Button, Chip } from "@nextui-org/react";
 import Link from "next/link";
 import { useEffect } from "react";
-
 export default function Page() {
-  const { setCurrentActivePage, userInfo } = useAppState();
-
-  useEffect(() => {
-    setCurrentActivePage(CurrentActivePage.AdminProfile);
-  }, [setCurrentActivePage]);
-
-  return (
-    <div className="min-h-screen bg-slate-50 px-6 py-6">
+    const { setCurrentActivePage, userInfo } = useAppState();
+    useEffect(() => {
+        setCurrentActivePage(CurrentActivePage.AdminProfile);
+    }, [setCurrentActivePage]);
+    return (<div className="min-h-screen bg-slate-50 px-6 py-6">
       <div className="mx-auto max-w-4xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>
@@ -60,6 +52,6 @@ export default function Page() {
           </Link>
         </div>
       </div>
-    </div>
-  );
+    </div>);
 }
+

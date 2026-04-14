@@ -21,12 +21,12 @@ module.exports = {
         'import/no-extraneous-dependencies': [
             'error',
             {
-              devDependencies: true,
-              optionalDependencies: false,
-              peerDependencies: false,
-              packageDir: './',
+                devDependencies: true,
+                optionalDependencies: false,
+                peerDependencies: false,
+                packageDir: './',
             },
-          ],
-        
+        ],
     },
 };
+

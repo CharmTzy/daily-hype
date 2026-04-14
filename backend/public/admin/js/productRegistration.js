@@ -1,34 +1,21 @@
-// Name: Thu Htet San
-// Admin No: 2235022
-// Date: 22.11.2023
-// Description: fuctions to be called from productRegistration.html
-
 const token = localStorage.getItem('token');
-
-var colourOptions; //['Black', 'White', 'Red', 'Blue'];
-var categoryOptions; //['Category 1', 'Category 2', 'Category 3'];
-var sizeOptions; //['S', 'M', 'L', 'XL'];
+var colourOptions;
+var categoryOptions;
+var sizeOptions;
 let selectedSizes = {};
-
 function initializeProductRegistration() {
     showLoadingContainer();
-
-    //promise to get all the select options
     Promise.all([getCategoryOptions(), getColourOptions(), getSizeOptions()])
         .then(([categoryResult, colourResult, sizeResult]) => {
-
-            hideLoadingContainer();
-
-            colourOptions = colourResult.map(colour => colour.name);
-            categoryOptions = categoryResult.map(category => category.categoryname);
-            sizeOptions = sizeResult.map(size => size.name);
-            renderProductRegistrationUI();
-        }).catch((error) => {
-            console.error(error);
-        });
-
+        hideLoadingContainer();
+        colourOptions = colourResult.map(colour => colour.name);
+        categoryOptions = categoryResult.map(category => category.categoryname);
+        sizeOptions = sizeResult.map(size => size.name);
+        renderProductRegistrationUI();
+    }).catch((error) => {
+        console.error(error);
+    });
 }
-
 function renderProductRegistrationUI() {
     const appElement = document.getElementById('app');
     appElement.innerHTML = `
@@ -77,14 +64,10 @@ function renderProductRegistrationUI() {
 
     `;
 }
-
-
 function addColor() {
     const colorSection = document.getElementById('colorSection');
     const colorNameSelect = document.getElementById('colorName');
     const selectedColor = colorNameSelect.value;
-
-    // Store the selected color in the selectedSizes object
     selectedSizes[selectedColor] = {
         sizes: [],
     };
@@ -96,12 +79,9 @@ function addColor() {
             return;
         }
     }
-
     const colorBox = document.createElement('div');
     colorBox.className = 'colorBox';
-
-    colorBox.setAttribute('data-color', selectedColor);//new
-
+    colorBox.setAttribute('data-color', selectedColor);
     colorBox.innerHTML = `
         
     <label class="sizeLabel" for="size">Colour:</label>
@@ -114,18 +94,12 @@ function addColor() {
     `;
     colorSection.appendChild(colorBox);
 }
-
 function addSize(colorIndex) {
-
     const colorBox = document.getElementsByClassName('colorBox')[colorIndex];
     const sizeSelect = colorBox.querySelector('.sizeSelect');
     const selectedSize = sizeSelect.value;
-
-    // Store the selected size in the selectedSizes object
-    const selectedColor = colorBox.getAttribute('data-color');//new
-    selectedSizes[selectedColor].sizes.push(selectedSize);//new
-
-    // Check if the size already exists for the current color
+    const selectedColor = colorBox.getAttribute('data-color');
+    selectedSizes[selectedColor].sizes.push(selectedSize);
     const existingSizes = colorBox.querySelectorAll('.sizeBox');
     for (const sizeBox of existingSizes) {
         const existingSize = sizeBox.getAttribute('data-size');
@@ -134,11 +108,9 @@ function addSize(colorIndex) {
             return;
         }
     }
-
     const sizeBox = document.createElement('div');
     sizeBox.className = 'sizeBox';
     sizeBox.setAttribute('data-size', selectedSize);
-
     sizeBox.innerHTML = `
         <label class="sizeLabel" for="size">Size:</label>
         <label style="margin-right:15px">${selectedSize}</label>
@@ -146,64 +118,44 @@ function addSize(colorIndex) {
         <input style="width: calc(15%); margin:0px 10px" type="number" class="qtyInput" id="quantity" min="0">
         <button onclick="removeSize(${colorIndex}, ${colorBox.children.length})" class="deleteBtn">Delete</button>
     `;
-
     colorBox.appendChild(sizeBox);
 }
-
 function removeColor(colorIndex) {
     const colorSection = document.getElementById('colorSection');
     const colorBox = colorSection.children[colorIndex];
     const colorLabel = colorBox.getAttribute('data-color');
-
-    // Remove the color and its sizes from the selectedSizes object
     delete selectedSizes[colorLabel];
-
     colorSection.removeChild(colorBox);
 }
-
 function removeSize(colorIndex, sizeIndex) {
     const colorBox = document.getElementsByClassName('colorBox')[colorIndex];
     const sizeElements = colorBox.querySelectorAll('.sizeBox');
-
-    // Ensure sizeIndex is within bounds
     if (sizeIndex >= 0 && sizeIndex < sizeElements.length) {
         const sizeToRemove = sizeElements[sizeIndex];
         const selectedColor = colorBox.getAttribute('data-color');
         const selectedSize = sizeToRemove.getAttribute('data-size');
-
-        // Remove the size from the selectedSizes object
         const sizeIndexToRemove = selectedSizes[selectedColor].sizes.indexOf(selectedSize);
         if (sizeIndexToRemove !== -1) {
             selectedSizes[selectedColor].sizes.splice(sizeIndexToRemove, 1);
         }
-
         colorBox.removeChild(sizeToRemove);
     }
 }
-
 function submitProduct() {
     const productName = document.getElementById('productName').value;
     const productDescription = document.getElementById('productDescription').value;
     const unitPrice = document.getElementById('unitPrice').value;
-    //const productCategory = Array.from(document.getElementById('productCategory').selectedOptions).map(option => option.value);
     const productCategory = document.getElementById('productCategory').value;
-
     const colorSection = document.getElementById('colorSection');
     const productColors = {};
-
     for (const colorBox of colorSection.getElementsByClassName('colorBox')) {
         const colorLabel = colorBox.getAttribute('data-color');
         const selectedSizesData = selectedSizes[colorLabel];
-
         const qtyInputs = colorBox.querySelectorAll('.qtyInput');
         const qtyValues = Array.from(qtyInputs).map(input => parseInt(input.value) || 0);
-
         if (!productColors[colorLabel]) {
             productColors[colorLabel] = {};
         }
-
-
-
         selectedSizesData.sizes.forEach((size, index) => {
             const qty = qtyValues[index];
             if (qty > 0) {
@@ -213,9 +165,7 @@ function submitProduct() {
                 productColors[colorLabel][size] = qty;
             }
         });
-
     }
-
     const product = {
         Name: productName,
         Description: productDescription,
@@ -224,41 +174,30 @@ function submitProduct() {
         Color: productColors,
     };
     console.log(product);
-    // Store the product data in localStorage
-    //localStorage.setItem('product', JSON.stringify(product));
-
     const promiseResult = Promise.all([sendProductToBackend(product), uploadProductImages()])
         .then(([productResult, imageId]) => {
-            // Use the productID for subsequent operations
-
-            createProductImage(productResult.productID, imageId.public_id)
-                .then((result) => {
-                    console.log("FINAL");
-                    console.log(result);
-                    // Handle the result if needed
-                    console.log(`Product image created for ${imageId.public_id}`);
-                    if(result.message === 'Insert Success') {
-                        alert("Product is inserted!");
-                        location.reload();
-                    }
-                })
-                .catch((error) => {
-                    console.error(`Error creating product image for ${imageId.public_id}:`, error);
-                });
-            return { result: 1 }
-
+        createProductImage(productResult.productID, imageId.public_id)
+            .then((result) => {
+            console.log("FINAL");
+            console.log(result);
+            console.log(`Product image created for ${imageId.public_id}`);
+            if (result.message === 'Insert Success') {
+                alert("Product is inserted!");
+                location.reload();
+            }
         })
-        .catch(error => {
-            console.error('Error in sending product to backend:', error);
-            // Handle the error as needed
+            .catch((error) => {
+            console.error(`Error creating product image for ${imageId.public_id}:`, error);
         });
-
+        return { result: 1 };
+    })
+        .catch(error => {
+        console.error('Error in sending product to backend:', error);
+    });
     if (promiseResult.result == 1) {
-
         alert("Product added successfully");
     }
 }
-
 function getColourOptions() {
     return fetch(`/api/colours`, {
         method: "GET",
@@ -268,17 +207,15 @@ function getColourOptions() {
         }
     }).
         then(function (response) {
-            return response.json();
-        })
+        return response.json();
+    })
         .then(function (result) {
-            return result.colours;
-        })
+        return result.colours;
+    })
         .catch(function (error) {
-            console.error(error);
-        })
+        console.error(error);
+    });
 }
-
-
 function getCategoryOptions() {
     return fetch(`/api/categories`, {
         method: "GET",
@@ -288,17 +225,15 @@ function getCategoryOptions() {
         }
     }).
         then(function (response) {
-            return response.json();
-        })
+        return response.json();
+    })
         .then(function (result) {
-            return result.categories;
-        })
+        return result.categories;
+    })
         .catch(function (error) {
-            console.error(error);
-        })
+        console.error(error);
+    });
 }
-
-
 function getSizeOptions() {
     return fetch(`/api/sizes`, {
         method: "GET",
@@ -308,42 +243,28 @@ function getSizeOptions() {
         }
     }).
         then(function (response) {
-            return response.json();
-        })
+        return response.json();
+    })
         .then(function (result) {
-            return result.sizes;
-        })
+        return result.sizes;
+    })
         .catch(function (error) {
-            console.error(error);
-        })
+        console.error(error);
+    });
 }
-
 function sendProductToBackend(product) {
     const token = localStorage.getItem('token');
-
-    // Check for null or empty values in the product data
-    if (
-        !product.Name ||
+    if (!product.Name ||
         !product.Description ||
         !product.unitPrice ||
         !product.Category ||
         !Object.keys(product.Color).length ||
-        Object.values(product.Color).some(colorData =>
-            //         console.log("size", size); 
-            //         console.log("colorData[size]", 
-            !Object.keys(colorData).some(size => colorData[size])
-        )
-    ) {
-
-
+        Object.values(product.Color).some(colorData => !Object.keys(colorData).some(size => colorData[size]))) {
         alert('Please provide valid values for all fields, including sizes and quantities for each color.');
         return;
     }
-
     console.log("INSIDE PRODUCT");
     console.log(product);
-
-
     return fetch('/api/productAdmin', {
         method: 'POST',
         headers: {
@@ -353,41 +274,32 @@ function sendProductToBackend(product) {
         body: JSON.stringify(product)
     })
         .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
         .then(data => {
-            console.log("data.productID", data)
-            console.log("product successfully inserted")
-            return data;
-        })
+        console.log("data.productID", data);
+        console.log("product successfully inserted");
+        return data;
+    })
         .catch(error => {
-            console.error('Error submitting product:', error);
-            alert('Error submitting product. Please try again.');
-        });
+        console.error('Error submitting product:', error);
+        alert('Error submitting product. Please try again.');
+    });
 }
-
-//LOADING
 function showLoadingContainer() {
     const loadingContainer = document.getElementById('loading-container');
     loadingContainer.style.display = 'flex';
 }
-
 function hideLoadingContainer() {
     const loadingContainer = document.getElementById('loading-container');
     loadingContainer.style.display = 'none';
 }
-
-// Function to upload product images
 function uploadProductImages() {
-
     const productImagesInput = document.getElementById('productImages');
-    // const imageIds = [];
-
     console.log(productImagesInput);
-
     const formData = new FormData();
     if (productImagesInput.files.length > 0) {
         const files = productImagesInput.files;
@@ -396,9 +308,7 @@ function uploadProductImages() {
             formData.append("photo", file);
         }
     }
-
     console.log(formData);
-
     return fetch("/api/uploadProductPhoto", {
         method: "POST",
         headers: {
@@ -410,24 +320,19 @@ function uploadProductImages() {
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
-        return response.json(); // Convert the response to JSON
+        return response.json();
     }).then(result => {
         console.log(result);
         var inputString = result.public_id;
-        // var imageId = inputString.split("/")[1];
         console.log(result.public_id);
-        // imageIds.push(imageId);
         return result;
     })
         .catch(error => {
-            console.error('Error:', error);
-            throw error;
-            // Handle the error as needed
-        });
-
-
-};
-
+        console.error('Error:', error);
+        throw error;
+    });
+}
+;
 function createProductImage(productId, imageId) {
     console.log("INSIDE Product Image");
     console.log(productId);
@@ -443,12 +348,10 @@ function createProductImage(productId, imageId) {
             imageId: imageId
         }),
     }).then((result) => {
-        
         console.log(result);
         return result.json();
     })
-    .then((result) => {
+        .then((result) => {
         return result;
-    })
-
+    });
 }

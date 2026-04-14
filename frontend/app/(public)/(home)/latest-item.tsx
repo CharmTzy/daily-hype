@@ -1,9 +1,4 @@
-// Name: Zay Yar Tun
-// Admin No: 2235035
-// Class: DIT/FT/2B/02
-
 "use client";
-
 import { URL } from "@/enums/global-enums";
 import { ICartLocalStorage } from "@/enums/global-interfaces";
 import { ILatestProductsByLimitData } from "@/enums/product-interfaces";
@@ -14,48 +9,74 @@ import Image from "next/image";
 import Link from "next/link";
 
 interface ILatestItemProps {
-  data: ILatestProductsByLimitData[];
-  setCart: React.Dispatch<React.SetStateAction<ICartLocalStorage[]>>;
-  title: string;
+    data: ILatestProductsByLimitData[];
+    setCart: React.Dispatch<React.SetStateAction<ICartLocalStorage[]>>;
+    title: string;
 }
 
-export default function LatestItem({ data, setCart,title }: ILatestItemProps) {
-  return (
-    <div className="mt-12 mb-24 flex flex-col laptop-3xl:px-28 laptop-2xl:px-16 laptop-xl:px-12">
-      <label className="text-xl font-semibold uppercase tracking-wider laptop-3xl:text-3xl laptop-2xl:text-2xl laptop-xl:text-xl">{title}</label>
-      <div className="flex justify-between w-full mt-4 laptop-2xl:mt-8 laptop-xl:mt-6">
-        {data.map((item: any, index: number) => {
-          return (
-            <div className="flex flex-col" key={index}>
-              <div className="rounded-xl relative overflow-hidden laptop-3xl:w-[220px] laptop-3xl:h-[270px] laptop-2xl:w-[200px] laptop-2xl:h-[250px] laptop-xl:w-[170px] laptop-xl:h-[220px]">
-                <Image src={item.url[0]} fill={true} quality={70} loading="eager" alt={item.productname} />
-              </div>
-              <Link href={`${URL.Man}?id=${item.productid}`} className="mt-2 h-12 overflow-hidden w-fit font-medium laptop-3xl:max-w-[220px] laptop-3xl:text-[18px] laptop-3xl:h-20 laptop-2xl:max-w-[200px] laptop-2xl:text-[16px] laptop-xl:w-[170px] laptop-xl:text-[14px] laptop-xl:h-16">
-                {item.productname}
-              </Link>
-              <label className="text-small mt-2 laptop-3xl:text-medium laptop-xl:text-[13px]">${formatMoney(item.unitprice)}</label>
-              <Button
-                className="mt-4 bg-transparent border-1 border-slate-800 dark:border-slate-200 laptop-3xl:text-medium"
-                onClick={() => {
-                  setCart((prevCart) => {
-                    const index = prevCart.findIndex((p: any) => p.productdetailid === item.productdetailid);
-                    let tempCart = [...prevCart];
-                    if (index === -1) {
-                      tempCart.push({ productdetailid: item.detail[0].productdetailid, qty: 1 });
-                    }
-                    tempCart = removeDuplicateCartData(tempCart).cart;
-                    localStorage.setItem("cart", JSON.stringify(tempCart));
-                    alert(`${item.productname} is added to cart!`);
-                    return tempCart;
-                  });
-                }}
-              >
-                Add to Cart
-              </Button>
+export default function LatestItem({ data, setCart, title }: ILatestItemProps) {
+    return (
+        <section className="mx-auto mb-14 mt-12 w-full max-w-7xl px-4 sm:px-6 lg:mb-20 lg:px-8">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">DailyHype Edit</p>
+                    <label className="mt-2 block text-2xl font-semibold tracking-tight text-slate-950 dark:text-white sm:text-3xl">
+                        {title}
+                    </label>
+                </div>
+                <Link href={URL.Explore} className="text-sm font-medium text-slate-600 transition hover:text-slate-950 dark:text-slate-300 dark:hover:text-white">
+                    Explore all
+                </Link>
             </div>
-          );
-        })}
-      </div>
-    </div>
-  );
+
+            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+                {data.map((item, index) => (
+                    <article
+                        className="group flex h-full flex-col overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white transition duration-200 hover:-translate-y-1 hover:shadow-xl dark:border-slate-800 dark:bg-slate-900"
+                        key={index}
+                    >
+                        <Link href={`${URL.ProductDetail}${item.productid}`} className="relative block aspect-[4/5] overflow-hidden bg-slate-100 dark:bg-slate-950">
+                            <Image
+                                src={item.url[0]}
+                                fill
+                                quality={70}
+                                loading="eager"
+                                alt={item.productname}
+                                sizes="(max-width: 640px) 50vw, (max-width: 1280px) 33vw, 16vw"
+                                className="object-cover transition duration-300 group-hover:scale-[1.03]"
+                            />
+                        </Link>
+
+                        <div className="flex flex-1 flex-col p-4">
+                            <Link
+                                href={`${URL.ProductDetail}${item.productid}`}
+                                className="line-clamp-2 min-h-[48px] text-sm font-semibold text-slate-900 transition hover:text-slate-600 dark:text-white dark:hover:text-slate-200"
+                            >
+                                {item.productname}
+                            </Link>
+                            <label className="mt-2 text-base font-semibold text-slate-900 dark:text-white">
+                                ${formatMoney(item.unitprice)}
+                            </label>
+                            <Button
+                                className="mt-4 h-11 rounded-full border border-slate-300 bg-transparent text-sm font-semibold text-slate-800 dark:border-slate-700 dark:text-white"
+                                onClick={() => {
+                                    setCart((prevCart) => {
+                                        let tempCart = [...prevCart];
+                                        if (!tempCart.find((product) => product.productdetailid === item.detail[0].productdetailid)) {
+                                            tempCart.push({ productdetailid: item.detail[0].productdetailid, qty: 1 });
+                                        }
+                                        tempCart = removeDuplicateCartData(tempCart).cart;
+                                        localStorage.setItem("cart", JSON.stringify(tempCart));
+                                        return tempCart;
+                                    });
+                                }}
+                            >
+                                Add to Cart
+                            </Button>
+                        </div>
+                    </article>
+                ))}
+            </div>
+        </section>
+    );
 }

@@ -1,15 +1,8 @@
 "use client";
 
+import TypeCatalogPage from "@/components/product/type-catalog-page";
 import { CurrentActivePage } from "@/enums/global-enums";
-import { useAppState } from "@/app/app-provider";
-import { useEffect } from "react";
 
-export default function KidProduct() {
-  const { setCurrentActivePage } = useAppState();
-
-  useEffect(() => {
-    setCurrentActivePage(CurrentActivePage.Boy);
-  }, []);
-
-  return <div>This is boy product page!</div>;
+export default function BoyProduct() {
+    return <TypeCatalogPage typeId={4} title="Boy" activePage={CurrentActivePage.Boy} />;
 }

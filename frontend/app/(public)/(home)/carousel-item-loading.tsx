@@ -1,33 +1,27 @@
 "use client";
-
 import { Skeleton } from "@nextui-org/react";
 
 export default function CarouselItemSkeleton() {
-  return (
-    <div className="flex w-full h-88 justify-center items-center my-8 px-16">
-      <div className="flex flex-col self-start mr-64">
-        <Skeleton className="mt-4 w-[400px] h-16"></Skeleton>
-        <div className="flex mt-6">
-          <div className="flex flex-col w-[150px] mr-6">
-            <Skeleton className="w-full h-[15px]"></Skeleton>
-            <Skeleton className="mt-3 w-full h-[15px]"></Skeleton>
-            <Skeleton className="mt-3 w-full h-[15px]"></Skeleton>
-            <Skeleton className="mt-3 w-full h-[15px]"></Skeleton>
-            <Skeleton className="mt-3 w-full h-[15px]"></Skeleton>
-          </div>
-          <div className="flex w-full flex-col">
-            <Skeleton className="w-full h-[15px]"></Skeleton>
-            <Skeleton className="mt-3 w-full h-[15px]"></Skeleton>
-            <Skeleton className="mt-3 w-full h-[15px]"></Skeleton>
-            <Skeleton className="mt-3 w-full h-[15px]"></Skeleton>
-            <Skeleton className="mt-3 w-full h-[15px]"></Skeleton>
-          </div>
+    return (
+        <div className="mx-auto w-full max-w-7xl px-4 pt-5 sm:px-6 lg:px-8 lg:pt-8">
+            <div className="grid overflow-hidden rounded-[2rem] border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 lg:grid-cols-[1fr_0.9fr]">
+                <div className="order-2 flex flex-col gap-5 px-5 py-6 sm:px-8 sm:py-8 lg:order-1 lg:px-10 lg:py-12">
+                    <Skeleton className="h-6 w-40 rounded-full" />
+                    <Skeleton className="h-12 w-full max-w-[420px] rounded-2xl" />
+                    <Skeleton className="h-24 w-full max-w-[520px] rounded-3xl" />
+                    <div className="grid gap-4 sm:grid-cols-2">
+                        <Skeleton className="h-24 rounded-[1.5rem]" />
+                        <Skeleton className="h-24 rounded-[1.5rem]" />
+                    </div>
+                    <div className="flex flex-col gap-4 sm:flex-row">
+                        <Skeleton className="h-14 w-32 rounded-[1.5rem]" />
+                        <Skeleton className="h-12 w-40 rounded-full" />
+                    </div>
+                </div>
+                <div className="order-1 lg:order-2">
+                    <Skeleton className="min-h-[300px] rounded-none sm:min-h-[380px] lg:min-h-[560px]" />
+                </div>
+            </div>
         </div>
-        <Skeleton className="mt-6 w-[450px] h-16"></Skeleton>
-      </div>
-      <div className="flex justify-center">
-        <Skeleton className="w-[200px] h-[250px] rounded-xl"></Skeleton>
-      </div>
-    </div>
-  );
+    );
 }

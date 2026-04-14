@@ -1,38 +1,19 @@
-// Name: Zay Yar Tun
-// Admin No: 2235035
-// Class: DIT/FT/2B/02
-
 "use client";
-
 import { useAppState } from "@/app/app-provider";
 import { CurrentActivePage, URL } from "@/enums/global-enums";
 import { Accordion, AccordionItem, Input, Link } from "@nextui-org/react";
 import { useEffect, useState } from "react";
-
 export default function Page() {
-  const { setCurrentActivePage } = useAppState();
-  const [searchText, setSearchText] = useState<string>("");
-
-  useEffect(() => {
-    setCurrentActivePage(CurrentActivePage.None);
-  }, []);
-
-  return (
-    <div className="flex flex-col w-full items-center my-8">
+    const { setCurrentActivePage } = useAppState();
+    const [searchText, setSearchText] = useState<string>("");
+    useEffect(() => {
+        setCurrentActivePage(CurrentActivePage.None);
+    }, []);
+    return (<div className="flex flex-col w-full items-center my-8">
       <label className="text-2xl font-bold mt-4">How can we help you?</label>
-      <Input
-        isClearable
-        value={searchText}
-        onChange={(e) => setSearchText(e.target.value)}
-        className="max-w-[60%] mt-8"
-        placeholder="Search for topics, questions, ..."
-        onClear={() => {
-          setSearchText("");
-        }}
-        variant="faded"
-        radius="lg"
-        size="lg"
-      />
+      <Input isClearable value={searchText} onChange={(e) => setSearchText(e.target.value)} className="max-w-[60%] mt-8" placeholder="Search for topics, questions, ..." onClear={() => {
+            setSearchText("");
+        }} variant="faded" radius="lg" size="lg"/>
       <div className="flex flex-col items-center mt-20 mb-8">
         <label className="text-xl font-semibold mb-4">Frequently Asked Questions</label>
         <Accordion variant="splitted" className="mt-4 w-[700px]" itemClasses={{ title: "text-medium data-[open=true]:font-semibold" }}>
@@ -102,6 +83,6 @@ export default function Page() {
           </AccordionItem>
         </Accordion>
       </div>
-    </div>
-  );
+    </div>);
 }
+

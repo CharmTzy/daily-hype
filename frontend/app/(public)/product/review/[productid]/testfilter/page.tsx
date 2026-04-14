@@ -1,37 +1,13 @@
-// export default function Page() {
-//   return <div>THis is review</div>;
-// }
 "use client";
-
 import React, { useEffect } from "react";
-// import "./review.css"; // Import the CSS file
-// import { loadHeaderFooter } from "./js/headerFooter";
-// import { getReview, displayReviewsByRating, displayAverageRating } from "./js/review"; // Assuming you have these functions in review.js
-
 const ReviewsPage: React.FC = () => {
-  useEffect(() => {
-    // loading header and footer html files
-    // loadHeaderFooter();
-
-    // initially display all reviews in "reviews" class
-    // getReview();
-
-    // data manipulation
-    // apply rating filter
-    const ratingFilter = document.getElementById(
-      "ratingFilter"
-    ) as HTMLSelectElement;
-    ratingFilter.addEventListener("change", function () {
-      const selectedRating = ratingFilter.value;
-      //   displayReviewsByRating(selectedRating);
-    });
-
-    // Calculate and display the average rating
-    // displayAverageRating();
-  }, []);
-
-  return (
-    <div>
+    useEffect(() => {
+        const ratingFilter = document.getElementById("ratingFilter") as HTMLSelectElement;
+        ratingFilter.addEventListener("change", function () {
+            const selectedRating = ratingFilter.value;
+        });
+    }, []);
+    return (<div>
       <label>Product Name: Sample Product</label>
       <br />
       <label>Product Size: Large</label>
@@ -42,7 +18,7 @@ const ReviewsPage: React.FC = () => {
       <label>Average Rating: 4.2</label>
 
       <div className="average-rating">
-        {/* This is where the average rating will be displayed */}
+        
       </div>
 
       <div className="filter">
@@ -92,16 +68,15 @@ const ReviewsPage: React.FC = () => {
         </select>
 
         <label>
-          <input type="checkbox" id="mediaToggle" />
+          <input type="checkbox" id="mediaToggle"/>
           With Media Only
         </label>
       </div>
 
       <div className="reviews">
-        {/* This is where the reviews will be displayed */}
+        
       </div>
-    </div>
-  );
+    </div>);
 };
-
 export default ReviewsPage;
+

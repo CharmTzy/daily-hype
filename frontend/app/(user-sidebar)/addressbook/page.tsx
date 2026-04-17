@@ -280,36 +280,36 @@ export default function Component() {
                   <ModalBody>
                     <form className="space-y-4 my-8">
                       <div className="flex flex-col">
-                        <Input classNames={{ inputWrapper: "bg-white border-grey border-1 dark:bg-white dark:border-black dark:border-2 rounded-none" }} label="Location*" placeholder="Singapore" isReadOnly/>
+                        <Input classNames={{ inputWrapper: "bg-white border-grey border-1 rounded-none" }} label="Location*" placeholder="Singapore" isReadOnly/>
                       </div>
                       <div className="flex flex-col">
-                        <Input classNames={{ inputWrapper: "bg-white border-grey border-1 dark:bg-white dark:border-black dark:border-2 rounded-none" }} value={fullname} onChange={(e) => setfullName(e.target.value)} label="Full Name*"/>
+                        <Input classNames={{ inputWrapper: "bg-white border-grey border-1 rounded-none" }} value={fullname} onChange={(e) => setfullName(e.target.value)} label="Full Name*"/>
                       </div>
                       <div className="flex">
                         <div className="flex flex-col">
-                          <Input classNames={{ inputWrapper: "bg-white border-grey border-1 dark:bg-white dark:border-black dark:border-2 w-24 rounded-md rounded-none" }} placeholder="SG +65" isReadOnly/>
+                          <Input classNames={{ inputWrapper: "bg-white border-grey border-1 w-24 rounded-md rounded-none" }} placeholder="SG +65" isReadOnly/>
                         </div>
                         <div className="flex flex-col w-full">
-                          <Input classNames={{ inputWrapper: "bg-white border-grey border-1 dark:bg-white dark:border-black dark:border-2 w-full rounded-none" }} value={phone} onChange={(e) => setPhone(e.target.value)} label="Phone Number*"/>
+                          <Input classNames={{ inputWrapper: "bg-white border-grey border-1 w-full rounded-none" }} value={phone} onChange={(e) => setPhone(e.target.value)} label="Phone Number*"/>
                         </div>
                       </div>
                       <div className="flex flex-col">
-                        <Input classNames={{ inputWrapper: "bg-white border-grey border-1 dark:bg-white dark:border-black dark:border-2 rounded-none" }} value={postal_code} onChange={(e) => setPostal_code(e.target.value)} label="Postal Code*"/>
+                        <Input classNames={{ inputWrapper: "bg-white border-grey border-1 rounded-none" }} value={postal_code} onChange={(e) => setPostal_code(e.target.value)} label="Postal Code*"/>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="flex flex-col">
-                          <Input classNames={{ inputWrapper: "bg-white border-grey border-1 dark:bg-white dark:border-black dark:border-2 rounded-none" }} value={block_no} onChange={(e) => setBlock(e.target.value)} label="Block*"/>
+                          <Input classNames={{ inputWrapper: "bg-white border-grey border-1 rounded-none" }} value={block_no} onChange={(e) => setBlock(e.target.value)} label="Block*"/>
                         </div>
                         <div className="flex flex-col">
-                          <Input classNames={{ inputWrapper: "bg-white border-grey border-1 dark:bg-white dark:border-black dark:border-2 rounded-none" }} value={street} onChange={(e) => setStreet(e.target.value)} label="Street Name*"/>
+                          <Input classNames={{ inputWrapper: "bg-white border-grey border-1 rounded-none" }} value={street} onChange={(e) => setStreet(e.target.value)} label="Street Name*"/>
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                       <div className="flex flex-col">
-                        <Input classNames={{ inputWrapper: "bg-white border-grey border-1 dark:bg-white dark:border-black dark:border-2 rounded-none" }} value={building} onChange={(e) => setBuilding(e.target.value)} label="Building Name(Optional)"/>
+                        <Input classNames={{ inputWrapper: "bg-white border-grey border-1 rounded-none" }} value={building} onChange={(e) => setBuilding(e.target.value)} label="Building Name(Optional)"/>
                       </div>
                       <div className="flex flex-col">
-                        <Input classNames={{ inputWrapper: "bg-white border-grey border-1 dark:bg-white dark:border-black dark:border-2 rounded-none" }} value={unit_no} onChange={(e) => setUnit_no(e.target.value)} label="Unit No.(Optional)"/>
+                        <Input classNames={{ inputWrapper: "bg-white border-grey border-1 rounded-none" }} value={unit_no} onChange={(e) => setUnit_no(e.target.value)} label="Unit No.(Optional)"/>
                       </div>
                       </div>
                       <div className="flex items-center justify-between">
@@ -330,7 +330,7 @@ export default function Component() {
                       </div>
                       <p className="text-sm text-gray-600 mt-2">We maintain industry-standard physical, technical, and administrative measures to safeguard your personal information.</p>
                       <div className="flex justify-center">
-                        <Button className="w-52 h-10 bg-black dark:bg-white text-white dark:text-black rounded-none text-lg" onClick={addOrEditAddress}>
+                        <Button className="w-52 h-10 bg-black text-white rounded-none text-lg" onClick={addOrEditAddress}>
                           {isAddMode ? "Save" : "Edit"}
                         </Button>
                       </div>

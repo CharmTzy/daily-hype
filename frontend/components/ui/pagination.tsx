@@ -29,7 +29,7 @@ export default function CustomPagination({ total, currentPage, className, onChan
       </button>);
     };
     return (<div className="flex w-full max-w-full justify-end">
-      <label className={clsx("mt-2 mr-5 text-slate-600 dark:text-slate-400", labelClassName)}>Total {total} pages</label>
+      <label className={clsx("mt-2 mr-5 text-slate-600", labelClassName)}>Total {total} pages</label>
       <Pagination disableCursorAnimation showControls total={total} page={currentPage} className={clsx("gap-2", `${className} gap-2`)} onChange={(current) => {
             onChange && onChange(current);
         }} radius="full" renderItem={renderItem} variant="light"/>

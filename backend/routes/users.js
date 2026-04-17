@@ -128,7 +128,6 @@ router.post("/loginVerificationCode", (req, res) => {
         IPAddress = "127.0.0.1";
     }
     const generatedCode = Math.floor(100000 + Math.random() * 900000);
-    console.log(generatedCode);
     const email = req.body.email;
     return Promise.all([mailFunctions.sendEmailVerificationCode(IPAddress, generatedCode, email), userModel.saveVerificationCode(generatedCode, email)])
         .then(() => {
@@ -141,7 +140,6 @@ router.post("/loginVerificationCode", (req, res) => {
 });
 router.post("/verify", (req, res) => {
     const { code, email } = req.body;
-    console.log(code, email);
     return userModel
         .verification(code, email)
         .then(function (user) {
@@ -271,7 +269,6 @@ router.post("/sendmail", async (req, res) => {
     }
     try {
         const email = req.body.email;
-        console.log(email);
         const generatedCode = Math.floor(100000 + Math.random() * 900000);
         const info = await mailFunctions.sendEmailVerificationCode(IPAddress, generatedCode, email);
         res.status(200).json({ message: "Email sent successfully", info });
@@ -283,7 +280,6 @@ router.post("/sendmail", async (req, res) => {
 });
 router.post("/checkExistingUser", (req, res) => {
     const { email } = req.body;
-    console.log(email);
     userModel
         .checkExistingUser(email, "normal")
         .then((existingUser) => {
@@ -322,7 +318,6 @@ router.get("/user/count/admin", validationFn.validateToken, refreshFn.refreshTok
     const id = req.body.id;
     const email = req.body.email;
     const role = req.body.role;
-    console.log(id, email, role);
     if (!id || isNaN(id) || !role || !email || (role != "admin" && role != "manager")) {
         return res.status(403).send({ error: errorMessages.UNAURHOTIZED });
     }
@@ -442,7 +437,6 @@ router.get("/user/stat/revenue/quarter", validationFn.validateToken, refreshFn.r
     const role = req.body.role;
     const tempYear = req.query.year;
     const year = tempYear !== undefined && !isNaN(tempYear) && tempYear > 0 ? tempYear : new Date().getFullYear();
-    console.log(id, email, role, tempYear, year);
     if (!id || isNaN(id) || !role || !email || (role != "admin" && role != "manager")) {
         return res.status(403).send({ error: errorMessages.UNAURHOTIZED });
     }
@@ -462,7 +456,6 @@ router.get("/user/stat/monthly", validationFn.validateToken, refreshFn.refreshTo
     const role = req.body.role;
     const tempYear = req.query.year;
     const year = tempYear !== undefined && !isNaN(tempYear) && tempYear > 0 ? tempYear : new Date().getFullYear();
-    console.log(id, email, role, tempYear, year);
     if (!id || isNaN(id) || !role || !email || (role != "admin" && role != "manager")) {
         return res.status(403).send({ error: errorMessages.UNAURHOTIZED });
     }
@@ -491,10 +484,8 @@ router.post("/create-user", validationFn.validateToken, refreshFn.refreshToken, 
     try {
         const { name, email, password, phone, gender, role } = req.body;
         const file = req.file;
-        console.log("This is route" + name);
         if (file) {
             const uploadPhoto = () => {
-                console.log("Hello there");
                 return cloudinary.uploader
                     .upload(file.path, { folder: "Design" })
                     .then((photoResult) => {
@@ -508,9 +499,7 @@ router.post("/create-user", validationFn.validateToken, refreshFn.refreshToken, 
                 });
             };
             const createUserInDatabase = (photoResult) => {
-                console.log("This is " + photoResult);
                 const photoUrl = photoResult ? photoResult.secure_url : null;
-                console.log("This is photoURL" + photoUrl);
                 return userModel.createUser({ name, email, password, phone, gender, role, photoUrl })
                     .then(() => {
                     return Promise.resolve();
@@ -547,7 +536,6 @@ router.get("/getTotalUserByAdmin", validationFn.validateToken, refreshFn.refresh
     try {
         const startDate = req.query.startDate;
         const endDate = req.query.endDate;
-        console.log(startDate, endDate);
         userModel
             .getTotalUserByAdmin(startDate, endDate)
             .then((users) => {
@@ -570,7 +558,6 @@ router.get("/getUserCreationData", validationFn.validateToken, refreshFn.refresh
     try {
         const startDate = req.query.startDate;
         const endDate = req.query.endDate;
-        console.log(startDate, endDate);
         userModel
             .getUserCreationData(startDate, endDate)
             .then((data) => {
@@ -604,7 +591,6 @@ router.post("/addAddress", validationFn.validateToken, refreshFn.refreshToken, f
         .checkExistingAddress(fullname, phone, postal_code, block_no, street, building, unit_no, userId)
         .then(function (existingAddress) {
         if (existingAddress) {
-            console.log("This is workinf");
             return res.status(400).json({ error: "Address already exists" });
         }
         else {
@@ -625,7 +611,6 @@ router.post("/addAddressAdmin", validationFn.validateToken, refreshFn.refreshTok
         .checkExistingAddress(fullname, phone, postal_code, block_no, street, building, unit_no, userId)
         .then(function (existingAddress) {
         if (existingAddress) {
-            console.log("This is workinf");
             return res.status(400).json({ error: "Address already exists" });
         }
         else {
@@ -647,15 +632,12 @@ router.get("/getAllAddresses", validationFn.validateToken, refreshFn.refreshToke
         return res.status(200).json({ addresses });
     })
         .catch(function (error) {
-        console.log(error);
         return res.status(500).json({ error: "Internal Server Error" });
     });
 });
 router.delete("/deleteAddress", validationFn.validateToken, refreshFn.refreshToken, function (req, res) {
     const userId = req.body.id;
     const addressId = req.body.address_id;
-    console.log("HIIII" + userId, addressId);
-    console.log(req.body);
     return userModel
         .deleteAddress(addressId, userId)
         .then((deletedAddressId) => {
@@ -674,7 +656,6 @@ router.delete("/deleteAddress", validationFn.validateToken, refreshFn.refreshTok
 router.delete("/deleteAddressAdmin", validationFn.validateToken, refreshFn.refreshToken, function (req, res) {
     const userId = req.body.userid;
     const addressId = req.body.address_id;
-    console.log("HIIII" + userId, addressId);
     return userModel
         .deleteAddress(addressId, userId)
         .then((deletedAddressId) => {
@@ -693,7 +674,6 @@ router.delete("/deleteAddressAdmin", validationFn.validateToken, refreshFn.refre
 router.get("/getAddress/:address_id", validationFn.validateToken, refreshFn.refreshToken, function (req, res) {
     const addressId = req.params.address_id;
     const userId = req.body.id;
-    console.log("UII", addressId, userId);
     return userModel
         .getAddressDetails(addressId, userId)
         .then((address) => {
@@ -711,7 +691,6 @@ router.put("/editAddress", validationFn.validateToken, refreshFn.refreshToken, f
     const addressId = req.body.address_id;
     const userId = req.body.id;
     const { fullname, phone, postal_code, block_no, street, building, unit_no, region, is_default } = req.body;
-    console.log("UII123", addressId, userId, fullname, phone, postal_code, block_no, street, building, unit_no, region, is_default);
     return userModel
         .checkExistingAddress(fullname, phone, postal_code, block_no, street, building, unit_no, userId)
         .then((existingAddress) => {

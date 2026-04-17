@@ -1,7 +1,6 @@
 "use client";
 import { Image, Modal, ModalContent, ModalBody, ModalFooter, useDisclosure, Button, ModalHeader } from "@nextui-org/react";
 import { useEffect, useState } from "react";
-import { useTheme } from "next-themes";
 import { useAppState } from "@/app/app-provider";
 import { CurrentActivePage } from "@/enums/global-enums";
 const teams = [
@@ -49,7 +48,6 @@ const teams = [
     { name: "Angie", image: "", position: `2<sup>nd</sup> Year DIT student`, description: "" },
 ];
 export default function Page() {
-    const { theme } = useTheme();
     const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const [selectedIndex, setSelectedIndex] = useState<number>(0);
     const { setCurrentActivePage } = useAppState();
@@ -73,11 +71,11 @@ export default function Page() {
         </ModalContent>
       </Modal>
       <div className="flex flex-col max-w-full mx-28 my-10">
-        <h2 className="before:border-2 before:me-3 before:border-black before:dark:border-white text-xl font-bold capitalize tracking-wider">About DailyHype</h2>
+        <h2 className="before:border-2 before:me-3 before:border-black text-xl font-bold capitalize tracking-wider">About DailyHype</h2>
         <p className="mt-4 leading-8">
           Welcome to DailyHype, created by 2<sup>nd</sup> year students at Singapore Polytechnic. We&apos;re more than just a clothing e-commerce site; we&apos;re a fusion of style and innovation. Discover curated fashion with a tech-forward twist. Join us on this chic journey where fashion meets technology!
         </p>
-        <h2 className="before:border-2 before:me-3 before:border-black before:dark:border-white mt-12 text-xl font-bold capitalize tracking-wider">Meet Our Teams</h2>
+        <h2 className="before:border-2 before:me-3 before:border-black mt-12 text-xl font-bold capitalize tracking-wider">Meet Our Teams</h2>
         <div className="flex justify-between mt-8 mb-5">
           {teams.map((team, index) => {
             return (<div key={index} className="flex flex-col items-center">
@@ -85,14 +83,13 @@ export default function Page() {
                     setSelectedIndex(index);
                     onOpen();
                 }}>
-                  <Image src={!team.image ? (theme === "dark" ? "/icons/user-dark.svg" : "/icons/user.svg") : team.image} width={150} alt={team.name}/>
+                  <Image src={team.image || "/icons/user.svg"} width={150} alt={team.name}/>
                 </div>
                 <label className="mt-3 font-semibold">{team.name}</label>
-                <label className="mt-2 text-small text-slate-700 dark:text-slate-300" dangerouslySetInnerHTML={{ __html: team.position }}></label>
+                <label className="mt-2 text-small text-slate-700" dangerouslySetInnerHTML={{ __html: team.position }}></label>
               </div>);
         })}
         </div>
       </div>
     </>);
 }
-

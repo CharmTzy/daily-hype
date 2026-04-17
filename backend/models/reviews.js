@@ -9,30 +9,35 @@ module.exports.createReview = function createReview(rating, reviewDescription, u
     });
 };
 module.exports.getReviewByProductId = function getReviewByProductId(productID) {
-    console.log('module.exports.getReviewByProductId', productID);
-    const sql = `SELECT AU.name, R.rating, R.reviewDescription, ARRAY_AGG(DISTINCT I.url) AS urls, R.createdAt, R.updatedAt,
-    (ARRAY_AGG(C.colourname ORDER BY RANDOM()))[1] AS colorname,
-    (ARRAY_AGG(S.sizename ORDER BY RANDOM()))[1] AS sizename
+    const sql = `SELECT
+        AU.name,
+        COALESCE(UI.url, '/icons/avatar-placeholder.svg') AS profileurl,
+        R.rating,
+        R.reviewDescription,
+        ARRAY_REMOVE(ARRAY_AGG(I.url ORDER BY I.imageID), NULL) AS urls,
+        R.createdAt,
+        R.updatedAt,
+        C.colourname AS colorname,
+        S.sizename AS sizename
     FROM
         review R
         LEFT JOIN reviewimage RI ON R.reviewID = RI.reviewID
         LEFT JOIN image I ON RI.imageID = I.imageID
         LEFT JOIN appuser AU ON R.userid = AU.userid
-        LEFT JOIN productdetail PD ON R.productID = PD.productID
+        LEFT JOIN image UI ON AU.imageid = UI.imageid
+        LEFT JOIN productdetail PD ON R.productDetailID = PD.productDetailID
         LEFT JOIN colour C ON PD.colourid = C.colourid
         LEFT JOIN size S ON PD.sizeid = S.sizeid
     WHERE R.productID = $1
-    GROUP BY R.reviewid, R.rating, R.reviewDescription, AU.name
+    GROUP BY R.reviewid, R.rating, R.reviewDescription, AU.name, UI.url, R.createdAt, R.updatedAt, C.colourname, S.sizename
     ORDER BY R.reviewid DESC;`;
     return query(sql, [productID])
         .then(function (result) {
-        console.log('Result:', result);
         const rows = result.rows;
         return rows;
     });
 };
 module.exports.getAllReviewsByUserId = function getAllReviewsByUserId(userID) {
-    console.log('module.exports.getAllReviewsByUserId', userID);
     const sql = `SELECT AU.name, R.reviewid, R.rating, R.reviewDescription, R.createdAt, R.updatedAt, P.productName, ARRAY_AGG(I.url ORDER BY I.imageID) AS urls
     FROM
         review R
@@ -82,14 +87,22 @@ module.exports.getTotalReviewCount = function getTotalReviewCount() {
     });
 };
 module.exports.getReviewsByLimit = function getReviewsByLimit(offset, limit) {
-    const sql = `SELECT R.reviewid, AU.name, P.productname, R.rating, ARRAY_AGG(I.url ORDER BY I.imageID) AS urls, R.reviewdescription
+    const sql = `SELECT
+        R.reviewid,
+        AU.name,
+        COALESCE(UI.url, '/icons/avatar-placeholder.svg') AS profileurl,
+        P.productname,
+        R.rating,
+        ARRAY_REMOVE(ARRAY_AGG(I.url ORDER BY I.imageID), NULL) AS urls,
+        R.reviewdescription
     FROM
         review R
         LEFT JOIN reviewimage RI ON R.reviewID = RI.reviewID
         LEFT JOIN image I ON RI.imageID = I.imageID
         LEFT JOIN appuser AU ON R.userid = AU.userid
+        LEFT JOIN image UI ON AU.imageid = UI.imageid
         LEFT JOIN product P ON R.productid = P.productid
-    GROUP BY R.reviewid, R.rating, R.reviewdescription, AU.name, P.productname
+    GROUP BY R.reviewid, R.rating, R.reviewdescription, AU.name, UI.url, P.productname
     ORDER BY R.reviewid DESC
     LIMIT $1 OFFSET $2;`;
     return query(sql, [limit, offset])
@@ -132,11 +145,9 @@ module.exports.checkReviewExists = async function checkReviewExists(orderID) {
     const sql = 'SELECT COUNT(*) AS count FROM review WHERE orderID = $1';
     const result = await query(sql, [orderID]);
     const count = result.rows[0].count;
-    console.log("Count is " + count);
     return count > 0;
 };
 module.exports.getReviewByOrderId = function getReviewByOrderId(orderID) {
-    console.log('module.exports.getReviewByOrderId', orderID);
     const sql = `SELECT * FROM review WHERE orderID = $1`;
     return query(sql, [orderID])
         .then(function (result) {

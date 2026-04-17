@@ -1,7 +1,6 @@
 "use client";
 import { useAppState } from "@/app/app-provider";
 import { ErrorMessage, URL } from "@/enums/global-enums";
-import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import AdminSideBar from "../admin-sidebar/admin-sidebar";
@@ -10,7 +9,6 @@ export default function AdminContent({ children }: {
 }) {
     const { userInfo, headerCanLoad } = useAppState();
     const router = useRouter();
-    const { setTheme } = useTheme();
     useEffect(() => {
         if (userInfo === null && headerCanLoad) {
             alert(ErrorMessage.UNAURHOTIZED);
@@ -22,10 +20,7 @@ export default function AdminContent({ children }: {
                 router.push(URL.SignOut);
             }
         }
-        if (headerCanLoad) {
-            setTheme("light");
-        }
-    }, [userInfo, headerCanLoad]);
+    }, [headerCanLoad, router, userInfo]);
     return (<>
       {headerCanLoad && (<div className="flex">
           <AdminSideBar />
@@ -33,4 +28,3 @@ export default function AdminContent({ children }: {
         </div>)}
     </>);
 }
-

@@ -383,22 +383,22 @@ export default function Page() {
                   </span>) : (<span>No new message</span>)}
               </td>
               <td className="p-2">
-                <button type="button" className="btn btn-primary mr-2 border border-neon-blue hover:bg-neon-blue hover:text-orange text-gray-900 dark:text-white" onClick={() => openModal(delivery)}>
+                <button type="button" className="btn btn-primary mr-2 border border-neon-blue hover:bg-neon-blue hover:text-orange text-gray-900" onClick={() => openModal(delivery)}>
                   View Details
                 </button>
-                <button type="button" className="btn btn-success border border-neon-green hover:bg-neon-green hover:text-green text-gray-900 dark:text-white" onClick={() => navigateToChatRoom(actualCurrentUserId, delivery, userrole)}>
+                <button type="button" className="btn btn-success border border-neon-green hover:bg-neon-green hover:text-green text-gray-900" onClick={() => navigateToChatRoom(actualCurrentUserId, delivery, userrole)}>
                   Chat
                 </button>
 
-                <button type="button" className="btn btn-success border border-neon-green hover:bg-neon-green hover:text-green text-gray-900 dark:text-white" onClick={() => openModalLoc(delivery.deliveryAddress)}>
+                <button type="button" className="btn btn-success border border-neon-green hover:bg-neon-green hover:text-green text-gray-900" onClick={() => openModalLoc(delivery.deliveryAddress)}>
                   View Location
                 </button>
 
                 
-                <button type="button" className="btn btn-warning border border-yellow hover:bg-yellow hover:text-blue text-gray-900 dark:text-white" onClick={() => openModalEdit(delivery)}>
+                <button type="button" className="btn btn-warning border border-yellow hover:bg-yellow hover:text-blue text-gray-900" onClick={() => openModalEdit(delivery)}>
                   Edit
                 </button>
-                <button type="button" className="btn btn-danger border border-red hover:bg-red hover:text-green text-gray-900 dark:text-white" onClick={() => openModalDelete(delivery.deliveryId)}>
+                <button type="button" className="btn btn-danger border border-red hover:bg-red hover:text-green text-gray-900" onClick={() => openModalDelete(delivery.deliveryId)}>
                   Delete
                 </button>
               </td>
@@ -739,15 +739,15 @@ export default function Page() {
               </div>
 
               
-              <button type="button" className="btn btn-primary mb-2 border border-gray-700 p-2 mb-4 mx-5 text-gray-900 dark:text-white" onClick={handleChangePage}>
+              <button type="button" className="btn btn-primary mb-2 border border-gray-700 p-2 mb-4 mx-5 text-gray-900" onClick={handleChangePage}>
                 Apply Filters
               </button>
 
-              <button type="button" className="btn btn-primary mb-2 border border-gray-700 p-2 mb-4 mx-5 text-gray-900 dark:text-white" onClick={handleDeliveryIdTransfer}>
+              <button type="button" className="btn btn-primary mb-2 border border-gray-700 p-2 mb-4 mx-5 text-gray-900" onClick={handleDeliveryIdTransfer}>
                 Bulk Update/Delete
               </button>
 
-              <button type="button" className="btn btn-primary mb-2 border border-gray-700 p-2 mb-4 mx-5 text-gray-900 dark:text-white" onClick={() => handleViewMap(true)}>
+              <button type="button" className="btn btn-primary mb-2 border border-gray-700 p-2 mb-4 mx-5 text-gray-900" onClick={() => handleViewMap(true)}>
                 View Current Location
               </button>
             </div>

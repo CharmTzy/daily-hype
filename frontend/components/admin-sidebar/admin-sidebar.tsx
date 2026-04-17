@@ -33,7 +33,7 @@ export default function AdminSideBar() {
     const isAdmin = userInfo ? (userInfo.role === "admin" ? true : false) : false;
     return (<div className="w-[250px] z-10 bg-slate-100 fixed h-screen min-w-[250px] flex flex-col pt-4">
       <Link href={URL.Dashboard} className={clsx("ms-5 my-2 hover:opacity-90", currentActivePage === CurrentActivePage.Dashboard && "text-logo-color")}>
-        <BrandLogo size="sm" theme="dark"/>
+        <BrandLogo size="sm"/>
       </Link>
       <div style={{ overflowY: "auto" }} className="px-4 mt-4 pb-4">
         <AccordionGroup variant="plain" transition="0.2s" sx={{

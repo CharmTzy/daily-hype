@@ -11,7 +11,7 @@ export default function CarouselSlider({ start, current, total, func, }: {
             items.push(<div key={i} onClick={() => {
                     if (func)
                         func(i);
-                }} className={clsx("w-4 h-4 rounded-full cursor-pointer mr-6 border-black dark:border-white laptop-3xl:w-5 laptop-3xl:h-5", current !== i && "border-1", current === i && "bg-black border-1 dark:bg-white")}></div>);
+                }} className={clsx("w-4 h-4 rounded-full cursor-pointer mr-6 border-black laptop-3xl:w-5 laptop-3xl:h-5", current !== i && "border-1", current === i && "bg-black border-1")}></div>);
         }
         return items;
     };

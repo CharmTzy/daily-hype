@@ -82,18 +82,17 @@ export default function CloudinaryFileInput({ limit, className, uploadedImages, 
     return (<>
       <input className="hidden" multiple ref={fileRef} type="file" accept="image/*" onChange={handleUpload}/>
       <div className="flex max-w-full">
-        {uploadedImages.map((item, index) => (<div key={index} className="flex mr-2 cursor-pointer relative flex-col items-center w-[100px] h-[100px] max-w-[100px] max-h-[100px] border-1 border-slate-700 dark:border-slate-300 border-dotted p-4">
+        {uploadedImages.map((item, index) => (<div key={index} className="flex mr-2 cursor-pointer relative flex-col items-center w-[100px] h-[100px] max-w-[100px] max-h-[100px] border-1 border-slate-700 border-dotted p-4">
             <Image fill={true} src={item.url} alt={item.imagename}/>
-            <div onClick={() => handleDelete(index)} className={clsx("absolute cursor-pointer -right-2 -top-2 px-[7px] bg-[#eee] dark:bg-[#111] rounded-full border-1 border-slate-700 dark:border-slate-300", className)}>
+            <div onClick={() => handleDelete(index)} className={clsx("absolute cursor-pointer -right-2 -top-2 px-[7px] bg-[#eee] rounded-full border-1 border-slate-700", className)}>
               <label className="cursor-pointer select-none">x</label>
             </div>
           </div>))}
 
-        {uploadedImages.length < limit && (<div className="flex cursor-pointer h-[100px] w-[100px] justify-center flex-col items-center max-w-[100px] max-h-[100px] border-1 border-slate-700 dark:border-slate-300 border-dotted p-4" title="Upload Photo" onClick={handleClick}>
-            <CameraAltIcon className="dark:text-slate-300 text-slate-700 cursor-pointer"/>
-            <label className="text-[13px] mt-2 dark:text-slate-300 text-slate-700 cursor-pointer">Add Photo</label>
+        {uploadedImages.length < limit && (<div className="flex cursor-pointer h-[100px] w-[100px] justify-center flex-col items-center max-w-[100px] max-h-[100px] border-1 border-slate-700 border-dotted p-4" title="Upload Photo" onClick={handleClick}>
+            <CameraAltIcon className="text-slate-700 cursor-pointer"/>
+            <label className="text-[13px] mt-2 text-slate-700 cursor-pointer">Add Photo</label>
           </div>)}
       </div>
     </>);
 }
-

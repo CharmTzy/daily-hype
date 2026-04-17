@@ -1,31 +1,30 @@
 "use client";
 import { IAddress } from "@/enums/address-interfaces";
 import { Chip } from "@nextui-org/react";
+
 interface IDeliveryCheckoutProps {
     addressData: IAddress;
 }
-export default function DeliveryCheckout({ addressData }: IDeliveryCheckoutProps) {
-    return (<div className="flex flex-col w-full ms-2">
-      <div className="flex flex-col mt-4 w-full">
-        <div className="flex items-center">
-          <Chip className="mr-20" color="primary">
-            {addressData.fullname}
-          </Chip>
-          <label>{addressData.phone}</label>
-        </div>
-        <div className="flex items-center mt-4">
-          <label>
-            Blk {addressData.block_no}, {addressData.street}
-          </label>
-        </div>
-        <div>
-          <label>{addressData.unit_no ? addressData.unit_no + ", " : ""}</label>
-          <label>{addressData.building}</label>
-        </div>
-        <div>
-          <label>Singapore {addressData.postal_code}</label>
-        </div>
-      </div>
-    </div>);
-}
 
+export default function DeliveryCheckout({ addressData }: IDeliveryCheckoutProps) {
+    return (
+        <div className="rounded-[24px] border border-slate-200 bg-[#faf7f3] p-5">
+            <div className="flex flex-wrap items-center gap-3">
+                <Chip color="primary" className="font-semibold">
+                    {addressData.fullname}
+                </Chip>
+                <span className="text-sm font-medium text-slate-700">{addressData.phone}</span>
+                {addressData.is_default ? (
+                    <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 ring-1 ring-slate-200">
+                        Default
+                    </span>
+                ) : null}
+            </div>
+            <div className="mt-4 space-y-2 text-sm leading-6 text-slate-600">
+                <p>Blk {addressData.block_no}, {addressData.street}</p>
+                <p>{addressData.unit_no ? `${addressData.unit_no}, ` : ""}{addressData.building}</p>
+                <p>Singapore {addressData.postal_code}</p>
+            </div>
+        </div>
+    );
+}

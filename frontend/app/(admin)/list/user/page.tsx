@@ -1,14 +1,15 @@
 "use client";
 import { useAppState } from "@/app/app-provider";
+import ResilientImage from "@/components/ui/resilient-image";
 import CustomTable from "@/components/ui/table";
 import { CurrentActivePage, ErrorMessage, URL } from "@/enums/global-enums";
 import { formatDateByMonthDayYear24Hour } from "@/functions/formatter";
 import { getAdminUser, getAdminUserCount, handleDeleteButton } from "@/functions/user-functions";
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from "@nextui-org/react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 const columns = ["User ID", "Profile Pic", "Email", "Customer Name", "Phone", "Account Created Time", "Default Address", "Default Region", "Role", "Status", "Action"];
+const avatarFallback = "/icons/avatar-placeholder.svg";
 interface IAdminUserRow {
     userid: string;
     url: string;
@@ -51,7 +52,7 @@ export default function Page() {
         return data.map((item, index) => {
             return [
                 item.userid.toString(),
-                <Image key={`image-${index}`} className="mx-auto" src={item.url ? item.url : "http://ssl.gstatic.com/accounts/ui/avatar_2x.png"} width={60} height={80} alt={item.name}/>,
+                <ResilientImage key={`image-${index}`} className="mx-auto h-[60px] w-[60px] rounded-full object-cover" src={item.url} fallbackSrc={avatarFallback} width={60} height={60} alt={item.name}/>,
                 <label key={`email-${index}`} className="text-[14px] flex justify-center text-center">
           {item.email}
         </label>,
@@ -197,4 +198,3 @@ export default function Page() {
         </Modal>)}
     </>);
 }
-

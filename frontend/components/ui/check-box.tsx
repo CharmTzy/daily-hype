@@ -1,6 +1,7 @@
 "use client";
 import clsx from "clsx";
-import { useState } from "react";
+import { useId } from "react";
+
 export default function CheckBox({ checked, className, func, label, labelClassName, disabled }: {
     checked?: boolean;
     className?: string;
@@ -9,13 +10,14 @@ export default function CheckBox({ checked, className, func, label, labelClassNa
     labelClassName?: string;
     disabled?: boolean;
 }) {
-    disabled = disabled || false;
-    return (<div className="flex justify-center items-center">
-      <input id={label} type={"checkbox"} className={clsx("disabled:cursor-not-allowed cursor-pointer", className)} checked={checked || false} onChange={() => {
-            if (func && disabled === false)
+    const inputId = useId();
+    const isDisabled = disabled || false;
+    return (<div className="flex items-center">
+      <input id={inputId} type="checkbox" className={clsx("cursor-pointer disabled:cursor-not-allowed", className)} checked={checked || false} onChange={() => {
+            if (func && !isDisabled) {
                 func();
-        }} disabled={disabled}/>
-      <label htmlFor={label} className={clsx("ms-2", labelClassName)}>{label}</label>
+            }
+        }} disabled={isDisabled}/>
+      {label ? <label htmlFor={inputId} className={clsx("ms-2", labelClassName)}>{label}</label> : null}
     </div>);
 }
-

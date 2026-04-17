@@ -57,7 +57,7 @@ export default function RefundRequest({ isOpen, onClose, orderID }: IRefundReque
                 </div>
                 <div className="flex me-auto ms-8 w-full flex-col mb-4">
                   <label>{orderID}</label>
-                  <select value={selectedProductIndex} className="mt-2 px-4 py-3 text-[15px] bg-default-200 dark:bg-default-700 border-r-8 outline-none cursor-pointer" onChange={(event) => {
+                  <select value={selectedProductIndex} className="mt-2 px-4 py-3 text-[15px] bg-default-200 border-r-8 outline-none cursor-pointer" onChange={(event) => {
                 setSelectedProductIndex(parseInt(event.target.value));
             }}>
                     {productData.map((item, index) => (<option key={index} value={index}>
@@ -66,7 +66,7 @@ export default function RefundRequest({ isOpen, onClose, orderID }: IRefundReque
                   </select>
                   <select onChange={(event) => {
                 setSelectedCategory(parseInt(event.target.value));
-            }} value={selectedCategory} className="mt-2 px-4 py-3 text-[15px] bg-default-200 dark:bg-default-700 border-r-8 outline-none cursor-pointer">
+            }} value={selectedCategory} className="mt-2 px-4 py-3 text-[15px] bg-default-200 border-r-8 outline-none cursor-pointer">
                     <option value="1">Missing Quantity</option>
                     <option value="2">Received wrong item</option>
                     <option value="3">Damaged item</option>
@@ -76,7 +76,7 @@ export default function RefundRequest({ isOpen, onClose, orderID }: IRefundReque
                   <textarea onChange={(event) => {
                 setTextCount(event.target.value.length);
                 setReason(event.target.value);
-            }} className="mt-2 px-2 py-2 text-[15px] h-32 bg-default-200 dark:bg-default-700"></textarea>
+            }} className="mt-2 px-2 py-2 text-[15px] h-32 bg-default-200"></textarea>
                   <label className={clsx("ms-auto text-[12px] mt-1 text-gray-500", textCount > 500 && "text-red-600")}>{textCount} / 500</label>
                   <div className="mt-1 flex items-center">
                     <button className="me-4 text-2xl select-none" onClick={() => {
@@ -88,7 +88,7 @@ export default function RefundRequest({ isOpen, onClose, orderID }: IRefundReque
             }}>
                       -
                     </button>
-                    <input type="number" value={refundQty} readOnly className="select-none border-1 h-9 bg-default-200 dark:bg-default-700 outline-none ps-5 max-w-[50px] text-[15px]"/>
+                    <input type="number" value={refundQty} readOnly className="select-none border-1 h-9 bg-default-200 outline-none ps-5 max-w-[50px] text-[15px]"/>
                     <button className="ms-4 text-2xl select-none" onClick={() => {
                 setRefundQty((prev) => {
                     if (prev + 1 > productData[selectedProductIndex].qty)

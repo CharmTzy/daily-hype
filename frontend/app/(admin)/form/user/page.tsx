@@ -133,7 +133,7 @@ export default function Page() {
       <div className="mx-auto max-w-[350px] space-y-6">
         <div className="space-y-2 text-center">
           <h1 className="text-3xl font-bold">User Form</h1>
-          <p className="text-gray-500 dark:text-gray-400">
+          <p className="text-gray-500">
             Enter user information to create an account
           </p>
         </div>

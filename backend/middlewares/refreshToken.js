@@ -9,7 +9,6 @@ module.exports.refreshToken = (req, res, next) => {
     }
     if (req.body.tokenExpired) {
         delete req.body.tokenExpired;
-        console.log("\nExpired Token");
         Promise.all([userModel.getRefreshToken(userID), userModel.getUserByUserID(userID)])
             .then(([result1, result2]) => {
             jwtFunctions.verifyJWTToken(result1.refreshtoken, process.env.JWT_REFRESH_KEY, (err, data) => {

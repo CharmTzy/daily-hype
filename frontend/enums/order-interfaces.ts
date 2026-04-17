@@ -14,6 +14,12 @@ export interface IAdminOrder {
     totalqty: number;
     userid: number;
 }
+export interface ICheckOutTotals {
+    subtotal: number;
+    shippingFee: number;
+    gstAmount: number;
+    total: number;
+}
 export type IAdminOrderCountFetch = {
     count: number;
     error: null;
@@ -70,19 +76,21 @@ export type TCheckOutFetch = {
     address: IAddress[];
     product: ICheckOutProductDetail[];
     cart: ICheckOutCart[];
+    totals: ICheckOutTotals;
     error: null;
 } | {
     clientsecret: null;
     address: null;
     product: null;
     cart: null;
+    totals: null;
     error: string | ErrorMessage.FetchError;
 };
 export type TCreateOrder = {
     orderid: null;
     error: string;
 } | {
-    orderid: number;
+    orderid: string;
     error: null;
 };
 export interface IGetOrderData {
@@ -125,4 +133,3 @@ export type TCancelOrder = {
     message: null;
     error: ErrorMessage;
 };
-

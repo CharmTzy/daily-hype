@@ -3,6 +3,7 @@ import React, { useState, useContext, createContext, useEffect } from "react";
 import { CurrentActivePage, URL } from "@/enums/global-enums";
 import { ICartLocalStorage, IUserInfo } from "@/enums/global-interfaces";
 import { removeDuplicateCartData } from "@/functions/cart-functions";
+import { normaliseProfileImage } from "@/functions/profile-image";
 interface IAppStateContext {
     userInfo: IUserInfo | null;
     setUserInfo: React.Dispatch<React.SetStateAction<IUserInfo | null>>;
@@ -55,8 +56,14 @@ export default function AppProvider({ children }: {
         if (user) {
             try {
                 const userObj = JSON.parse(user) as IUserInfo;
-                if (userObj.email && userObj.image && userObj.name && userObj.role && userObj.method && userObj.id)
-                    setUserInfo(userObj);
+                const normalisedUser = {
+                    ...userObj,
+                    image: normaliseProfileImage(userObj.image),
+                };
+                if (normalisedUser.email && normalisedUser.image && normalisedUser.name && normalisedUser.role && normalisedUser.method && normalisedUser.id) {
+                    setUserInfo(normalisedUser);
+                    localStorage.setItem("user", JSON.stringify(normalisedUser));
+                }
                 else
                     localStorage.removeItem("user");
             }
@@ -77,4 +84,3 @@ export function useAppState() {
     }
     return context;
 }
-

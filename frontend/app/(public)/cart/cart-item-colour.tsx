@@ -1,4 +1,5 @@
 "use client";
+
 interface ICartItemColourProps {
     data: {
         colourid: number;
@@ -8,14 +9,29 @@ interface ICartItemColourProps {
     loading: boolean;
     onChange: (colourid: number) => void;
 }
-export default function CartItemColour({ data, value, loading, onChange }: ICartItemColourProps) {
-    return (!loading && (<select className="p-2 text-sm rounded-lg outline-none ms-8 cursor-pointer border-r-[15px] border-r-transparent shadow-input laptop-3xl:p-2 laptop-2xl:p-2 laptop-2xl:w-[140px] laptop-2xl:ms-12 laptop-xl:w-[120px] laptop-xl:py-[6px] laptop-xl:text-[13px] capitalize" value={value} title="Colour" onChange={(e) => {
-            const value = parseInt(e.target.value, 10);
-            onChange(value);
-        }}>
-        {data.map((item, index) => (<option value={item.colourid} className="capitalize" key={index}>
-            {item.colour}
-          </option>))}
-      </select>));
-}
 
+export default function CartItemColour({ data, value, loading, onChange }: ICartItemColourProps) {
+    if (loading) {
+        return null;
+    }
+
+    return (
+        <div className="space-y-2">
+            <label className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">Colour</label>
+            <select
+                className="min-h-[44px] w-full rounded-[16px] border border-[#e8e1d8] bg-white px-4 text-sm capitalize text-slate-700 outline-none transition focus:border-[#fb6050]"
+                value={value}
+                title="Colour"
+                onChange={(event) => {
+                    onChange(parseInt(event.target.value, 10));
+                }}
+            >
+                {data.map((item, index) => (
+                    <option value={item.colourid} className="capitalize" key={index}>
+                        {item.colour}
+                    </option>
+                ))}
+            </select>
+        </div>
+    );
+}

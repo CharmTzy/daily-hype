@@ -9,11 +9,8 @@ const refreshFn = require("../middlewares/refreshToken");
 router.post("/deliveries", validationFn.validateToken, refreshFn.refreshToken, async (req, res) => {
     try {
         const { orderID, userID, deliverydate, deliverystatus, deliverystatusdetail, trackingnumber, shipperid } = req.body;
-        console.log("userID is " + userID);
         const [isOrderPaid, isOrderExistsWithUser] = await Promise.all([await deliveryController.checkOrderInPaymentTableAsync(orderID), await deliveryController.checkOrderExistsWithUserAsync(orderID, userID)]);
-        console.log("userID2 is " + userID);
         if (isOrderPaid && isOrderExistsWithUser) {
-            console.log("reached-1");
             const newDelivery = await deliveryController.createADelivery(deliverydate, deliverystatus, deliverystatusdetail, trackingnumber, shipperid);
             res.status(201).json(newDelivery);
         }
@@ -33,7 +30,6 @@ router.put("/updateDeliveryStatusBatch", validationFn.validateToken, refreshFn.r
         res.json({ message: "Deliveries updated successfully" });
     }
     catch (error) {
-        console.log("failed");
         res.status(400).json({ error: error.message });
     }
 });
@@ -109,11 +105,9 @@ router.get("/trackingnumbers", async (req, res) => {
 router.get('/getDeliveriesSortedByStageNumChart0', async (req, res) => {
     try {
         const selectedDropdownValueForm = req.query.selectedDropdownValueForm;
-        console.log("selectedDropdownValueForm" + selectedDropdownValueForm);
         const choiceNum = req.query.choiceNum;
         const date1 = decodeURIComponent(req.query.date1True);
         const date2 = decodeURIComponent(req.query.date2True);
-        console.log("GOING TO Chart 0 Result================================================: ");
         const deliveries = await deliveryController.getDeliveriesSortedByStageNum(selectedDropdownValueForm, choiceNum, date1, date2);
         res.json(deliveries);
     }
@@ -125,7 +119,6 @@ router.get('/getDeliveriesSortedByStageNumChart0', async (req, res) => {
 router.get("/chartJS1", async (req, res) => {
     try {
         const selectedDropdownValueForm = req.query.selectedDropdownValueForm;
-        console.log("selectedDropdownValueForm" + selectedDropdownValueForm);
         const choiceNum = req.query.choiceNum;
         const date1 = decodeURIComponent(req.query.date1True);
         const date2 = decodeURIComponent(req.query.date2True);
@@ -144,14 +137,10 @@ router.get("/chartJSPart2Specific", async (req, res) => {
         const chartJS1Array2Specific = deliveryController.retrievechartJS2Array(deliveryIdsString, chartHeaderString, true);
         const chartJS2Array3Specific = deliveryController.retrievechartJS3Array(deliveryIdsString, chartHeaderString, true);
         const [chartJS1Array2Ids, chartJS2Array3Ids] = await Promise.all([chartJS1Array2Specific, chartJS2Array3Specific]);
-        console.log("Chart1Specifc is " + chartJS1Array2Ids);
-        console.log("Chart1Specifc is " + chartJS2Array3Ids);
         const namesArr = JSON.parse(decodeURIComponent(chartHeaderString));
         const diffHoursSpecific = {};
-        console.log("names length " + namesArr.length);
         for (let i = 0; i < namesArr.length; i++) {
             const name = namesArr[i];
-            console.log("reached pre header value name is " + name);
             const deliveryObject = chartJS2Array3Ids[i];
             if (diffHoursSpecific.hasOwnProperty(name)) {
                 diffHoursSpecific[name].deliveries.push(deliveryObject);
@@ -165,7 +154,6 @@ router.get("/chartJSPart2Specific", async (req, res) => {
         const stageintervalSpecific = {};
         for (let i = 0; i < namesArr.length; i++) {
             const name = namesArr[i];
-            console.log("reached pre header value name is " + name);
             const deliveryObject = chartJS1Array2Ids[i];
             if (stageintervalSpecific.hasOwnProperty(name)) {
                 stageintervalSpecific[name].deliveries.push(deliveryObject);
@@ -180,8 +168,6 @@ router.get("/chartJSPart2Specific", async (req, res) => {
             diffHoursSpecific: diffHoursSpecific,
             stageintervalSpecific: stageintervalSpecific,
         };
-        console.log("Diffhourspecfic " + JSON.stringify(diffHoursSpecific));
-        console.log("stageIntervalSpecific " + JSON.stringify(stageintervalSpecific));
         res.json(combinedJSON);
     }
     catch (error) {
@@ -197,18 +183,9 @@ router.get("/chartJSPart2", async (req, res) => {
         const chartJS2Array3Execute = deliveryController.retrievechartJS3Array(deliveryIdsString, chartHeaderString, false);
         const [chartJS1Array2, chartJS2Array3] = await Promise.all([chartJS1Array2Execute, chartJS2Array3Execute]);
         const namesArr = JSON.parse(decodeURIComponent(chartHeaderString));
-        console.log("chartJS1Array2 is " + chartJS1Array2);
-        console.log("chartJS1Array2 is " + JSON.stringify(chartJS1Array2));
-        console.log("chartJS1Array3 is " + chartJS2Array3);
-        console.log("chartJS1Array3 is " + JSON.stringify(chartJS2Array3));
-        console.log("nameArr is" + namesArr);
         const averagedDiffHours = {};
-        console.log("Array 2 Print: ");
-        console.log(chartJS1Array2);
-        console.log("names length " + namesArr.length);
         for (let i = 0; i < namesArr.length; i++) {
             const name = namesArr[i];
-            console.log("reached pre header value name is " + name);
             const diffHours = chartJS1Array2[i].chartHeaderValue;
             if (averagedDiffHours.hasOwnProperty(name)) {
                 averagedDiffHours[name].count++;
@@ -240,14 +217,9 @@ router.get("/chartJSPart2", async (req, res) => {
             diff_cd_hours: diffHours.diff_cd_hours,
         }));
         const averagedDiffHoursJSON = JSON.stringify(averagedDiffHoursArray);
-        console.log(averagedDiffHoursJSON);
         const summedLateHours = {};
-        console.log("Array 3 Print: ");
-        console.log(chartJS2Array3);
-        console.log("names length " + namesArr.length);
         for (let i = 0; i < namesArr.length; i++) {
             const name = namesArr[i];
-            console.log("reached pre header value is " + name);
             const lateHours = chartJS2Array3[i].chartHeaderValue;
             if (summedLateHours.hasOwnProperty(name)) {
                 summedLateHours[name].hour_difference += parseFloat(lateHours.hour_difference);
@@ -263,7 +235,6 @@ router.get("/chartJSPart2", async (req, res) => {
             hour_difference: lateHours.hour_difference,
         }));
         const summedLateHoursJSON = JSON.stringify(summedLateHoursArray);
-        console.log(summedLateHoursJSON);
         const combinedJSON = {
             averagedDiffHours: JSON.parse(averagedDiffHoursJSON),
             summedLateHours: JSON.parse(summedLateHoursJSON)
@@ -277,13 +248,11 @@ router.get("/chartJSPart2", async (req, res) => {
 });
 router.get("/Alldeliveries/user/:part", validationFn.validateToken, refreshFn.refreshToken, async (req, res) => {
     try {
-        console.log("hello");
         var userid = req.body.id;
         const deliveries = await deliveryController.retrieveAllDeliveriesForUser(userid);
         res.status(200).json(deliveries);
     }
     catch (error) {
-        console.log("Error caught: " + error.message);
         res.status(404).json({ error: error.message });
     }
 });
@@ -300,7 +269,6 @@ router.get("/listOfUserIds", validationFn.validateToken, refreshFn.refreshToken,
 router.get("/allDeliveriesAllUsers", validationFn.validateToken, refreshFn.refreshToken, async (req, res) => {
     userIDStringEncode = req.query.userIDString;
     userIDStringArr = JSON.parse(decodeURIComponent(userIDStringEncode));
-    console.log("Array of userIds is " + userIDStringArr);
     try {
         const allDeliveries = await Promise.all(userIDStringArr.map(async (userID) => {
             try {
@@ -309,7 +277,6 @@ router.get("/allDeliveriesAllUsers", validationFn.validateToken, refreshFn.refre
                     return { userId: userID, deliveries: deliveriesForUser };
                 }
                 else {
-                    console.log(`No deliveries found for user ${userID}`);
                     return null;
                 }
             }
@@ -344,10 +311,6 @@ router.get("/getAllMessages/:roomid", validationFn.validateToken, refreshFn.refr
             deliveryController.updateMessageReadStatus(userid, roomid),
             deliveryController.getAllMessagesRoom(roomid)
         ]);
-        console.log("UPDATED MESSAGES");
-        console.log(updatedMessages);
-        console.log("ALL MESSAGES");
-        console.log(allMessages);
         res.json(allMessages);
     }
     catch (error) {
@@ -390,7 +353,6 @@ router.get("/getCurrentUserId", validationFn.validateToken, refreshFn.refreshTok
     try {
         var userid = req.body.id;
         const role = await deliveryController.retrieveuserrole(userid);
-        console.log("Role is " + role + "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
         res.json({ userId: userid, userRole: role });
     }
     catch (error) {
@@ -408,12 +370,9 @@ router.get("/AlldeliveriesPage/user/:part", validationFn.validateToken, refreshF
             return;
         }
         const deliveries = await deliveryController.retrieveDeliveryDetails(distinctDeliveryIds, createdAtSortOrder || null, deliveryDateSortOrder || null);
-        console.log("BACKEND DELIVERIES");
-        console.log(deliveries);
         res.status(200).json(deliveries);
     }
     catch (error) {
-        console.log("Error caught: " + error.message);
         res.status(404).json({ error: error.message });
     }
 });
@@ -421,12 +380,10 @@ router.get("/deliverydetailsArr", async (req, res) => {
     try {
         const { deliveryId } = req.query;
         const deliveryIdArray = deliveryId.split(',').map(Number);
-        console.log("Delivery id array retrieved: " + deliveryIdArray);
         const deliveries = await deliveryController2.retrieveDeliveryDetailsAdmin(deliveryIdArray, null, null);
         res.status(200).json(deliveries);
     }
     catch (error) {
-        console.log("Error caught: " + error.message);
         res.status(404).json({ error: error.message });
     }
 });
@@ -435,7 +392,6 @@ router.get("/deliveries/:deliveryid", validationFn.validateToken, refreshFn.refr
         const deliveryid = req.params.deliveryid;
         deliveryidArr = [deliveryid];
         const deliveries = await deliveryController.retrieveDeliveryDetails(deliveryidArr, null, null);
-        console.log(deliveries);
         res.status(200).json(deliveries);
     }
     catch (error) {
@@ -491,15 +447,11 @@ router.post('/deliverycreate', validationFn.validateToken, refreshFn.refreshToke
     try {
         const { orderID, deliverydate, deliverystatus, deliverystatusdetail, trackingnumber, shipperId } = req.body;
         const userId = req.body.id;
-        console.log("userID is " + userId);
-        console.log("orderID is " + orderID);
         const [isOrderPaid, isOrderExistsWithUser] = await Promise.all([
             deliveryController.checkOrderInPaymentTableAsync(orderID),
             deliveryController.checkOrderExistsWithUserAsync(orderID)
         ]);
         if (isOrderPaid && isOrderExistsWithUser) {
-            console.log("reached-1");
-            console.log("deliverystatusdetail is " + deliverystatusdetail);
             const newDelivery = await deliveryController.createADelivery(deliverydate, deliverystatus, deliverystatusdetail, trackingnumber, shipperId);
             res.status(201).json(newDelivery);
         }
@@ -548,17 +500,13 @@ router.put('/addRoom', validationFn.validateToken, refreshFn.refreshToken, async
     try {
         const { deliveryid } = req.body;
         var adminuserid = req.body.id;
-        console.log("adding room where adminuserid " + adminuserid + " and delivery id is " + deliveryid);
         const result = await deliveryController2.addRoom(adminuserid, deliveryid);
         const updatedroomid = result.roomid;
         const updateduserid = result.userid;
         const now = new Date();
         const timestampWithoutTimezone = now.toISOString().slice(0, 19).replace('T', ' ');
-        console.log("Timestamp is " + timestampWithoutTimezone + " roomid is " + updatedroomid + " userid is " + updateduserid);
         const result2 = await deliveryController2.removeduplicatechat(updatedroomid);
         const result3 = await deliveryController.addNewMessage(timestampWithoutTimezone, "Welcome, Thank you for Choosing DailyHype", updatedroomid, adminuserid, updateduserid);
-        console.log("Executed");
-        console.log();
         if (result.success) {
             res.status(200).json({ success: true, room: result.room });
         }
@@ -588,7 +536,6 @@ router.get("/getDeliveryIdFromTracking/:trackingid", async (req, res) => {
     try {
         const trackingid = req.params.trackingid;
         const deliveriesIds = await deliveryController2.retrieveDeliveriesByTrackingNumber(trackingid);
-        console.log(deliveriesIds);
         if (deliveriesIds.length === 0) {
             res.status(200).json([]);
             return;
@@ -613,12 +560,9 @@ router.get("/AlldeliveriesPageAdmin/user/:part", validationFn.validateToken, ref
             return;
         }
         const deliveries = await deliveryController2.retrieveDeliveryDetailsAdmin(distinctDeliveryIds, createdAtSortOrder || null, deliveryDateSortOrder || null);
-        console.log("BACKEND DELIVERIES ADMIN");
-        console.log(deliveries);
         res.status(200).json(deliveries);
     }
     catch (error) {
-        console.log("Error caught: " + error.message);
         res.status(404).json({ error: error.message });
     }
 });
@@ -628,12 +572,9 @@ router.get("/AllSingledeliveriesPageAdmin/:deliveryid", async (req, res) => {
         const deliveryid = req.params.deliveryid;
         distinctDeliveryIds = [deliveryid];
         const deliveries = await deliveryController2.retrieveDeliveryDetailsAdmin(distinctDeliveryIds, null, null);
-        console.log("BACKEND DELIVERIES ADMIN");
-        console.log(deliveries);
         res.status(200).json(deliveries);
     }
     catch (error) {
-        console.log("Error caught: " + error.message);
         res.status(404).json({ error: error.message });
     }
 });
@@ -676,7 +617,6 @@ router.delete("/deliveriesCA2/:deliveryid", validationFn.validateToken, refreshF
         const deliveryid = req.params.deliveryid;
         await deliveryController.deleteMessagesAndRoom(deliveryid);
         await deliveryController.deleteDelivery(deliveryid);
-        console.log("Delete success");
         res.json({ message: "Delivery deleted successfully" });
     }
     catch (error) {
@@ -685,19 +625,15 @@ router.delete("/deliveriesCA2/:deliveryid", validationFn.validateToken, refreshF
 });
 router.post("/checkIfOrderCancelled/:deliveryid", async (req, res) => {
     const deliveryId = req.params.deliveryid;
-    console.log("reached");
     try {
         await deliveryController.checkOrderCancelledFirst(deliveryId);
-        console.log("order checked to be cancalled");
         res.status(200).json({ message: `Order is cancelled for Delivery with ID ${deliveryId}` });
     }
     catch (error) {
         if (error instanceof EMPTY_RESULT_ERROR) {
-            console.log("Error 404 reached");
             res.status(404).json({ error: error.message });
         }
         else {
-            console.log("Error 500 reached");
             res.status(500).json({ error: error.message });
         }
     }
@@ -709,7 +645,6 @@ router.post("/removeDeliveryIDFromOrder/:deliveryid", validationFn.validateToken
             deliveryController.removeDeliveryIDFromOrder(deliveryid),
             deliveryController.removeDeliveryIDFromOrderItem(deliveryid),
         ]);
-        console.log("DeliveryID removed from order and order item");
         res.json({ resultOrder, resultOrderItem });
     }
     catch (error) {

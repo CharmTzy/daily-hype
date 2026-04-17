@@ -5,7 +5,6 @@ import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { MonthValue, OrderStatusValue } from "@/enums/order-enums";
 import { Button, Image, Skeleton } from "@nextui-org/react";
-import { useTheme } from "next-themes";
 import dynamic from "next/dynamic";
 import OrderTab from "./order-tab";
 import { getOrders, getOrdersCount } from "@/functions/order-functions";
@@ -61,7 +60,6 @@ export default function Page({ params }: {
     const orderDivRef = useRef<HTMLDivElement>(null);
     const orderStatus = params.orderstatus;
     const router = useRouter();
-    const { theme } = useTheme();
     const { setCurrentActivePage } = useAppState();
     const [searchOrder, setSearchOrder] = useState<string>("");
     const [searchMonth, setSearchMonth] = useState<MonthValue>(MonthValue.All);
@@ -155,8 +153,7 @@ export default function Page({ params }: {
                 if (orderDivRef.current)
                     orderDivRef.current.scrollIntoView();
             }}>
-          <Image src={theme === "dark" ? "/icons/arrow-up-dark.svg" : "/icons/arrow-up.svg"} className="w-5 h-5" alt="Top Icon"/>
+          <Image src="/icons/arrow-up.svg" className="w-5 h-5" alt="Top Icon"/>
         </Button>)}
     </div>);
 }
-

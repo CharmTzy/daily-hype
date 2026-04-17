@@ -4,7 +4,9 @@ const getStripe = () => {
     if (!process.env.STRIPE_SECRET_KEY) {
         throw new Error("Stripe is not configured");
     }
-    return require("stripe")(process.env.STRIPE_SECRET_KEY);
+    return require("stripe")(process.env.STRIPE_SECRET_KEY, {
+        apiVersion: "2026-02-25.clover",
+    });
 };
 module.exports.insertPayment = function insertPayment(orderid, paymentid, paymentmethod, paymentamount, paymentstatus, transactionid) {
     const sql = `
@@ -20,9 +22,11 @@ module.exports.insertPayment = function insertPayment(orderid, paymentid, paymen
 };
 module.exports.getPaymentIntent = (amount) => {
     return getStripe().paymentIntents.create({
-        payment_method_types: ["card"],
         amount: amount,
         currency: "sgd",
+        automatic_payment_methods: {
+            enabled: true,
+        },
     });
 };
 module.exports.checkPaymentSuccess = (orderID) => {
@@ -38,6 +42,21 @@ module.exports.checkPaymentSuccess = (orderID) => {
 };
 module.exports.retrievePaymentIntent = (paymentIntent) => {
     return getStripe().paymentIntents.retrieve(paymentIntent);
+};
+module.exports.getPaymentByTransactionID = (transactionID) => {
+    const sql = `
+        SELECT orderid, paymentstatus, transactionid
+        FROM payment
+        WHERE transactionid = $1
+        ORDER BY createdat DESC
+        LIMIT 1
+    `;
+    return query(sql, [transactionID])
+        .then((result) => result.rows[0] || null)
+        .catch((error) => {
+        console.error(error);
+        throw error;
+    });
 };
 module.exports.getPaymentTransactionID = (userID, orderID) => {
     const sql = `
@@ -89,4 +108,3 @@ module.exports.getPaymentByOrderID = (orderIDArr) => {
         throw error;
     });
 };
-

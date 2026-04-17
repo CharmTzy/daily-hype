@@ -229,7 +229,7 @@ export default function Page() {
               <h5 className="card-title text-center mb-5">Calendar 🤩</h5>
 
               <div style={{ color: "black" }}>
-                <Calendar onChange={handleDateChange} value={date} className={`react-calendar text-black text-slate-800 dark:text-black`} tileClassName={(value) => selectedDates.includes(new Date(value.date).toISOString().split("T")[0])
+                <Calendar onChange={handleDateChange} value={date} className={`react-calendar text-black text-slate-800`} tileClassName={(value) => selectedDates.includes(new Date(value.date).toISOString().split("T")[0])
             ? "has-delivery"
             : ""} tileContent={renderTileContent}/>
               </div>

@@ -133,4 +133,3 @@ export default function CustomTable({ rowsPerPage, columns, rows, totalCount, se
       </Table>
     </TableContainer>);
 }
-

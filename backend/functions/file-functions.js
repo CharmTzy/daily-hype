@@ -11,16 +11,14 @@ module.exports.deleteAllFilesFolders = (folderPath) => {
             }
             else {
                 fs.unlinkSync(currentPath);
-                console.log("File Deleted: " + currentPath);
             }
         });
         fs.rmdirSync(folderPath);
-        console.log("Folder Deleted: " + folderPath);
     }
 };
 module.exports.createFolder = (folderPath) => {
     if (!fs.existsSync(folderPath))
-        fs.mkdirSync(folderPath);
+        fs.mkdirSync(folderPath, { recursive: true });
 };
 module.exports.deleteFile = (filePath) => {
     return new Promise((resolve, reject) => {
@@ -78,4 +76,3 @@ module.exports.checkFileExistsInFolder = (folderPath) => {
 module.exports.checkFolderExists = (folderPath) => {
     return fs.existsSync(folderPath);
 };
-

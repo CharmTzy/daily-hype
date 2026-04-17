@@ -61,7 +61,7 @@ export default function Home() {
           <CarouselItem data={hero} currentActiveNo={activeNo}/>
           <CarouselSlider start={0} current={activeNo} total={hero.length} func={(clickedIndex) => setActiveNo(clickedIndex)}/>
           <div className="mx-auto my-2 max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="border-t border-slate-200 dark:border-slate-800"/>
+            <div className="border-t border-slate-200"/>
           </div>
           <LatestItem setCart={setCart} data={justArrived.length > 0 ? justArrived : latestProduct.slice(4, 10)} title="Just Arrived"/>
           <LatestItem setCart={setCart} data={popular.length > 0 ? popular : bestSelling.slice(0, 6)} title="Most Popular"/>
@@ -69,7 +69,7 @@ export default function Home() {
       {dataLoading && (<>
           <CarouselItemSkeleton />
           <div className="mx-auto my-2 max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="border-t border-slate-200 dark:border-slate-800"/>
+            <div className="border-t border-slate-200"/>
           </div>
           <LatestItemSkeleton title="Just Arrived" total={6}/>
           <LatestItemSkeleton title="Most Popular" total={6}/>

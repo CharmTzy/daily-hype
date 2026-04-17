@@ -16,15 +16,15 @@ export function initialiseCheckOut(cart: ICartLocalStorage[]): Promise<TCheckOut
         .then((response) => response.json())
         .then((result) => {
         if (result.error) {
-            return { clientsecret: null, address: null, cart: null, product: null, error: result.error } as TCheckOutFetch;
+            return { clientsecret: null, address: null, cart: null, product: null, totals: null, error: result.error } as TCheckOutFetch;
         }
         else {
-            return { clientsecret: result.clientsecret, address: result.address, cart: result.cart, product: result.product, error: null } as TCheckOutFetch;
+            return { clientsecret: result.clientsecret, address: result.address, cart: result.cart, product: result.product, totals: result.totals, error: null } as TCheckOutFetch;
         }
     })
         .catch((error) => {
         console.error(error);
-        return { clientsecret: null, address: null, cart: null, product: null, error: ErrorMessage.FetchError } as TCheckOutFetch;
+        return { clientsecret: null, address: null, cart: null, product: null, totals: null, error: ErrorMessage.FetchError } as TCheckOutFetch;
     });
 }
 export function createOrder(addressID: number, cart: ICheckOutCart[]): Promise<TCreateOrder> {
@@ -247,4 +247,3 @@ export function getOrdersCount(searchText: string, status: OrderStatusValue, mon
         return { count: null, error: ErrorMessage.FetchError } as TGetOrderCount;
     });
 }
-

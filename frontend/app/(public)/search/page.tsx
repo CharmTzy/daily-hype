@@ -34,14 +34,14 @@ export default function SearchProduct() {
 
     return (
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-            <div className="rounded-[2rem] border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900 sm:p-6 lg:p-8">
+            <div className="rounded-[2rem] border border-slate-200 bg-white p-5 sm:p-6 lg:p-8">
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                     <div>
                         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Search</p>
-                        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950 dark:text-white sm:text-4xl">
+                        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
                             Find your next piece
                         </h1>
-                        <p className="mt-3 max-w-2xl text-sm text-slate-500 dark:text-slate-300">
+                        <p className="mt-3 max-w-2xl text-sm text-slate-500">
                             Search by keyword, then narrow the results by category, size, colour, and price.
                         </p>
                     </div>
@@ -53,7 +53,7 @@ export default function SearchProduct() {
                         placeholder="Search products, styles, or categories"
                         classNames={{
                             input: "text-sm",
-                            inputWrapper: "h-12 rounded-full border border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-950",
+                            inputWrapper: "h-12 rounded-full border border-slate-300 bg-white",
                         }}
                         className="w-full"
                         variant="bordered"
@@ -75,7 +75,7 @@ export default function SearchProduct() {
                                 size: "",
                             });
                         }}
-                        className="h-12 rounded-full border-slate-300 px-6 text-sm font-semibold text-slate-700 dark:border-slate-700 dark:text-slate-100"
+                        className="h-12 rounded-full border-slate-300 px-6 text-sm font-semibold text-slate-700"
                     >
                         Clear
                     </Button>

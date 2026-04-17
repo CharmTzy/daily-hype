@@ -3,10 +3,10 @@ import { CurrentActivePage, URL } from "@/enums/global-enums";
 import { useAppState } from "@/app/app-provider";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
-import { Input, Button, user } from "@nextui-org/react";
+import { Input, Button } from "@nextui-org/react";
 import UserIcon from "@/icons/user-icon";
-import { Router } from "react-router-dom";
+import ResilientImage from "@/components/ui/resilient-image";
+import { DEFAULT_PROFILE_IMAGE, normaliseProfileImage } from "@/functions/profile-image";
 interface UserData {
     email: string;
     name: string;
@@ -25,7 +25,7 @@ export default function Profile() {
         gender: "",
         url: "",
     });
-    const [selectedImage, setSelectedImage] = useState<File | string>("http://ssl.gstatic.com/accounts/ui/avatar_2x.png");
+    const [selectedImage, setSelectedImage] = useState<string>(DEFAULT_PROFILE_IMAGE);
     const [file, setFile] = useState<File | null>(null);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,16 +34,13 @@ export default function Profile() {
         setCurrentActivePage(CurrentActivePage.Profile);
     }, []);
     useEffect(() => {
-        console.log("LOADING: " + loading);
         if (loading) {
             fetchUserProfile();
         }
     }, [loading]);
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-        console.log("File input changed");
         const file = event.target.files?.[0];
         if (file) {
-            setSelectedImage(file);
             const reader = new FileReader();
             reader.onload = (e) => {
                 const result = e.target?.result as string | null;
@@ -64,10 +61,6 @@ export default function Profile() {
         formData.append("name", userData.name);
         formData.append("phone", userData.phone);
         formData.append("gender", userData.gender);
-        console.log("formData details:");
-        formData.forEach((value, key) => {
-            console.log(key, value);
-        });
         const uploadPhotoPromise = file
             ? fetch(`${process.env.BACKEND_URL}/api/upload-photo`, {
                 method: "POST",
@@ -115,7 +108,6 @@ export default function Profile() {
         window.location.reload();
     };
     const handleDeleteAccount = () => {
-        console.log("Delete Account button clicked");
         setIsModalOpen(true);
     };
     const handleConfirmDelete = (password: string) => {
@@ -152,22 +144,17 @@ export default function Profile() {
             return response.json();
         })
             .then((userData) => {
-            console.log("User Profile Data:", userData);
             setUserData(userData);
-            if (userData.url) {
-                setSelectedImage(userData.url);
-                setUserInfo((prev) => {
-                    if (prev) {
-                        const newObj = { ...prev };
-                        newObj.image = userData.url;
-                        localStorage.setItem("user", JSON.stringify(newObj));
-                        return newObj;
-                    }
-                    else {
-                        return null;
-                    }
-                });
-            }
+            const nextProfileImage = normaliseProfileImage(userData.url);
+            setSelectedImage(nextProfileImage);
+            setUserInfo((prev) => {
+                if (prev) {
+                    const newObj = { ...prev, image: nextProfileImage };
+                    localStorage.setItem("user", JSON.stringify(newObj));
+                    return newObj;
+                }
+                return null;
+            });
         })
             .catch((error) => {
             console.error("Error fetching user profile data:", error.message);
@@ -184,7 +171,7 @@ export default function Profile() {
       <div className="flex">
         <div className="w-1/4 p-4">
           <div className="text-center mb-4">
-            <Image src={typeof selectedImage === "string" ? selectedImage : window.URL.createObjectURL(selectedImage)} className="rounded-full border-2 cursor-pointer border-gray-300" alt="avatar" width={200} height={200} style={{ width: "200px", height: "200px" }} onClick={handleClick}/>
+            <ResilientImage src={selectedImage} fallbackSrc={DEFAULT_PROFILE_IMAGE} className="rounded-full border-2 cursor-pointer border-gray-300 object-cover" alt="avatar" width={200} height={200} style={{ width: "200px", height: "200px" }} onClick={handleClick}/>
             <br />
             <input type="file" ref={fileRef} className="text-center hidden center-block file-upload" id="photoInput" accept="image/*" onChange={handleFileChange}/>
           </div>
@@ -203,7 +190,7 @@ export default function Profile() {
                 <Input isRequired type="phone" label="Phone" value={userData.phone} onChange={(e) => setUserData({ ...userData, phone: e.target.value })} className="max-w-xs mb-8"/>
 
                 <div className="mb-12">
-                  <div className="flex items-center space-x-4 text-black dark:text-white">
+                  <div className="flex items-center space-x-4 text-black">
                     <label className="flex items-center">
                       <input type="radio" id="male" name="gender" value="M" onChange={(e) => setUserData({ ...userData, gender: e.target.value })} checked={userData.gender === "M"} className="form-radio text-white"/>
                       <span className="ml-2">Male</span>
@@ -251,4 +238,3 @@ export default function Profile() {
       </div>
     </div>);
 }
-

@@ -82,13 +82,13 @@ export default function ProductReviews() {
     };
     return (<div>
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+        <h2 className="text-3xl font-extrabold tracking-tight text-gray-900">
           Customer Reviews
         </h2>
         <div className="mt-4 border-b border-gray-200">
           <div className="flex justify-between items-center pb-6">
             <div className="flex items-center">
-              <h3 className="text-4xl font-bold text-gray-900 mr-2 dark:text-white">
+              <h3 className="text-4xl font-bold text-gray-900 mr-2">
                 {averageRating().toFixed(2)}
               </h3>
               <div className="flex items-center">
@@ -112,7 +112,7 @@ export default function ProductReviews() {
               <div className="mt-4 border-b border-gray-200">
                 <div className="flex justify-between">
                   <div className="flex items-center space-x-20 max-w-[40%]">
-                    <h4 className="text-lg font-bold text-gray-900 w-52 dark:text-white">
+                    <h4 className="text-lg font-bold text-gray-900 w-52">
                       {review.name}
                     </h4>
 

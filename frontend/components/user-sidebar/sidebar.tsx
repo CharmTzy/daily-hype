@@ -19,7 +19,7 @@ export default function SideBar() {
         localStorage.setItem("selectedKeys", JSON.stringify(Array.from(selectedKeys)));
     }, [selectedKeys]);
     return (<div className="flex flex-col basis-1/5 items-start min-w-[200px]">
-      <Link href={URL.Personal} className="mb-1 text-[16px] text-black font-semibold dark:text-white">
+      <Link href={URL.Personal} className="mb-1 text-[16px] text-black font-semibold">
         Personal Center
       </Link>
       <Accordion selectedKeys={selectedKeys} onSelectionChange={setSelectedKeys} className="m-0 p-0" selectionMode="multiple" isCompact itemClasses={{ heading: "mb-0" }}>
@@ -66,7 +66,7 @@ export default function SideBar() {
       <Divider />
       <label onClick={() => {
             router.push(URL.SignOut);
-        }} className="my-2 cursor-pointer text-[15px] text-black font-semibold dark:text-white">
+        }} className="my-2 cursor-pointer text-[15px] text-black font-semibold">
         Sign Out
       </label>
     </div>);

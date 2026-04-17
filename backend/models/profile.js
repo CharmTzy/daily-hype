@@ -1,20 +1,20 @@
 const { query } = require("../database");
-const bcrypt = require('bcrypt');
+const { EMPTY_RESULT_ERROR } = require("../errors");
+const bcrypt = require("bcrypt");
 module.exports.retrieveProfileData = function retrieveProfileData(email) {
-    const sql = `SELECT a.email, a.name, a.gender, a.phone, i.url FROM appuser a LEFT JOIN image i ON a.imageid = i.imageid WHERE email = $1`;
+    const sql = `SELECT a.email, a.name, a.gender, a.phone, a.imageid, i.url FROM appuser a LEFT JOIN image i ON a.imageid = i.imageid WHERE email = $1`;
     return query(sql, [email]).then(function (result) {
         const rows = result.rows;
         if (rows.length === 0) {
             throw new Error(`User with email ${email} not found!`);
         }
-        var userData = {
+        const userData = {
             email: rows[0].email,
             name: rows[0].name,
             gender: rows[0].gender,
             phone: rows[0].phone,
-            address: rows[0].address,
-            region: rows[0].region,
-            url: rows[0].url
+            imageid: rows[0].imageid,
+            url: rows[0].url,
         };
         return userData;
     });
@@ -77,7 +77,6 @@ module.exports.retrievePhoto = function retrievePhoto(email) {
         .then(function (result) {
         const rows = result.rows;
         if (rows.length === 0) {
-            console.log('There is no photo');
             return null;
         }
         return rows[0].url;

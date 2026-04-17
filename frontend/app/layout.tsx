@@ -8,16 +8,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
     title: "DailyHype",
     description: "This is a clothing e-commerce website",
-    icons: [
-        {
-            media: "(prefers-color-scheme: light)",
-            url: "/images/logo.png",
-        },
-        {
-            media: "(prefers-color-scheme: dark)",
-            url: "/images/logo.png",
-        },
-    ],
+    icons: ["/images/logo.png"],
 };
 export default function RootLayout({ children }: {
     children: React.ReactNode;
@@ -25,7 +16,7 @@ export default function RootLayout({ children }: {
     const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
         "661445928383-tf4kpsnredt5pfb5479dbiebrip5pjfl.apps.googleusercontent.com";
     return (<html lang="en">
-      <body className={`${inter.className} dark:bg-slate-900`}>
+      <body className={inter.className}>
         <GoogleOAuthProvider clientId={googleClientId}>
           <UIProvider>
             <AppProvider>{children}</AppProvider>

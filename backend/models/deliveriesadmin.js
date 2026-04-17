@@ -2,21 +2,6 @@ const { query } = require('../database');
 const { DUPLICATE_ENTRY_ERROR, EMPTY_RESULT_ERROR, SQL_ERROR_CODE, TABLE_ALREADY_EXISTS_ERROR } = require('../errors');
 const { use } = require('../routes/delivery');
 module.exports.retrieveFilteredDeliveriesWithMessageReadAdmin = function retrieveFilteredDeliveriesWithMessageReadAdmin(userId, startDate, endDate, startDateOrder, endDateOrder, statusDetail, limit, offset, chatunread, userName, productName, region, categoryName, address, shipper) {
-    console.log('userId:', userId);
-    console.log('startDate:', startDate);
-    console.log('endDate:', endDate);
-    console.log('startDateOrder:', startDateOrder);
-    console.log('endDateOrder:', endDateOrder);
-    console.log('statusDetail:', statusDetail);
-    console.log('limit:', limit);
-    console.log('offset:', offset);
-    console.log('chatunread:', chatunread);
-    console.log('userName:', userName);
-    console.log('productName:', productName);
-    console.log('region:', region);
-    console.log('categoryName:', categoryName);
-    console.log('address:', address);
-    console.log('shipper:', shipper);
     var filterunread = ``;
     if (chatunread == "UnreadChats") {
         filterunread = `AND (CASE WHEN NOT message.messagereadadmin THEN 1 END) > 0`;
@@ -89,16 +74,11 @@ module.exports.retrieveFilteredDeliveriesWithMessageReadAdmin = function retriev
         if (rows.length === 0) {
             return [];
         }
-        console.log("rows length prev is " + rows.length);
         const distinctDeliveryIds = rows.map(row => row.deliveryid);
-        console.log("rows length is " + distinctDeliveryIds.length);
         return distinctDeliveryIds;
     });
 };
 module.exports.retrieveDeliveryDetailsAdmin = function retrieveDeliveryDetails(deliveryIds, arrangeByOrder, arrangeByDelivery) {
-    console.log("Retrieving all deliveriles");
-    console.log('arrangeByOrder:', arrangeByOrder);
-    console.log('arrangeByDelivery:', arrangeByDelivery);
     if (arrangeByOrder == 'Default') {
         arrangeByOrder = null;
     }
@@ -213,7 +193,6 @@ module.exports.retrieveDeliveryDetailsAdmin = function retrieveDeliveryDetails(d
                 size: row.size
             });
         });
-        console.log(deliveriesArray);
         return deliveriesArray;
     });
 };
@@ -318,7 +297,6 @@ module.exports.checkIfSingleDeliveryInOrderTable = async function checkIfSingleD
             console.error(`Delivery ID ${deliveryID} not found in productorder table`);
             return { deliveryID, success: false, error: `Delivery ID ${deliveryID} not found in productorder table` };
         }
-        console.log(`Delivery ID ${deliveryID} is in productorder table`);
         return { deliveryID, success: true };
     }
     catch (error) {
@@ -328,7 +306,6 @@ module.exports.checkIfSingleDeliveryInOrderTable = async function checkIfSingleD
 };
 module.exports.addRoom = async function addRoom(adminuserid, deliveryid) {
     try {
-        console.log("ONE TIME ADD ROOM: " + "===========================================================");
         const selectQuery = `
             SELECT appuser.userid, appuser.name
             FROM appuser
@@ -342,19 +319,15 @@ module.exports.addRoom = async function addRoom(adminuserid, deliveryid) {
             RETURNING *;`;
         const selectResult = await query(selectQuery, [deliveryid]);
         if (!selectResult || selectResult.rows.length == 0) {
-            console.log("Not found");
             console.error(`Delivery ID ${deliveryid} not found in productorder table`);
             return { success: false, error: `Delivery ID ${deliveryid} not found in productorder table` };
         }
         const userid = selectResult.rows[0].userid;
         const insertResult = await query(insertQuery, [adminuserid, deliveryid, userid]);
         if (!insertResult || insertResult.rows.length == 0) {
-            console.log("Failed insert, returning");
             console.error(`Failed to add chat record for admin ID ${adminuserid}, delivery ID ${deliveryid}, and user ID ${userid}`);
             return { success: false, error: `Failed to add chat record for admin ID ${adminuserid}, delivery ID ${deliveryid}, and user ID ${userid}` };
         }
-        console.log(`Chat record added for admin ID ${adminuserid}, delivery ID ${deliveryid}, and user ID ${userid}`);
-        console.log("return to sender");
         return { success: true, roomid: insertResult.rows[0].roomid, userid: userid };
     }
     catch (error) {
@@ -381,7 +354,6 @@ module.exports.removeduplicatechat = async function removeduplicatechat(updatedr
     `;
     try {
         const result = await query(queryText);
-        console.log('Duplicate chat rows removed successfully');
         return result;
     }
     catch (error) {

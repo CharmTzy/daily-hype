@@ -1,6 +1,7 @@
 export interface IAdminReview {
     reviewid: number;
     name: string;
+    profileurl: string;
     productname: string;
     rating: number;
     reviewdescription: string;

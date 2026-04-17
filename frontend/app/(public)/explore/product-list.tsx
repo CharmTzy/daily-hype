@@ -35,7 +35,7 @@ export default function ProductList({ data }: {
             {data.map((item, index) => (
                 <Card
                     shadow="sm"
-                    className="w-full overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950"
+                    className="w-full overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white"
                     key={index}
                     isPressable
                     onPress={() => {
@@ -43,7 +43,7 @@ export default function ProductList({ data }: {
                     }}
                 >
                     <CardBody className="overflow-visible p-0">
-                        <div className="relative aspect-[4/5] w-full bg-slate-100 dark:bg-slate-900">
+                        <div className="relative aspect-[4/5] w-full bg-slate-100">
                             <Image
                                 priority
                                 fetchPriority="high"
@@ -57,14 +57,14 @@ export default function ProductList({ data }: {
                         </div>
                     </CardBody>
                     <CardFooter className="flex flex-col gap-3 p-4 text-small">
-                        <b className="line-clamp-2 min-h-[40px] self-start text-left text-[14px] text-slate-900 dark:text-white">
+                        <b className="line-clamp-2 min-h-[40px] self-start text-left text-[14px] text-slate-900">
                             {item.productname}
                         </b>
                         <div className="flex w-full items-center self-start">
-                            <p className="text-[12px] font-semibold capitalize text-slate-400 dark:text-slate-500">
+                            <p className="text-[12px] font-semibold capitalize text-slate-400">
                                 {item.typename}
                             </p>
-                            <p className="ms-auto text-[12px] font-semibold capitalize text-slate-400 dark:text-slate-500">
+                            <p className="ms-auto text-[12px] font-semibold capitalize text-slate-400">
                                 {item.categoryname}
                             </p>
                         </div>
@@ -72,12 +72,12 @@ export default function ProductList({ data }: {
                             <div className="flex flex-wrap gap-1">{colourRender(item.detail)}</div>
                             <div className="ms-auto flex items-center">
                                 <span className="mr-1 text-[18px] text-[gold]">&#9733;</span>
-                                <p className="tracking-wide text-slate-600 dark:text-slate-300">
+                                <p className="tracking-wide text-slate-600">
                                     {parseFloat(item.rating).toFixed(1)}
                                 </p>
                             </div>
                         </div>
-                        <p className="self-start font-semibold text-slate-700 dark:text-slate-200">
+                        <p className="self-start font-semibold text-slate-700">
                             ${formatMoney(item.unitprice)}
                         </p>
                     </CardFooter>

@@ -9,12 +9,17 @@ const spaceGrotesk = Space_Grotesk({
 
 type BrandLogoProps = {
     className?: string;
-    size?: "sm" | "md" | "lg";
-    theme?: "adaptive" | "dark" | "light";
+    size?: "xs" | "sm" | "md" | "lg";
+    variant?: "default" | "inverse";
     tagline?: string;
 };
 
 const sizeStyles = {
+    xs: {
+        width: 118,
+        tagline: "text-[0.55rem]",
+        gap: "gap-1",
+    },
     sm: {
         width: 140,
         tagline: "text-[0.6rem]",
@@ -32,16 +37,12 @@ const sizeStyles = {
     },
 };
 
-const themeStyles = {
-    adaptive: {
-        tagline: "text-slate-500 dark:text-slate-300",
-        image: "/images/logo.png",
-    },
-    dark: {
+const variantStyles = {
+    default: {
         tagline: "text-slate-500",
         image: "/images/logo.png",
     },
-    light: {
+    inverse: {
         tagline: "text-white/80",
         image: "/images/logo-light.png",
     },
@@ -50,16 +51,16 @@ const themeStyles = {
 export default function BrandLogo({
     className,
     size = "md",
-    theme = "adaptive",
+    variant = "default",
     tagline,
 }: BrandLogoProps) {
     const selectedSize = sizeStyles[size];
-    const selectedTheme = themeStyles[theme];
+    const selectedVariant = variantStyles[variant];
 
     return (
         <span className={clsx("inline-flex flex-col leading-none", selectedSize.gap, className)}>
             <Image
-                src={selectedTheme.image}
+                src={selectedVariant.image}
                 alt="DailyHype logo"
                 width={selectedSize.width}
                 height={Math.round((selectedSize.width * 180) / 411)}
@@ -70,7 +71,7 @@ export default function BrandLogo({
                 <span
                     className={clsx(
                         spaceGrotesk.className,
-                        selectedTheme.tagline,
+                        selectedVariant.tagline,
                         selectedSize.tagline,
                     )}
                 >

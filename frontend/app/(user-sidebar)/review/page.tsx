@@ -153,13 +153,13 @@ export default function PostedReviews() {
         }
     };
     return (<div className="w-full max-w-2xl mx-auto px-4 py-6">
-      <div className="divide-y divide-gray-200 dark:divide-gray-800">
+      <div className="divide-y divide-gray-200">
         {reviews.map((review, index) => (<div key={index} className="flex gap-4 p-4">
             <div className="grid gap-4 flex-1">
               <div className="flex gap-4 items-start">
                 <div className="grid gap-0.5 text-sm">
                   <h3 className="font-semibold">{review.productname}</h3>
-                  <time className="text-xs text-gray-500 dark:text-gray-400">
+                  <time className="text-xs text-gray-500">
                     {calculateElapsedTime(review.createdat)}
                   </time>
                 </div>
@@ -170,7 +170,7 @@ export default function PostedReviews() {
                   {Array.from({ length: 5 - review.rating }, (_, i) => (<StarIcon key={i + review.rating} className="w-5 h-5 fill-muted stroke-muted-foreground"/>))}
                 </div>
               </div>
-              <div className="text-sm leading-loose text-gray-500 dark:text-gray-400">
+              <div className="text-sm leading-loose text-gray-500">
                 <p>{review.reviewdescription}</p>
               </div>
               <div className="flex justify-end gap-2 mt-2">
@@ -197,10 +197,10 @@ export default function PostedReviews() {
                     <form className="space-y-4 my-8">
                       
                       <div className="flex flex-col">
-                        <label className="text-gray-600 dark:text-gray-400">
+                        <label className="text-gray-600">
                           Rating*
                         </label>
-                        <select className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-none" value={rating} onChange={(e) => setRating(e.target.value)}>
+                        <select className="w-full p-2 border border-gray-300 rounded-none" value={rating} onChange={(e) => setRating(e.target.value)}>
                           {[1, 2, 3, 4, 5].map((value) => (<option key={value} value={value}>
                               {value}
                             </option>))}
@@ -210,15 +210,15 @@ export default function PostedReviews() {
                       
                       <div className="flex">
                         <div className="flex flex-col w-full">
-                          <label className="text-gray-600 dark:text-gray-400">
+                          <label className="text-gray-600">
                             Description*
                           </label>
-                          <textarea className="w-full p-2 border border-gray-300 dark:border-gray-700 rounded-none" value={reviewdescription} onChange={(e) => setReviewDescription(e.target.value)} rows={4}/>
+                          <textarea className="w-full p-2 border border-gray-300 rounded-none" value={reviewdescription} onChange={(e) => setReviewDescription(e.target.value)} rows={4}/>
                         </div>
                       </div>
 
                       <div className="flex items-center" style={{ marginTop: "3xrem" }}>
-                        <Button className="w-52 h-10 bg-black dark:bg-white text-white dark:text-black rounded-none text-lg" onClick={addOrEditReview}>
+                        <Button className="w-52 h-10 bg-black text-white rounded-none text-lg" onClick={addOrEditReview}>
                           {isAddMode ? "Save" : "Confirm"}
                         </Button>
                       </div>

@@ -146,14 +146,14 @@ export default function TypeCatalogPage({ typeId, title, activePage }: TypeCatal
 
     const renderFilters = (isMobilePanel: boolean) => (
         <aside
-            className={`flex h-fit flex-col rounded-[1.75rem] border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900 ${
+            className={`flex h-fit flex-col rounded-[1.75rem] border border-slate-200 bg-white p-5 ${
                 isMobilePanel ? "" : "lg:sticky lg:top-28"
             }`}
         >
             <div className="flex items-center justify-between">
                 <div>
                     <h2 className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-500">Categories</h2>
-                    <p className="mt-2 text-sm text-slate-500 dark:text-slate-300">
+                    <p className="mt-2 text-sm text-slate-500">
                         Narrow this section the way shoppers would on smaller screens.
                     </p>
                 </div>
@@ -161,7 +161,7 @@ export default function TypeCatalogPage({ typeId, title, activePage }: TypeCatal
                     <button
                         type="button"
                         onClick={() => setShowFilters(false)}
-                        className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 text-slate-600 dark:border-slate-700 dark:text-slate-200"
+                        className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 text-slate-600"
                     >
                         ✕
                     </button>
@@ -185,7 +185,7 @@ export default function TypeCatalogPage({ typeId, title, activePage }: TypeCatal
                                 setCurrentPage(1);
                                 setSelectedCategoryIds(nextSelected);
                             }}
-                            classNames={{ label: "capitalize text-slate-700 dark:text-slate-100" }}
+                            classNames={{ label: "capitalize text-slate-700" }}
                         >
                             {category.categoryname}
                         </Checkbox>
@@ -193,11 +193,11 @@ export default function TypeCatalogPage({ typeId, title, activePage }: TypeCatal
                 })}
             </div>
 
-            <div className="mt-6 space-y-4 rounded-[1.5rem] bg-slate-50 p-4 dark:bg-slate-950">
+            <div className="mt-6 space-y-4 rounded-[1.5rem] bg-slate-50 p-4">
                 <div className="flex items-center justify-between gap-3">
                     <div>
-                        <p className="text-sm font-semibold text-slate-700 dark:text-slate-100">In-stock items only</p>
-                        <p className="text-xs text-slate-500 dark:text-slate-300">Hide unavailable sizes and colours</p>
+                        <p className="text-sm font-semibold text-slate-700">In-stock items only</p>
+                        <p className="text-xs text-slate-500">Hide unavailable sizes and colours</p>
                     </div>
                     <Switch
                         isSelected={inStockOnly}
@@ -235,10 +235,10 @@ export default function TypeCatalogPage({ typeId, title, activePage }: TypeCatal
             <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                 <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Collection</p>
-                    <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950 dark:text-white sm:text-4xl">
+                    <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
                         {title}
                     </h1>
-                    <p className="mt-3 max-w-2xl text-sm text-slate-500 dark:text-slate-300">
+                    <p className="mt-3 max-w-2xl text-sm text-slate-500">
                         {selectedCategoryNames.length > 0
                             ? selectedCategoryNames.join(" / ")
                             : "Choose a category to browse"}
@@ -248,13 +248,13 @@ export default function TypeCatalogPage({ typeId, title, activePage }: TypeCatal
                 <div className="flex flex-wrap items-center gap-3">
                     <Button
                         variant="bordered"
-                        className="h-11 rounded-full border-slate-300 px-5 text-sm font-semibold text-slate-700 lg:hidden dark:border-slate-700 dark:text-slate-100"
+                        className="h-11 rounded-full border-slate-300 px-5 text-sm font-semibold text-slate-700 lg:hidden"
                         onClick={() => setShowFilters(true)}
                     >
                         Filters
                     </Button>
-                    <div className="hidden items-center gap-3 rounded-full border border-slate-200 px-4 py-2 text-sm lg:flex dark:border-slate-800">
-                        <span className="font-medium text-slate-600 dark:text-slate-300">In stock only</span>
+                    <div className="hidden items-center gap-3 rounded-full border border-slate-200 px-4 py-2 text-sm lg:flex">
+                        <span className="font-medium text-slate-600">In stock only</span>
                         <Switch
                             isSelected={inStockOnly}
                             color="success"
@@ -273,7 +273,7 @@ export default function TypeCatalogPage({ typeId, title, activePage }: TypeCatal
                     {selectedCategoryNames.map((name) => (
                         <span
                             key={name}
-                            className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-slate-600 dark:bg-slate-800 dark:text-slate-200"
+                            className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-slate-600"
                         >
                             {name}
                         </span>
@@ -284,10 +284,10 @@ export default function TypeCatalogPage({ typeId, title, activePage }: TypeCatal
             <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
                 <div className="hidden lg:block">{renderFilters(false)}</div>
 
-                <section className="min-w-0 rounded-[2rem] border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900 sm:p-6">
-                    <div className="flex flex-col gap-3 border-b border-slate-200 pb-5 dark:border-slate-800 sm:flex-row sm:items-center sm:justify-between">
+                <section className="min-w-0 rounded-[2rem] border border-slate-200 bg-white p-5 sm:p-6">
+                    <div className="flex flex-col gap-3 border-b border-slate-200 pb-5 sm:flex-row sm:items-center sm:justify-between">
                         <div>
-                            <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                            <p className="text-sm font-medium text-slate-600">
                                 {products.length} item{products.length === 1 ? "" : "s"} on this page
                             </p>
                             <p className="mt-1 text-xs uppercase tracking-[0.2em] text-slate-400">
@@ -320,8 +320,8 @@ export default function TypeCatalogPage({ typeId, title, activePage }: TypeCatal
                         </div>
                     ) : products.length === 0 ? (
                         <div className="flex min-h-[420px] flex-col items-center justify-center px-6 text-center">
-                            <h3 className="text-xl font-semibold text-slate-900 dark:text-white">No products found</h3>
-                            <p className="mt-2 max-w-md text-sm text-slate-500 dark:text-slate-300">
+                            <h3 className="text-xl font-semibold text-slate-900">No products found</h3>
+                            <p className="mt-2 max-w-md text-sm text-slate-500">
                                 Try another category selection or turn off the stock filter to see more items.
                             </p>
                         </div>
@@ -333,9 +333,9 @@ export default function TypeCatalogPage({ typeId, title, activePage }: TypeCatal
                                         key={product.productid}
                                         type="button"
                                         onClick={() => router.push(`${URL.ProductDetail}${product.productid}`)}
-                                        className="group overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white text-left transition duration-200 hover:-translate-y-1 hover:shadow-xl dark:border-slate-800 dark:bg-slate-950"
+                                        className="group overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white text-left transition duration-200 hover:-translate-y-1 hover:shadow-xl"
                                     >
-                                        <div className="relative aspect-[4/5] bg-slate-100 dark:bg-slate-900">
+                                        <div className="relative aspect-[4/5] bg-slate-100">
                                             {product.image?.[0]?.url ? (
                                                 <Image
                                                     src={product.image[0].url}
@@ -348,15 +348,15 @@ export default function TypeCatalogPage({ typeId, title, activePage }: TypeCatal
                                         </div>
                                         <div className="flex flex-col gap-3 p-4">
                                             <div>
-                                                <h3 className="text-base font-semibold text-slate-900 dark:text-white">
+                                                <h3 className="text-base font-semibold text-slate-900">
                                                     {product.productname}
                                                 </h3>
-                                                <p className="mt-1 line-clamp-2 text-sm text-slate-500 dark:text-slate-300">
+                                                <p className="mt-1 line-clamp-2 text-sm text-slate-500">
                                                     {product.description}
                                                 </p>
                                             </div>
                                             <div className="flex items-center justify-between">
-                                                <span className="text-lg font-semibold text-slate-900 dark:text-white">
+                                                <span className="text-lg font-semibold text-slate-900">
                                                     ${formatMoney(product.unitprice)}
                                                 </span>
                                                 <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-600">
@@ -378,8 +378,8 @@ export default function TypeCatalogPage({ typeId, title, activePage }: TypeCatal
                                 ))}
                             </div>
 
-                            <div className="mt-8 flex flex-col gap-4 border-t border-slate-200 pt-5 dark:border-slate-800 sm:flex-row sm:items-center sm:justify-between">
-                                <p className="text-sm text-slate-500 dark:text-slate-300">
+                            <div className="mt-8 flex flex-col gap-4 border-t border-slate-200 pt-5 sm:flex-row sm:items-center sm:justify-between">
+                                <p className="text-sm text-slate-500">
                                     Page {currentPage} of {totalPages}
                                 </p>
                                 <CustomPagination
@@ -403,7 +403,7 @@ export default function TypeCatalogPage({ typeId, title, activePage }: TypeCatal
                         aria-label="Close filters backdrop"
                         className="fixed inset-0 z-40 bg-slate-950/50"
                     />
-                    <div className="fixed inset-x-0 bottom-0 z-50 max-h-[85vh] overflow-y-auto rounded-t-[2rem] bg-white p-4 shadow-2xl dark:bg-slate-950">
+                    <div className="fixed inset-x-0 bottom-0 z-50 max-h-[85vh] overflow-y-auto rounded-t-[2rem] bg-white p-4 shadow-2xl">
                         {renderFilters(true)}
                     </div>
                 </div>

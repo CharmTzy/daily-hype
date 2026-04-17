@@ -1,59 +1,57 @@
 "use client";
-import { JSX, SVGProps, useEffect, useState } from "react";
+import { JSX, SVGProps, useState } from "react";
 import Link from "next/link";
-import { Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Button } from "@nextui-org/react";
+import { Button, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
-import BrandLogo from "@/components/brand/brand-logo";
+import AuthShell from "@/components/auth/auth-shell";
+import { URL } from "@/enums/global-enums";
+
 export default function Page() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState<string>("");
     const [confirmPassword, setConfirmPassword] = useState<string>("");
     const [showAdditional, setShowAdditional] = useState<boolean>(false);
-    const { isOpen, onOpenChange } = useDisclosure();
-    const [showModal, setModal] = useState(false);
+    const { isOpen, onOpen, onClose, onOpenChange } = useDisclosure();
     const [code, setCode] = useState<string>("");
     const [passwordError, setPasswordError] = useState<string>("");
     const [confirmPasswordError, setConfirmPasswordError] = useState<string>("");
+    const [requestError, setRequestError] = useState<string>("");
     const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/;
     const isPasswordValid = passwordRegex.test(password);
     const doPasswordsMatch = password === confirmPassword;
     const router = useRouter();
+
     const handleForgotPassword = (email: string) => {
+        setRequestError("");
         fetch(`${process.env.BACKEND_URL}/api/forgot-password`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({
-                email,
-            }),
+            body: JSON.stringify({ email }),
         })
-            .then((response) => {
-            return response.json();
-        })
+            .then((response) => response.json())
             .then((result) => {
             if (result.success) {
-                onOpenChange();
-                setModal(true);
+                onOpen();
             }
             else {
-                alert("Email not found. Please check your email address or signup.");
+                setRequestError("Email not found. Please check the address or sign up first.");
             }
         })
             .catch((error) => {
             console.error(error);
+            setRequestError("We couldn't send a verification code right now.");
         });
     };
+
     const handleVerificationCode = (code: number) => {
         fetch(`${process.env.BACKEND_URL}/api/verify`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({
-                email,
-                code
-            }),
+            body: JSON.stringify({ email, code }),
         })
             .then((response) => {
             if (!response.ok) {
@@ -61,124 +59,98 @@ export default function Page() {
             }
             return response.json();
         })
-            .then((verificationResult) => {
-            console.log("Verification Result:", verificationResult);
+            .then(() => {
             alert("Account verification successful");
             setShowAdditional(true);
-            setModal(false);
+            onClose();
         })
             .catch((error) => {
             alert("Verification code is wrong");
             console.error("Error during verification:", error.message);
         });
     };
+
     const PasswordReset = (email: string, password: string) => {
         fetch(`${process.env.BACKEND_URL}/api/password-reset`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({
-                email,
-                password
-            }),
+            body: JSON.stringify({ email, password }),
         })
-            .then((response) => {
-            return response.json();
-        })
-            .then((passwordResetResult) => {
-            console.log("Password Reset Result:", passwordResetResult);
+            .then((response) => response.json())
+            .then(() => {
             alert("Password reset successful");
-            router.push("/signin");
+            router.push(URL.SignIn);
         })
-            .catch((error) => {
+            .catch(() => {
             alert("Password Error");
         });
     };
-    return (<div className="flex min-h-screen flex-col items-center justify-center bg-[#FB6050]">
-        
-      <BrandLogo size="md" theme="light" tagline="Reset access with confidence"/>
-      {!showAdditional && (<div className="mt-8 w-full max-w-md rounded-lg bg-white p-8">
-        <div className="flex items-center justify-center">
-          <AlertCircleIcon className="h-12 w-12 text-blue-500"/>
-        </div>
-        <h2 className="mt-4 text-center text-2xl font-bold">Forgot Password</h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
-          Enter your email and we&apos;ll send you a link to reset your password.
-        </p>
-        <form className="mt-4">
-            <div className="mt-1">
-                <Input placeholder="dailyhypeteam2023@gmail.com" type="email" value={email} onChange={(e) => setEmail(e.target.value)}/>
+
+    return (<>
+      <AuthShell title={showAdditional ? "Create a new password" : "Reset your password"} description={showAdditional ? "Choose a new password for your DailyHype account." : "Enter your account email and we'll send a verification code so you can safely reset your password."} panelTitle="Recover your access smoothly" panelDescription="We keep password recovery simple: verify your email, choose a fresh password, and get back to your orders and saved cart." panelContent={<div className="grid gap-3">
+              <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
+                <p className="font-medium text-white">Verified recovery</p>
+                <p className="mt-1 text-white/70">A verification code is sent to your inbox before any password change is allowed.</p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-4">
+                <p className="font-medium text-white">Quick return to checkout</p>
+                <p className="mt-1 text-white/70">Once updated, you can jump straight back into your account and cart.</p>
+              </div>
+            </div>} footer={<p>Remembered your password? <Link href={URL.SignIn} className="font-medium text-[#FB6050]">Back to sign in</Link></p>}>
+        {!showAdditional ? (<div className="space-y-5">
+            <div className="flex items-center gap-3 rounded-2xl border border-slate-100 bg-slate-50 px-4 py-4 text-sm text-slate-600">
+              <AlertCircleIcon className="h-5 w-5 text-[#FB6050]"/>
+              <span>Use the email address linked to your DailyHype account.</span>
             </div>
-            <div className="mt-4 flex items-center justify-center">
-                <Button className="bg-green-500 text-white" onClick={() => { handleForgotPassword(email); }}>Submit</Button>
-            </div>
-        </form>
-        <div className="mt-4 text-center">
-          <Link className="text-sm text-blue-500" href="./signin">
-            Back to Login
-          </Link>
-        </div>
-      </div>)}
-      {showAdditional && (<div className="mt-8 w-full max-w-md rounded-lg bg-white p-8">
-        <div className="flex items-center justify-center">
-          <AlertCircleIcon className="h-12 w-12 text-blue-500"/>
-        </div>
-        <h2 className="mt-4 text-center text-2xl font-bold">Forgot Password</h2>
-        <form className="mt-4">
-            <div className="mt-1">
-            <Input isRequired type="password" label="Password" value={password} onChange={(e) => setPassword(e.target.value)} className={` ${isPasswordValid ? '' : 'border-red-500'}`}/>
-            </div>
-            <div className="mt-4">
-            <Input isRequired type="password" label="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className={` ${doPasswordsMatch ? '' : 'border-red-500'}`}/>
-            </div>
-            <div className="mt-4 flex items-center justify-center">
-                <Button className="bg-green-500 text-white" onClick={() => {
+            <Input placeholder="you@example.com" type="email" label="Email" value={email} onChange={(e) => setEmail(e.target.value)} variant="bordered" labelPlacement="outside"/>
+            {requestError ? <p className="text-sm font-medium text-red-500">{requestError}</p> : null}
+            <Button className="h-12 w-full rounded-full bg-[#111827] text-sm font-semibold uppercase tracking-[0.18em] text-white" onClick={() => { handleForgotPassword(email); }}>
+              Send Code
+            </Button>
+          </div>) : (<div className="space-y-5">
+            <Input isRequired type="password" label="Password" value={password} onChange={(e) => setPassword(e.target.value)} variant="bordered" labelPlacement="outside" placeholder="New password"/>
+            <Input isRequired type="password" label="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} variant="bordered" labelPlacement="outside" placeholder="Confirm new password"/>
+            {passwordError ? <p className="text-sm font-medium text-red-500">{passwordError}</p> : null}
+            {confirmPasswordError ? <p className="text-sm font-medium text-red-500">{confirmPasswordError}</p> : null}
+            <Button className="h-12 w-full rounded-full bg-[#111827] text-sm font-semibold uppercase tracking-[0.18em] text-white" onClick={() => {
+                setPasswordError("");
+                setConfirmPasswordError("");
                 if (!isPasswordValid) {
                     setPasswordError("Password must be at least 8 characters long and include a number and a special character.");
+                    return;
                 }
-                else if (!doPasswordsMatch) {
+                if (!doPasswordsMatch) {
                     setConfirmPasswordError("Passwords do not match.");
+                    return;
                 }
-                else {
-                    onOpenChange();
-                    setModal(true);
-                    PasswordReset(email, password);
-                }
-            }}>Submit</Button>
-            </div>
-        </form>
-        {passwordError && <p className="text-red-500">{passwordError}</p>}
-        {confirmPasswordError && <p className="text-red-500">{confirmPasswordError}</p>}        
-        <div className="mt-4 text-center">
-          <Link className="text-sm text-blue-500" href="./signin">
-            Back to Login
-          </Link>
-        </div>
-      </div>)}
+                PasswordReset(email, password);
+            }}>
+              Reset Password
+            </Button>
+          </div>)}
+      </AuthShell>
 
-      <div className="mt-8 text-center text-xs text-white">
-        Copyright © 2023 DailyHype Team
-      </div>
-
-      {showModal && (<Modal isOpen={isOpen} onOpenChange={onOpenChange}>
-       <ModalContent>
-         {(onClose) => (<>
-             <ModalHeader className="flex flex-col gap-1">Verify your account</ModalHeader>
-             <ModalBody>
-               <p>6-digit code has been sent to your email account</p>
-               <Input type="text" label="Code" value={code} onChange={(e) => setCode(e.target.value)}/>
-             </ModalBody>
-             <ModalFooter>
-               <Button color="primary" onPress={() => handleVerificationCode(Number(code))}>
-                 Verify
-               </Button>
-             </ModalFooter>
-           </>)}
-       </ModalContent>
-     </Modal>)}
-    </div>);
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+        <ModalContent>
+          {() => (<>
+              <ModalHeader className="flex flex-col gap-1">Verify your account</ModalHeader>
+              <ModalBody>
+                <p>6-digit code has been sent to your email account</p>
+                <Input type="text" label="Code" value={code} onChange={(e) => setCode(e.target.value)}/>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="primary" onPress={() => handleVerificationCode(Number(code))}>
+                  Verify
+                </Button>
+              </ModalFooter>
+            </>)}
+        </ModalContent>
+      </Modal>
+    </>);
 }
+
 function AlertCircleIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
     return (<svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="12" r="10"/>

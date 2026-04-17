@@ -261,9 +261,11 @@ router.get("/productsAdmin", validationFn.validateToken, function (req, res) {
     });
 });
 router.use(bodyParser.json());
+const productUploadFolder = path.join(__dirname, "../tmp/product-uploads");
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, "public/admin/js/uploads/");
+        fileFn.createFolder(productUploadFolder);
+        cb(null, productUploadFolder);
     },
     filename: (req, file, cb) => {
         cb(null, file.originalname);
@@ -275,7 +277,6 @@ router.post("/uploadProductPhoto", validationFn.validateToken, upload.single("ph
         return res.status(503).json({ error: "Cloudinary is not configured" });
     }
     const file = req.file;
-    console.log("Received photo upload request:", { file });
     if (!file) {
         console.error("No file provided");
         return res.status(400).json({ error: "No file provided" });
@@ -286,8 +287,6 @@ router.post("/uploadProductPhoto", validationFn.validateToken, upload.single("ph
         return imageModel
             .createProductImage(result.public_id, result.original_filename, result.secure_url)
             .then((result1) => {
-            console.log("IMAGE FINAL");
-            console.log(result1);
             return res.json({ public_id: result1 });
         })
             .catch((error) => {
@@ -308,7 +307,6 @@ router.post("/createProductImage", validationFn.validateToken, function (req, re
     if (!id || isNaN(id) || !role || !email || role != "admin") {
         return res.status(403).send({ error: "Unauthorized Access" });
     }
-    console.log(req.body);
     productsModel
         .createProductImage(productId, imageId)
         .then((result) => {
@@ -443,9 +441,6 @@ router.post("/productAdmin/CA1", validationFn.validateToken, function (req, res)
     }
     const { Name, Description, unitPrice, Category, Color } = req.body;
     const resultArray = [];
-    console.log("INSIDE ROUTER");
-    console.log(Category);
-    console.log(Color);
     if (!Name || !Description || !unitPrice || !Category || !Color || !Object.keys(Color).length || Object.values(Color).some((colorData) => !Object.keys(colorData).some((size) => colorData[size]))) {
         return res.status(400).json({ error: { Name, Description, unitPrice, Category, Color } });
     }
@@ -456,15 +451,12 @@ router.post("/productAdmin/CA1", validationFn.validateToken, function (req, res)
             resultArray.push({ color, size, quantity });
         }
     }
-    console.log(resultArray);
     return productsModel
         .getCategoryID(Category)
         .then(function (categoryID) {
-        console.log(categoryID);
         return productsModel
             .createProductAndGetID({ productName: Name, description: Description, unitPrice, categoryID })
             .then(function (productID) {
-            console.log(productID);
             const selectColour = [];
             const selectSize = [];
             resultArray.forEach((item) => {
@@ -472,8 +464,6 @@ router.post("/productAdmin/CA1", validationFn.validateToken, function (req, res)
                 selectSize.push(productsModel.getSizeID(item.size));
             });
             return Promise.all(selectColour).then((result) => {
-                console.log("GETTING COLOUR");
-                console.log(result);
                 resultArray.forEach((item) => {
                     for (let i = 0; i < result.length; i++) {
                         if (item.color === result[i].name) {
@@ -489,7 +479,6 @@ router.post("/productAdmin/CA1", validationFn.validateToken, function (req, res)
                             }
                         }
                     });
-                    console.log(resultArray);
                     const insertProductDetail = [];
                     resultArray.forEach((item) => {
                         insertProductDetail.push(productsModel.createProductDetail(productID, item.color, item.size, item.quantity, "In Stock"));
@@ -583,11 +572,7 @@ router.delete("/productAdmin", validationFn.validateToken, refreshFn.refreshToke
     }
     return Promise.all([productsModel.deleteProductDetail(productid), imageModel.getImageIDByProductID(productid)])
         .then(([deleteCount, imageResult]) => {
-        console.log(deleteCount);
-        console.log(imageResult);
         return Promise.all([imageModel.deleteProductImage(productid), imageModel.deleteImage(imageResult.imageid)]).then(([deleteCount2, count]) => {
-            console.log(deleteCount2);
-            console.log(count);
             if (imageResult && imageResult.imageid) {
                 return Promise.all([productsModel.deleteProduct(productid), imageModel.deleteCloudinaryImage(imageResult.imageid)]).then(() => {
                     return res.status(201).json({ message: successMessages.DELETE_SUCCESS });
@@ -623,7 +608,6 @@ router.delete("/deleteProductDetail", validationFn.validateToken, function (req,
 });
 router.get("/categories/:typeid", function (req, res) {
     const typeid = req.params.typeid;
-    console.log("typeid", typeid);
     if (!typeid || isNaN(typeid)) {
         return res.status(400).json({ error: "Invalid Type ID" });
     }
@@ -633,7 +617,6 @@ router.get("/categories/:typeid", function (req, res) {
         return res.json({ category: category });
     })
         .catch((error) => {
-        console.log(error);
         return res.status(500).json({ error: "Unknown Error" });
     });
 });
@@ -648,7 +631,6 @@ router.get("/productsCountByCategory", function (req, res) {
         return res.json({ productCount: productCount[0].productcount });
     })
         .catch((error) => {
-        console.log(error);
         return res.status(500).json({ error: "Unknown Error" });
     });
 });
@@ -660,7 +642,6 @@ router.get("/ProductsWithImageAndColour", function (req, res) {
     return productsModel
         .getProductsByCategoryID(categoryid, limit, offset, isinstock)
         .then((product) => {
-        console.log(product);
         const productIDArr = [];
         const getImageExecute = [];
         const getProductColourExecute = [];
@@ -687,7 +668,6 @@ router.get("/ProductsWithImageAndColour", function (req, res) {
         });
     })
         .catch((error) => {
-        console.log(error);
         return res.status(500).json({ error: "Unknown Error" });
     });
 });
@@ -729,7 +709,6 @@ router.get("/productsByCategoryIDs", function (req, res) {
         });
     })
         .catch((error) => {
-        console.log(error);
         return res.status(500).json({ error: "Unknown Error" });
     });
 });
@@ -746,14 +725,12 @@ router.get("/productsCountByCategoryIDs", function (req, res) {
         return res.json({ productCount: productCount[0].productcount });
     })
         .catch((error) => {
-        console.log(error);
         return res.status(500).json({ error: "Unknown Error" });
     });
 });
 router.post("/searchProduct", function (req, res) {
     try {
         const { ORDER_BY, SEARCH_TEXT, FILTERS, PRICE, LIMIT, OFFSET, INSTOCK } = req.body;
-        console.log(`${ORDER_BY},${SEARCH_TEXT}, ${JSON.stringify(FILTERS)},${PRICE}`);
         let [MIN_PRICE, MAX_PRICE] = PRICE ? PRICE.split(",").map(parseFloat) : [];
         return productsModel
             .getProductByFilter(ORDER_BY, SEARCH_TEXT, FILTERS, MIN_PRICE, MAX_PRICE, LIMIT, OFFSET, INSTOCK)
@@ -788,7 +765,6 @@ router.post("/searchProductCount", function (req, res) {
     }
 });
 router.get("/filterOptions", function (req, res) {
-    console.log("inside");
     return Promise.all([productsModel.getTypes(), productsModel.getCategories(), productsModel.getColours(), productsModel.getSizes()]).then(([types, categories, colours, sizes]) => {
         const result = {
             type: types,
@@ -801,7 +777,6 @@ router.get("/filterOptions", function (req, res) {
 });
 router.get("/productAndDetail", function (req, res) {
     const productid = req.query.productid;
-    console.log(req.query.productid);
     if (!productid || isNaN(productid)) {
         return res.status(400).json({ error: "Invalid Request" });
     }
@@ -811,7 +786,6 @@ router.get("/productAndDetail", function (req, res) {
         return res.json({ productdetail: productdetail });
     })
         .catch((error) => {
-        console.log(error);
         return res.status(500).json({ error: "Unknown Error" });
     });
 });
@@ -888,7 +862,6 @@ router.get("/productAdmin", validationFn.validateToken, refreshFn.refreshToken, 
         return res.json({ productdetail: productdetail });
     })
         .catch((error) => {
-        console.log(error);
         return res.status(500).json({ error: "Unknown Error" });
     });
 });
@@ -930,12 +903,10 @@ router.post("/colourAdmin", validationFn.validateToken, refreshFn.refreshToken, 
                 return res.json({ message: successMessages.CREATE_SUCCESS });
         })
             .catch((error) => {
-            console.log(error);
             return res.status(500).json({ error: errorMessages.UNKNOWN_ERROR });
         });
     })
         .catch((error) => {
-        console.log(error);
         return res.status(500).json({ error: errorMessages.UNKNOWN_ERROR });
     });
 });
@@ -959,12 +930,10 @@ router.post("/categoryAdmin", validationFn.validateToken, refreshFn.refreshToken
                 return res.json({ message: successMessages.CREATE_SUCCESS });
         })
             .catch((error) => {
-            console.log(error);
             return res.status(500).json({ error: errorMessages.UNKNOWN_ERROR });
         });
     })
         .catch((error) => {
-        console.log(error);
         return res.status(500).json({ error: errorMessages.UNKNOWN_ERROR });
     });
 });
@@ -988,12 +957,10 @@ router.post("/sizeAdmin", validationFn.validateToken, refreshFn.refreshToken, as
                 return res.json({ message: successMessages.CREATE_SUCCESS });
         })
             .catch((error) => {
-            console.log(error);
             return res.status(500).json({ error: errorMessages.UNKNOWN_ERROR });
         });
     })
         .catch((error) => {
-        console.log(error);
         return res.status(500).json({ error: errorMessages.UNKNOWN_ERROR });
     });
 });

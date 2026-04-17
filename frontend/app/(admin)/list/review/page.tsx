@@ -1,14 +1,45 @@
 "use client";
 import { useAppState } from "@/app/app-provider";
+import ResilientImage from "@/components/ui/resilient-image";
 import CustomTable from "@/components/ui/table";
 import { CurrentActivePage, ErrorMessage, URL } from "@/enums/global-enums";
+import { IAdminReview } from "@/enums/review-interfaces";
 import { formatDecimal } from "@/functions/formatter";
 import { getAdminReview, getAdminReviewCount, handleDeleteButton } from "@/functions/review-functions";
 import { Button } from "@nextui-org/react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 const columns = ["Review ID", "Review Image", "Customer Name", "Product Name", "Rating", "Description", "Action"];
+const avatarFallback = "/icons/avatar-placeholder.svg";
+
+function renderReviewRows(data: IAdminReview[]) {
+    return data.map((item, index) => {
+        const reviewImage = item.urls?.find((url): url is string => Boolean(url));
+        return [
+            item.reviewid.toString(),
+            reviewImage ? (<ResilientImage className="mx-auto rounded-xl object-cover" src={reviewImage} fallbackSrc="/images/image-not-found.jpg" width={70} height={90} alt={item.productname}/>) : (<ResilientImage className="mx-auto rounded-xl object-cover" src="/images/image-not-found.jpg" width={70} height={90} alt="Image Not Found"/>),
+            <div key={`customer-${index}`} className="flex items-center justify-center gap-3 text-[14px]">
+                <ResilientImage className="h-10 w-10 rounded-full object-cover" src={item.profileurl} fallbackSrc={avatarFallback} width={40} height={40} alt={item.name}/>
+                <label>{item.name}</label>
+            </div>,
+            <label key={`product-${index}`} className="flex justify-center text-center text-[14px]">
+                {item.productname}
+            </label>,
+            <label key={`rating-${index}`} className="flex justify-center text-[14px]">
+                {formatDecimal(item.rating.toString(), 1)}
+            </label>,
+            <label key={`description-${index}`} className="flex justify-center text-[14px] text-center">
+                {item.reviewdescription}
+            </label>,
+            <div className="flex flex-col" key={`action-${index}`}>
+                <Button color="danger" size="sm" onClick={() => handleDeleteButton(item.reviewid)}>
+                    Delete
+                </Button>
+            </div>,
+        ] as [string, ...React.ReactNode[]];
+    });
+}
+
 export default function Page() {
     const { setCurrentActivePage } = useAppState();
     const [reviewData, setReviewData] = useState<[
@@ -37,30 +68,7 @@ export default function Page() {
                 }
                 else {
                     const data = result2.data || [];
-                    setReviewData(data.map((item, index) => {
-                        return [
-                            item.reviewid.toString(),
-                            item.urls[0] === null ? <Image className="mx-auto" src="/images/image-not-found.jpg" width={70} height={90} alt="Image Not Found"/> : <Image className="mx-auto" src={item.urls[0]} width={70} height={90} alt={item.productname}/>,
-                            <label key={index} className="flex justify-center text-[14px]">
-                  {item.name}
-                </label>,
-                            <label key={index} className="flex justify-center text-center text-[14px]">
-                  {item.productname}
-                </label>,
-                            <label key={index} className="flex justify-center text-[14px]">
-                  {formatDecimal(item.rating.toString(), 1)}
-                </label>,
-                            <label key={index} className="flex justify-center text-[14px] text-center">
-                  {item.reviewdescription}
-                </label>,
-                            <div className="flex flex-col" key={index}>
-                  
-                  <Button color="danger" size="sm" onClick={() => handleDeleteButton(item.reviewid)}>
-                    Delete
-                  </Button>
-                </div>,
-                        ];
-                    }));
+                    setReviewData(renderReviewRows(data));
                 }
             }
         });
@@ -76,30 +84,7 @@ export default function Page() {
         if (isLoading) {
             getAdminReview(pageNo, limit).then((result) => {
                 const data = result.data || [];
-                setReviewData(data.map((item, index) => {
-                    return [
-                        item.reviewid.toString(),
-                        item.urls[0] === null ? <Image className="mx-auto" src="/images/image-not-found.jpg" width={70} height={90} alt="Image Not Found"/> : <Image className="mx-auto" src={item.urls[0]} width={70} height={90} alt={item.productname}/>,
-                        <label key={index} className="flex justify-center text-[14px]">
-                {item.name}
-              </label>,
-                        <label key={index} className="flex justify-center text-center text-[14px]">
-                {item.productname}
-              </label>,
-                        <label key={index} className="flex justify-center text-[14px]">
-                {formatDecimal(item.rating.toString(), 1)}
-              </label>,
-                        <label key={index} className="flex justify-center text-[14px] text-center">
-                {item.reviewdescription}
-              </label>,
-                        <div className="flex flex-col" key={index}>
-                
-                <Button color="danger" size="sm" onClick={() => { handleDeleteButton(item.reviewid); window.location.reload(); }}>
-                    Delete
-                  </Button>
-              </div>,
-                    ];
-                }));
+                setReviewData(renderReviewRows(data));
                 setIsLoading(false);
             });
         }
@@ -117,4 +102,3 @@ export default function Page() {
       </div>
     </>);
 }
-

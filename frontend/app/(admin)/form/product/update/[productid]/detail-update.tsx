@@ -34,17 +34,17 @@ export default function DetailUpdate({ isOpen, onClose, onModalClose, productDet
                                 </div>
                                 <div className="flex me-auto ms-8 min-w-[150px] flex-col mb-4">
                                     <label>{productDetails.productdetailid}</label>
-                                    <select disabled className="mt-[20px] px-4 py-4 text-[15px] bg-default-200 dark:bg-default-700 border-r-8 outline-none cursor-pointer">
+                                    <select disabled className="mt-[20px] px-4 py-4 text-[15px] bg-default-200 border-r-8 outline-none cursor-pointer">
                                         <option key={productDetails.colourid} value={productDetails.colourid}>
                                             {productDetails.colour}
                                         </option>
                                     </select>
-                                    <select disabled className="mt-[20px] px-4 py-4 text-[15px] bg-default-200 dark:bg-default-700 border-r-8 outline-none cursor-pointer">
+                                    <select disabled className="mt-[20px] px-4 py-4 text-[15px] bg-default-200 border-r-8 outline-none cursor-pointer">
                                         <option key={productDetails.sizeid} value={productDetails.sizeid}>
                                             {productDetails.size}
                                         </option>
                                     </select>
-                                    <Input value={quantity} onValueChange={setQuantity} className="mt-3 px-2 py-2 text-[15px] dark:bg-default-700"/>
+                                    <Input value={quantity} onValueChange={setQuantity} className="mt-3 px-2 py-2 text-[15px]"/>
                                 </div>
                             </div>
 

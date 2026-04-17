@@ -1256,12 +1256,6 @@ async function run() {
     const imageMode = cloudinaryUploadsEnabled ? "Cloudinary" : "local generated assets";
     const cacheFlushed = await flushRedisCache();
 
-    console.log("Database bootstrap completed.");
-    console.log(`Seeded ${products.length} products, ${orders.length} orders, and ${users.length} users.`);
-    console.log(`Image source: ${imageMode}`);
-    console.log(`Redis cache reset: ${cacheFlushed ? "yes" : "no"}`);
-    console.log(`Admin login: ${seedConfig.adminEmail} / ${seedConfig.adminPassword}`);
-    console.log(`Customer login: ${seedConfig.customerEmail} / ${seedConfig.customerPassword}`);
   } catch (error) {
     await client.query("ROLLBACK");
     console.error("Database bootstrap failed:", error);

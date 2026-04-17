@@ -28,7 +28,6 @@ if (process.env.LOG_SQL === "true") {
     const oldQuery = pool.query.bind(pool);
     pool.query = function (...args) {
         const [sql, params] = args;
-        console.log("\nEXECUTING QUERY |", sql, params);
         return oldQuery(...args);
     };
 }

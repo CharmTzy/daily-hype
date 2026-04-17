@@ -20,11 +20,11 @@ export default function LatestItem({ data, setCart, title }: ILatestItemProps) {
             <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">DailyHype Edit</p>
-                    <label className="mt-2 block text-2xl font-semibold tracking-tight text-slate-950 dark:text-white sm:text-3xl">
+                    <label className="mt-2 block text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
                         {title}
                     </label>
                 </div>
-                <Link href={URL.Explore} className="text-sm font-medium text-slate-600 transition hover:text-slate-950 dark:text-slate-300 dark:hover:text-white">
+                <Link href={URL.Explore} className="text-sm font-medium text-slate-600 transition hover:text-slate-950">
                     Explore all
                 </Link>
             </div>
@@ -32,10 +32,10 @@ export default function LatestItem({ data, setCart, title }: ILatestItemProps) {
             <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
                 {data.map((item, index) => (
                     <article
-                        className="group flex h-full flex-col overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white transition duration-200 hover:-translate-y-1 hover:shadow-xl dark:border-slate-800 dark:bg-slate-900"
+                        className="group flex h-full flex-col overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white transition duration-200 hover:-translate-y-1 hover:shadow-xl"
                         key={index}
                     >
-                        <Link href={`${URL.ProductDetail}${item.productid}`} className="relative block aspect-[4/5] overflow-hidden bg-slate-100 dark:bg-slate-950">
+                        <Link href={`${URL.ProductDetail}${item.productid}`} className="relative block aspect-[4/5] overflow-hidden bg-slate-100">
                             <Image
                                 src={item.url[0]}
                                 fill
@@ -50,15 +50,15 @@ export default function LatestItem({ data, setCart, title }: ILatestItemProps) {
                         <div className="flex flex-1 flex-col p-4">
                             <Link
                                 href={`${URL.ProductDetail}${item.productid}`}
-                                className="line-clamp-2 min-h-[48px] text-sm font-semibold text-slate-900 transition hover:text-slate-600 dark:text-white dark:hover:text-slate-200"
+                                className="line-clamp-2 min-h-[48px] text-sm font-semibold text-slate-900 transition hover:text-slate-600"
                             >
                                 {item.productname}
                             </Link>
-                            <label className="mt-2 text-base font-semibold text-slate-900 dark:text-white">
+                            <label className="mt-2 text-base font-semibold text-slate-900">
                                 ${formatMoney(item.unitprice)}
                             </label>
                             <Button
-                                className="mt-4 h-11 rounded-full border border-slate-300 bg-transparent text-sm font-semibold text-slate-800 dark:border-slate-700 dark:text-white"
+                                className="mt-4 h-11 rounded-full border border-slate-300 bg-transparent text-sm font-semibold text-slate-800"
                                 onClick={() => {
                                     setCart((prevCart) => {
                                         let tempCart = [...prevCart];

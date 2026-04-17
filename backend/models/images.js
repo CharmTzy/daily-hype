@@ -86,7 +86,7 @@ module.exports.deleteProductImage = function deleteProductImage(productid) {
 `;
     return query(sql, [productid]).then((result) => {
         const rows = result.rowCount;
-        if (rows.length === 0) {
+        if (rows === 0) {
             throw new EMPTY_RESULT_ERROR(`Image Delete Failed`);
         }
         return rows;
@@ -97,7 +97,6 @@ module.exports.deleteCloudinaryImage = function deleteCloudinaryImage(public_id)
     return cloudinary.uploader
         .destroy(public_id)
         .then((result) => {
-        console.log(result);
         return result;
     })
         .catch((error) => {
@@ -111,22 +110,10 @@ module.exports.deleteUserImage = function deleteUserImage(imageid) {
     `;
     return query(sql, [imageid]).then((result) => {
         const rows = result.rowCount;
-        if (rows.length === 0) {
+        if (rows === 0) {
             throw new EMPTY_RESULT_ERROR(`Image Delete Failed`);
         }
         return rows;
-    });
-};
-module.exports.getImageIDByProductID = function getImageIDByProductID(productid) {
-    const sql = `
-    SELECT DISTINCT i.imageid
-    FROM Image i, ProductImage pi
-    WHERE i.imageid = pi.imageid
-    AND pi.productid = $1
-  `;
-    return query(sql, [productid]).then((result) => {
-        const rows = result.rows;
-        return rows[0];
     });
 };
 module.exports.deleteImage = function deleteImage(imageid) {
@@ -135,7 +122,7 @@ module.exports.deleteImage = function deleteImage(imageid) {
 `;
     return query(sql, [imageid]).then((result) => {
         const rows = result.rowCount;
-        if (rows.length === 0) {
+        if (rows === 0) {
             throw new EMPTY_RESULT_ERROR(`Image Delete Failed`);
         }
         return rows;
@@ -147,17 +134,6 @@ module.exports.getImage = (imageID) => {
   `;
     return query(sql, [imageID])
         .then((result) => result.rows[0])
-        .catch((error) => {
-        console.error(error);
-        throw error;
-    });
-};
-module.exports.deleteImage = (imageID) => {
-    const sql = `
-      DELETE FROM image WHERE imageid = $1
-  `;
-    return query(sql, [imageID])
-        .then((result) => result.rowCount)
         .catch((error) => {
         console.error(error);
         throw error;
@@ -244,4 +220,3 @@ module.exports.getImageByProductIDArr = async (productIDArr) => {
   `;
     return query(sql, [productIDArr]).then((result) => result.rows);
 };
-

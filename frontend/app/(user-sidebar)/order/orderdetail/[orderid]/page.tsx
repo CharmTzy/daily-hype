@@ -54,8 +54,8 @@ export default function Page({ params }: {
     if (!orderData)
         return null;
     return (<div className="flex flex-col w-full">
-      <div className="flex justify-start items-center w-full rounded-tr-lg rounded-tl-lg bg-zinc-300 dark:bg-zinc-700 px-8 py-4">
-        <label onClick={() => router.back()} className="text-small cursor-pointer text-blue-700 dark:text-blue-300">
+      <div className="flex justify-start items-center w-full rounded-tr-lg rounded-tl-lg bg-zinc-300 px-8 py-4">
+        <label onClick={() => router.back()} className="text-small cursor-pointer text-blue-700">
           <span className="text-medium">&lt;</span> Back
         </label>
         <label className="text-small ms-auto">Order #{orderid}</label>
@@ -67,10 +67,10 @@ export default function Page({ params }: {
             return (<div key={index} className="flex px-4 mb-4 items-start">
               <Image src={item.image} alt={item.productname} radius="lg" className="border-1 w-[80px] h-[100px]"/>
               <div className="flex flex-col ml-4">
-                <Link href="" className="text-black mt-1 dark:text-white text-medium cursor-pointer">
+                <Link href="" className="text-black mt-1 text-medium cursor-pointer">
                   {item.productname}
                 </Link>
-                <label className="text-small mt-3 text-slate-600 dark:text-slate-400">
+                <label className="text-small mt-3 text-slate-600">
                   Color: {capitaliseWord(item.colour)}, Size: {item.size}
                 </label>
                 <label className="mt-2 text-small">x{item.qty}</label>

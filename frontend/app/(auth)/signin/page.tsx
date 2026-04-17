@@ -8,6 +8,8 @@ import { useGoogleLogin, TokenResponse } from "@react-oauth/google";
 import axios from "axios";
 import { getCart } from "@/functions/cart-functions";
 import BrandLogo from "@/components/brand/brand-logo";
+import { normaliseProfileImage } from "@/functions/profile-image";
+
 export default function Page() {
     const { setUserInfo, setCart } = useAppState();
     const [email, setEmail] = useState("");
@@ -19,10 +21,21 @@ export default function Page() {
     const [user, setUser] = useState<TokenResponse[]>([]);
     const urlParams = useSearchParams();
     const redirect = urlParams.get("redirect");
+
+    const buildUserInfo = (user: any, method: "normal" | "google") => ({
+        id: user.userid,
+        method,
+        name: user.name,
+        email: user.email,
+        image: normaliseProfileImage(user.url),
+        role: user.rolename,
+    });
+
     const isValidEmail = (email: string) => {
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailPattern.test(email);
     };
+
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!isValidEmail(email)) {
@@ -55,14 +68,9 @@ export default function Page() {
             }
             else {
                 const user = result.user;
-                if (user.rolename === "admin") {
-                    localStorage.setItem("user", JSON.stringify({ id: user.userid, method: "normal", name: user.name, email: user.email, image: "/admin", role: user.rolename }));
-                    setUserInfo({ id: user.userid, name: user.name, email: user.email, method: "normal", image: "/admin", role: user.rolename });
-                }
-                else {
-                    localStorage.setItem("user", JSON.stringify({ id: user.userid, method: "normal", name: user.name, email: user.email, image: user.url ? user.url : "/customer", role: user.rolename }));
-                    setUserInfo({ id: user.userid, name: user.name, email: user.email, method: "normal", image: user.url ? user.url : "/customer", role: user.rolename });
-                }
+                const nextUserInfo = buildUserInfo(user, "normal");
+                localStorage.setItem("user", JSON.stringify(nextUserInfo));
+                setUserInfo(nextUserInfo);
                 if (user.rolename === "admin" || user.rolename === "manager") {
                     router.push(URL.Dashboard);
                 }
@@ -94,10 +102,12 @@ export default function Page() {
             console.error("Login failed:", error.message);
         });
     };
+
     const login = useGoogleLogin({
         onSuccess: (codeResponse: TokenResponse) => setUser([codeResponse]),
         onError: (error) => console.log("Login Failed:", error),
     });
+
     useEffect(() => {
         if (user.length > 0) {
             const currentUser = user[0];
@@ -134,8 +144,9 @@ export default function Page() {
                     console.log("hello");
                     console.log(data);
                     const user = data.user;
-                    localStorage.setItem("user", JSON.stringify({ id: user.userid, method: "google", name: user.name, email: user.email, image: user.url, role: user.rolename }));
-                    setUserInfo({ id: user.userid, name: user.name, email: user.email, method: "google", image: user.url, role: user.rolename });
+                    const nextUserInfo = buildUserInfo(user, "google");
+                    localStorage.setItem("user", JSON.stringify(nextUserInfo));
+                    setUserInfo(nextUserInfo);
                     if (redirect && redirect === "cart") {
                         router.push(URL.Cart);
                     }
@@ -168,6 +179,7 @@ export default function Page() {
             });
         }
     }, [user, router]);
+
     const handleVerification = () => {
         fetch(`${process.env.BACKEND_URL}/api/loginVerificationCode`, {
             method: "POST",
@@ -185,6 +197,7 @@ export default function Page() {
             console.error(error);
         });
     };
+
     const handleVerificationCode = (code: number) => {
         fetch(`${process.env.BACKEND_URL}/api/verify`, {
             method: "POST",
@@ -207,8 +220,9 @@ export default function Page() {
             alert("Account verification successful");
             onClose();
             const user = userData.user;
-            localStorage.setItem("user", JSON.stringify({ id: user.userid, method: "normal", name: user.name, email: user.email, image: user.url, role: user.rolename }));
-            setUserInfo({ id: user.userid, name: user.name, email: user.email, image: user.url, method: "normal", role: user.rolename });
+            const nextUserInfo = buildUserInfo(user, "normal");
+            localStorage.setItem("user", JSON.stringify(nextUserInfo));
+            setUserInfo(nextUserInfo);
             if (redirect && redirect === "cart") {
                 router.push(URL.Cart);
             }
@@ -235,14 +249,15 @@ export default function Page() {
             console.error("Error during verification:", error.message);
         });
     };
+
     return (<div className="w-full min-h-screen grid grid-cols-1 sm:grid-cols-2">
       <div className="left w-full sm:min-h-full flex justify-center items-center flex-col p-8">
         <a href={URL.Home} className="logo-box">
-          <BrandLogo size="lg" theme="dark" tagline="Curated fashion, elevated daily"/>
+          <BrandLogo size="lg" tagline="Curated fashion, elevated daily"/>
         </a>
         <p className="text-center mt-4">Stay Tuned, stay Hyped!</p>
       </div>
-
+	
       <div className="right w-full min-h-screen flex flex-col justify-center items-center gap-10 bg-[#FB6050] text-white">
         <h2 className="text-3xl text-center">Log in</h2>
         <form onSubmit={handleSubmit} className="w-full">
@@ -266,9 +281,9 @@ export default function Page() {
           <p className="ml-40">{errorMessage}</p>
         </form>
         <div className="grid ">
-          <button onClick={() => login()} className="group  h-12 px-9 border-2 border-gray-300 rounded-full transition duration-300 hover:border-blue-400 focus:bg-blue-50 active:bg-blue-100 bg-white">
-            <div className="relative flex items-center space-x-6 justify-center">
-              <img src="https://tailus.io/sources/blocks/social/preview/images/google.svg" className="w-5" alt="google logo"/>
+          <button onClick={() => login()} className="group h-12 px-9 border-2 border-gray-300 rounded-full transition duration-300 hover:border-blue-400 focus:bg-blue-50 active:bg-blue-100 bg-white">
+            <div className="relative flex items-center space-x-4 justify-center">
+              <img src="/icons/google.svg" className="w-5 h-5" alt="google logo"/>
               <span className="block w-max font-semibold tracking-wide text-gray-700 text-sm transition duration-300 group-hover:text-blue-600 sm:text-base">Continue with Google</span>
             </div>
           </button>

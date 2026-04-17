@@ -12,25 +12,20 @@ const io = new Server(server, {
     },
 });
 io.on("connection", (socket) => {
-    console.log("A user connected to the default namespace");
     socket.on("message", (message) => {
         io.emit("message", message);
     });
     socket.on("disconnect", () => {
-        console.log("User disconnected from the default namespace");
     });
 });
 const chatNamespace = io.of("/chat");
 chatNamespace.on("connection", (socket) => {
-    console.log("A user connected to the chat namespace", socket.handshake.query.deliveryId);
     socket.on("message", (messageData) => {
         chatNamespace.emit("message", messageData);
     });
     socket.on("disconnect", () => {
-        console.log("User disconnected from the chat namespace");
     });
 });
 server.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
 });
 

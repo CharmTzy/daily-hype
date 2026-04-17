@@ -182,7 +182,6 @@ router.delete("/image/upload/cloudinary/*", validateFn.validateToken, refreshFn.
         return res.status(403).send({ error: errorMessages.UNAURHOTIZED });
     }
     const imageid = req.params[0];
-    console.log(imageid);
     if (imageid === undefined) {
         return res.status(400).json({ error: errorMessages.INVALID_INPUT });
     }

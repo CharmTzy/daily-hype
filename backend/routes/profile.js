@@ -11,7 +11,6 @@ const jwtAuth = require("../middlewares/validateToken");
 const refreshFn = require("../middlewares/refreshToken");
 const validationFn = require("../middlewares/validateToken");
 const fileFn = require("../functions/file-functions");
-express().use(express.static("public"));
 router.get("/profile", jwtAuth.validateToken, refreshFn.refreshToken, (req, res) => {
     try {
         const email = req.body.email;
@@ -20,7 +19,6 @@ router.get("/profile", jwtAuth.validateToken, refreshFn.refreshToken, (req, res)
         if (!id || !email || !role || role != "customer") {
             return res.status(403).send({ error: "Unauthorized Access" });
         }
-        console.log(id, email, role);
         profileModel
             .retrieveProfileData(email)
             .then((userData) => {
@@ -78,69 +76,40 @@ const storage = multer.diskStorage({
     },
 });
 const upload = multer({ storage: storage });
-router.post("/upload-photo", jwtAuth.validateToken, refreshFn.refreshToken, upload.single("photo"), (req, res) => {
+router.post("/upload-photo", jwtAuth.validateToken, refreshFn.refreshToken, upload.single("photo"), async (req, res) => {
     const email = req.body.email;
     const file = req.file;
-    console.log("UPLOADING");
-    console.log("Received photo upload request:", { email, file });
     if (!file) {
         console.error("No file provided");
         return res.status(400).json({ error: "No file provided" });
     }
-    return Promise.all([imageModel.uploadCloudinaryPhoto(email, file), profileModel.retrieveProfileData(email)])
-        .then(([result, user]) => {
-        const uploadFolder = path.join(__dirname, "../uploads");
-        fileFn.deleteFile(path.join(uploadFolder, file.filename));
-        console.log(result);
-        if (result && user) {
-            console.log(user);
-            console.log(user.imageid);
-            if (user.imageid) {
-                return Promise.all([imageModel.createImage(result.public_id, result.original_filename, result.url), imageModel.deleteCloudinaryImage(user.imageid)]).then(([result1, result2]) => {
-                    if (result2.result === "ok" && result1 === 1) {
-                        return userModel.updateUserImage(result.public_id, email).then((updateCount) => {
-                            if (updateCount === 1) {
-                                return imageModel.deleteUserImage(user.imageid).then((deleteCount) => {
-                                    return res.status(201).status({ message: "Update Success" });
-                                });
-                            }
-                            else {
-                                throw new Error("Image Update Error");
-                            }
-                        });
-                    }
-                    else {
-                        throw new Error("Image Error");
-                    }
-                });
-            }
-            else {
-                console.log(result.public_id);
-                return imageModel.createImage(result.public_id, result.original_filename, result.url).then((result2) => {
-                    if (result2 === 1) {
-                        return userModel.updateUserImage(result.public_id, email).then((updateCount) => {
-                            if (updateCount === 1) {
-                                return res.status(201).status({ message: "Update Success" });
-                            }
-                            else {
-                                throw new Error("Image Update Error");
-                            }
-                        });
-                    }
-                    else {
-                        throw new Error("Image Error");
-                    }
-                });
-            }
+    let nextImageId = null;
+    try {
+        const [result, user] = await Promise.all([imageModel.uploadCloudinaryPhoto(email, file), profileModel.retrieveProfileData(email)]);
+        nextImageId = result.public_id;
+        const insertCount = await imageModel.createImage(result.public_id, result.original_filename, result.secure_url);
+        if (insertCount !== 1) {
+            throw new Error("Image Error");
         }
-        else {
-            throw new Error("ERror");
+        const updateCount = await userModel.updateUserImage(result.public_id, email);
+        if (updateCount !== 1) {
+            throw new Error("Image Update Error");
         }
-    })
-        .catch((error) => {
+        if (user.imageid && user.imageid !== result.public_id) {
+            await Promise.allSettled([imageModel.deleteCloudinaryImage(user.imageid), imageModel.deleteUserImage(user.imageid)]);
+        }
+        return res.status(201).json({ message: "Update Success", url: result.secure_url, imageid: result.public_id });
+    }
+    catch (error) {
+        if (nextImageId) {
+            await Promise.allSettled([imageModel.deleteCloudinaryImage(nextImageId), imageModel.deleteUserImage(nextImageId)]);
+        }
         console.error(error);
-        res.status(500).json({ error: "Unknown Error" });
-    });
+        return res.status(500).json({ error: "Unknown Error" });
+    }
+    finally {
+        fileFn.deleteFile(file.path);
+    }
 });
 router.get("/getPhoto", jwtAuth.validateToken, refreshFn.refreshToken, (req, res) => {
     try {
@@ -169,7 +138,6 @@ router.put("/deleteAccount", jwtAuth.validateToken, refreshFn.refreshToken, (req
     const id = req.body.id;
     const password = req.body.password;
     const email = req.body.email;
-    console.log("LEE" + id, password, email);
     if (!id || !email) {
         return res.status(403).send({ error: "Unauthorized Access" });
     }
@@ -192,4 +160,3 @@ router.put("/deleteAccount", jwtAuth.validateToken, refreshFn.refreshToken, (req
     });
 });
 module.exports = router;
-

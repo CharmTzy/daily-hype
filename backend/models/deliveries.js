@@ -4,22 +4,18 @@ module.exports.checkOrderInPaymentTableAsync = async function checkOrderInPaymen
     const sql = 'SELECT COUNT(*) AS count FROM payment WHERE orderID = $1';
     const result = await query(sql, [orderID]);
     const count = result.rows[0].count;
-    console.log("Count0 is " + count);
     return count > 0;
 };
 module.exports.checkOrderExistsWithUserAsync = async function checkOrderExistsWithUserAsync(orderID) {
     const sql = 'SELECT userID FROM productorder WHERE orderID = $1';
     const result = await query(sql, [orderID]);
     if (result.rows.length === 0) {
-        console.log("Order not found.");
         return false;
     }
     const userID = result.rows[0].userID;
     if (userID === null) {
-        console.log("User ID is null.");
         return false;
     }
-    console.log("User ID is " + userID);
     return true;
 };
 module.exports.checkIfDeliveryInOrderTable = async function checkIfDeliveryInOrderTable(deliveryIDs) {
@@ -34,7 +30,6 @@ module.exports.checkIfDeliveryInOrderTable = async function checkIfDeliveryInOrd
             if (!result || result.length === 0) {
                 throw new Error(`Delivery ID ${deliveryID} not found in productorder table`);
             }
-            console.log(`Delivery ID ${deliveryID} is in productorder table`);
             return { deliveryID, success: true };
         }
         catch (error) {
@@ -61,8 +56,6 @@ module.exports.updateDeliveriesBatch = function updateDeliveriesBulk(updatedDeli
                 throw new EMPTY_RESULT_ERROR(`Delivery with ID ${deliveryid} not found!`);
             }
             const deliveryStatusDetailRetrieved = rows[0].deliverystatusdetail;
-            console.log("Retrieved deliverydetailstatus" + deliveryStatusDetailRetrieved);
-            console.log("deliverydate is " + selectedDateDelivery);
             let sql = 'UPDATE delivery SET deliverystatus = $1, deliverystatusdetail = $2, deliverydate = $3';
             let nullTimestamps = '';
             if (deliverystatusdetail == "Order confirmed") {
@@ -104,7 +97,6 @@ module.exports.updateDeliveriesBatch = function updateDeliveriesBulk(updatedDeli
                 });
             }
             const sqlInsert = sql;
-            console.log("Actual SQL is " + sqlInsert);
             return query(sqlInsert, [newDeliveryStatus, deliverystatusdetail, selectedDateDelivery, deliveryid])
                 .then(function (result) {
                 if (result.rowCount === 0) {
@@ -233,7 +225,6 @@ module.exports.retrieveDeliveryDetailsById = function retrieveDeliveryDetailsByI
         if (rows.length === 0) {
             return null;
         }
-        console.log(rows);
         const deliveryDetails = {
             carrier: rows[0].carrier,
             phone: rows[0].phone,
@@ -323,7 +314,6 @@ delivery.deliveryid as deliveryId,
     }
     const sql = `${sqlstart} ${sqlend} ORDER BY CurrentStageNum`;
     const result = await query(sql);
-    console.log("Chart 0 Result================================================: " + result.rows);
     return result.rows;
 };
 module.exports.retrievechartJS1Array = async function retrievechartJS1Array(selectedDropdownValueForm, choiceNum, date1, date2) {
@@ -358,7 +348,6 @@ module.exports.retrievechartJS1Array = async function retrievechartJS1Array(sele
         }
     }
     else if (choiceNum == 2) {
-        console.log(selectedDropdownValueForm);
         sqlstart = "SELECT DISTINCT delivery.deliveryid, product.productname";
         sqlend = " WHERE category.categoryname = '" + selectedDropdownValueForm + "' AND";
     }
@@ -367,19 +356,16 @@ module.exports.retrievechartJS1Array = async function retrievechartJS1Array(sele
         sqlend = " WHERE address.region = '" + selectedDropdownValueForm + "' AND";
     }
     else if (choiceNum == 4) {
-        console.log("Reached ChoiceNum 4");
         sqlstart = "SELECT DISTINCT delivery.deliveryid, delivery.deliverydate, delivery.updatedatpick";
         sqlend = " WHERE delivery.deliverydate BETWEEN '" + date1 + "' AND '" + date2 + "' AND delivery.updatedatpick IS NOT NULL AND";
     }
     else {
     }
     var sql = sqlstart + " FROM appuser JOIN address ON appuser.userid = address.userid JOIN productorder ON appuser.userid = productorder.userid JOIN delivery ON delivery.deliveryid = productorder.deliveryid JOIN productorderitem ON productorder.orderid = productorderitem.orderid JOIN productdetail ON productorderitem.productdetailid = productdetail.productdetailid JOIN product ON productdetail.productid = product.productid JOIN category ON product.categoryid = category.categoryid JOIN productimage ON productimage.productid = product.productid JOIN image ON productimage.imageid = image.imageid JOIN deliveryshipper ON delivery.shipperid = deliveryshipper.shipperid" + sqlend + sqlend2 + ";";
-    console.log("sql: " + sql);
     return query(sql).then(function (result) {
         const rows = result.rows;
         return rows.map(row => {
             let fieldValue;
-            console.log("ChoiceNum" + choiceNum);
             if (choiceNum == 1) {
                 if (selectedDropdownValueForm == "Region") {
                     fieldValue = row.region;
@@ -415,20 +401,17 @@ module.exports.retrievechartJS1Array = async function retrievechartJS1Array(sele
                         return 'Afternoon';
                     }
                     else {
-                        console.log("Night hour is: " + hour);
                         return 'Evening/Night';
                     }
                 }
             }
             else {
             }
-            console.log("=============  fieldValue is " + fieldValue + " ===================");
             return { deliveryid: row.deliveryid, chartHeaderValue: fieldValue };
         });
     });
 };
 module.exports.retrievechartJS3Array = async function retrievechartJS3Array(deliveryIdsString, chartHeaderString, specficboolean) {
-    console.log("RetrievechartJS3ArrayEncoded" + deliveryIdsString);
     const allDeliveryIdsArr = JSON.parse(decodeURIComponent(deliveryIdsString));
     const sqlBase = `
     SELECT 
@@ -457,13 +440,10 @@ module.exports.retrievechartJS3Array = async function retrievechartJS3Array(deli
             return { rows: rows };
         }
         else {
-            console.log("========================= ROWS2nd: " + rows.length);
             if (rows.length > 0) {
-                console.log(rows[0].hour_difference);
                 const fieldValue = {
                     hour_difference: rows[0].hour_difference
                 };
-                console.log(fieldValue == null);
                 return { deliveryid: deliveryId, chartHeaderValue: fieldValue };
             }
             else {
@@ -474,7 +454,6 @@ module.exports.retrievechartJS3Array = async function retrievechartJS3Array(deli
     return Promise.all(promises);
 };
 module.exports.retrievechartJS2Array = async function retrievechartJS2Array(deliveryIdsString, chartHeaderString, specficboolean) {
-    console.log("RetrievechartJS2ArrayEncoded" + deliveryIdsString);
     allDeliveryIdsArr = JSON.parse(decodeURIComponent(deliveryIdsString));
     const sqlBase = "SELECT" +
         " DISTINCT" +
@@ -502,15 +481,12 @@ module.exports.retrievechartJS2Array = async function retrievechartJS2Array(deli
             return { deliveryid: deliveryId, rows: rows };
         }
         else {
-            console.log("========================= ROWS: " + rows.length);
             if (rows.length > 0) {
-                console.log(rows[0].diff_ab_hours + rows[0].diff_bc_hours + rows[0].diff_cd_hours);
                 const fieldValue = {
                     diff_ab_hours: rows[0].diff_ab_hours,
                     diff_bc_hours: rows[0].diff_bc_hours,
                     diff_cd_hours: rows[0].diff_cd_hours
                 };
-                console.log(fieldValue == null);
                 return { deliveryid: deliveryId, chartHeaderValue: fieldValue };
             }
             else {
@@ -544,7 +520,6 @@ const removeDeliveryIDFromTable = function (tableName, deliveryid) {
     SET deliveryid = null
     WHERE deliveryid = $1;
     `;
-    console.log(`Removing deliveryid to NULL in table ${tableName}`);
     return query(sql, [deliveryid]).then(function (result) {
         if (result.rowCount === 0) {
             throw new Error(`No record found in table ${tableName} with associated delivery ID ${deliveryid}`);
@@ -591,7 +566,6 @@ module.exports.addNewChatEntry = function addNewChatEntry(adminUserID, userUserI
 module.exports.addNewMessage = function addNewMessage(messagedatetime, msgcontent, roomid, speakerid, userid) {
     const roleQuery = `SELECT role.rolename FROM role INNER JOIN appuser ON role.roleid = appuser.roleid WHERE appuser.userid = $1`;
     const roleValues = [speakerid];
-    console.log("Adding new message ===========================================");
     return query(roleQuery, roleValues)
         .then(function (roleResult) {
         const roleName = roleResult.rows[0] ? roleResult.rows[0].rolename : null;
@@ -643,7 +617,6 @@ module.exports.updateMessageReadStatus = function updateMessageReadStatus(userid
     return query(roleQuery, roleValues)
         .then(function (roleResult) {
         const roleName = roleResult.rows[0] ? roleResult.rows[0].rolename : null;
-        console.log("roleName for updateMessageReadStatus is: " + roleName);
         const readStatusField = roleName === 'admin' ? 'messagereadadmin' : 'messagereaduser';
         const updateQuery = `
                 UPDATE message AS m
@@ -667,7 +640,6 @@ module.exports.getAllMessagesRoom = function getAllMessagesRoom(roomid) {
 };
 module.exports.updatechatleavestatus = function updatechatleavestatus(leaveStatus, roomId, userId) {
     let updatechatleavestatusQuery = '';
-    console.log("ROOMID IS " + roomId);
     var sqlInput;
     if (roomId == null) {
         return o;
@@ -679,11 +651,9 @@ module.exports.updatechatleavestatus = function updatechatleavestatus(leaveStatu
                 userenteredchat = CASE WHEN useruserid = $2 THEN $1 ELSE userenteredchat END,
                 adminenteredchat = CASE WHEN adminuserid = $2 THEN $1 ELSE adminenteredchat END
         `;
-        console.log("BY RIGHT CORRECT");
         sqlInput = [leaveStatus, userId];
     }
     else {
-        console.log("BY RIGHT WRONG");
         sqlInput = [leaveStatus, roomId, userId];
         updatechatleavestatusQuery = `
             UPDATE chat
@@ -754,7 +724,6 @@ module.exports.retrieveDistinctDeliveryIdsWithPagination = function retrieveDist
     });
 };
 module.exports.retrieveDeliveryDetails = function retrieveDeliveryDetails(deliveryIds, arrangeByOrder, arrangeByDelivery) {
-    console.log("FUNCTION CALLED");
     let sql = `
     SELECT 
         delivery.deliveryid,
@@ -862,12 +831,10 @@ module.exports.retrieveDeliveryDetails = function retrieveDeliveryDetails(delive
                 size: row.size
             });
         });
-        console.log(deliveriesArray);
         return deliveriesArray;
     });
 };
 module.exports.retrieveProductOrderDetails = function retrieveProductOrderDetails(orderId) {
-    console.log("FUNCTION CALLED");
     let sql = `
     SELECT 
         productorder.orderid as orderId,
@@ -942,7 +909,6 @@ module.exports.deleteDeliveriesNotInItems = function deleteDeliveriesNotInItems(
     `;
     return query(sql).then(function (result) {
         if (result.rowCount === 0) {
-            console.log('No matching deliveries found for deletion.');
         }
     });
 };
@@ -960,10 +926,8 @@ module.exports.getShipperId = function getShipperId(shipperName) {
 };
 module.exports.createADelivery = function create(deliverydate, deliverystatus, deliverystatusdetail, trackingnumber, shipperid) {
     const sql = `INSERT INTO delivery (deliverydate, deliverystatus, deliverystatusdetail, trackingnumber, shipperid, updatedat, updatedatConfirmed) VALUES ($1, $2, $3, $4, $5, NOW(), NOW()) RETURNING deliveryid`;
-    console.log("reached0");
     return query(sql, [deliverydate, deliverystatus, deliverystatusdetail, trackingnumber, shipperid])
         .then(result => {
-        console.log("reached");
         if (result.rowCount > 0 && result.rows.length > 0) {
             return result.rows[0].deliveryid;
         }
@@ -979,7 +943,6 @@ module.exports.createADelivery = function create(deliverydate, deliverystatus, d
     });
 };
 module.exports.updateProductOrderItemDeliveryId = function updateProductOrderItemDeliveryId(productdetailId, orderId, deliveryId) {
-    console.log("UPDATE FUNCTION CALLED");
     let sql = `
     UPDATE productorderitem
     SET deliveryid = $1

@@ -18,7 +18,7 @@ export default function OrderTab({ initialLoadComplete, selectedTab, totalOrder 
         <Tab key={OrderStatusValue.Cancelled} href={URL.CancelledOrder} title="Cancelled"></Tab>
         <Tab key={OrderStatusValue.Returned} href={URL.ReturnedOrder} title="Returned"></Tab>
       </Tabs>
-      {initialLoadComplete && <label className="text-slate-700 text-sm dark:text-slate-300">{totalOrder <= 1 ? totalOrder + " item" : totalOrder + " items"} found</label>}
+      {initialLoadComplete && <label className="text-slate-700 text-sm">{totalOrder <= 1 ? totalOrder + " item" : totalOrder + " items"} found</label>}
     </div>);
 }
 

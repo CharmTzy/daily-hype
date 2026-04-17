@@ -251,7 +251,7 @@ const ChatRoomPage = () => {
         }}>
       <div className="chatroom-header">
         <div className="flex flex-col cursor-default">{backLink2}</div>
-        <h1 className="text-slate-800 dark:text-slate-200">
+        <h1 className="text-slate-800">
           Chat Room for Delivery #{deliveryId}
         </h1>
         <button onClick={() => openModal(deliveryDetails)}>View Details</button>

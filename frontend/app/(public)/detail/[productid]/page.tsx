@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { Button, Spinner } from "@nextui-org/react";
 import { useAppState } from "@/app/app-provider";
@@ -11,6 +10,7 @@ import { ProductDetail } from "@/enums/product-interfaces";
 import { removeDuplicateCartData } from "@/functions/cart-functions";
 import { capitaliseWord, formatMoney } from "@/functions/formatter";
 import { getProductAndDetail } from "@/functions/product-functions";
+import ResilientImage from "@/components/ui/resilient-image";
 
 interface ProductDetailPageProps {
     params: {
@@ -77,7 +77,7 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
     const selectedDetail = activeColourGroup?.items.find(
         (item) => item.productdetailid === selectedProductDetailId,
     ) || activeColourGroup?.items[0];
-    const imageUrls = product?.urls || [];
+    const imageUrls = Array.from(new Set((product?.urls || []).filter(Boolean)));
     const maxQty = Math.max(0, Number(selectedDetail?.qty || 0));
 
     const handleAddToCart = () => {
@@ -162,7 +162,7 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
                                     selectedImageIndex === index ? "border-slate-900" : "border-slate-200"
                                 }`}
                             >
-                                <Image
+                                <ResilientImage
                                     src={url}
                                     alt={`${product.productname} thumbnail ${index + 1}`}
                                     fill
@@ -175,7 +175,7 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
 
                     <div className="order-1 relative min-h-[360px] overflow-hidden rounded-[2rem] bg-slate-100 md:order-2 md:min-h-[520px]">
                         {imageUrls[selectedImageIndex] ? (
-                            <Image
+                            <ResilientImage
                                 src={imageUrls[selectedImageIndex]}
                                 alt={product.productname}
                                 fill

@@ -70,7 +70,7 @@ export default function Page() {
         items: { label: string; checked: boolean; toggle: () => void }[],
         upperCase = false,
     ) => (
-        <div className="border-b border-slate-200 pb-5 last:border-b-0 dark:border-slate-800">
+        <div className="border-b border-slate-200 pb-5 last:border-b-0">
             <label className="mb-3 block text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">{title}</label>
             <div className="flex flex-col gap-2">
                 {items.map((item, index) => (
@@ -78,7 +78,7 @@ export default function Page() {
                         key={index}
                         checked={item.checked}
                         func={item.toggle}
-                        labelClassName={`me-auto cursor-pointer text-sm text-slate-600 dark:text-slate-300 ${upperCase ? "uppercase" : ""}`}
+                        labelClassName={`me-auto cursor-pointer text-sm text-slate-600 ${upperCase ? "uppercase" : ""}`}
                         label={item.label}
                     />
                 ))}
@@ -87,18 +87,18 @@ export default function Page() {
     );
 
     const filterPanel = (
-        <div className="flex h-fit flex-col rounded-[1.75rem] border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
+        <div className="flex h-fit flex-col rounded-[1.75rem] border border-slate-200 bg-white p-5">
             <div className="flex items-center justify-between">
                 <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Filters</p>
-                    <p className="mt-2 text-sm text-slate-500 dark:text-slate-300">
+                    <p className="mt-2 text-sm text-slate-500">
                         Refine by type, category, colour, and size.
                     </p>
                 </div>
                 <button
                     type="button"
                     onClick={() => setShowFilters(false)}
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 text-slate-600 lg:hidden dark:border-slate-700 dark:text-slate-200"
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 text-slate-600 lg:hidden"
                 >
                     ✕
                 </button>
@@ -165,17 +165,17 @@ export default function Page() {
             <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                 <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Browse</p>
-                    <label className="mt-2 block text-3xl font-semibold tracking-tight text-slate-950 dark:text-white sm:text-4xl">
+                    <label className="mt-2 block text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
                         Explore now
                     </label>
-                    <p className="mt-3 text-sm text-slate-500 dark:text-slate-300">
+                    <p className="mt-3 text-sm text-slate-500">
                         {totalProduct} item{totalProduct === 1 ? "" : "s"} found
                     </p>
                 </div>
 
                 <Button
                     variant="bordered"
-                    className="h-11 rounded-full border-slate-300 px-5 text-sm font-semibold text-slate-700 lg:hidden dark:border-slate-700 dark:text-slate-100"
+                    className="h-11 rounded-full border-slate-300 px-5 text-sm font-semibold text-slate-700 lg:hidden"
                     onClick={() => setShowFilters(true)}
                 >
                     {selectedCount > 0 ? `Filters (${selectedCount})` : "Filters"}
@@ -185,26 +185,26 @@ export default function Page() {
             <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
                 <div className="hidden lg:block">{filterPanel}</div>
 
-                <section className="rounded-[2rem] border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900 sm:p-6">
+                <section className="rounded-[2rem] border border-slate-200 bg-white p-5 sm:p-6">
                     {selectedCount > 0 ? (
                         <div className="mb-5 flex flex-wrap gap-2">
                             {types.filter((_, index) => selectedTypes[index]).map((type) => (
-                                <span key={type.typeid} className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-slate-600 dark:bg-slate-800 dark:text-slate-200">
+                                <span key={type.typeid} className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">
                                     {capitaliseWord(type.typename)}
                                 </span>
                             ))}
                             {categories.filter((_, index) => selectedCategories[index]).map((category) => (
-                                <span key={category.categoryid} className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-slate-600 dark:bg-slate-800 dark:text-slate-200">
+                                <span key={category.categoryid} className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">
                                     {capitaliseWord(category.categoryname)}
                                 </span>
                             ))}
                             {colours.filter((_, index) => selectedColours[index]).map((colour) => (
-                                <span key={colour.colourid} className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-slate-600 dark:bg-slate-800 dark:text-slate-200">
+                                <span key={colour.colourid} className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">
                                     {capitaliseWord(colour.colourname)}
                                 </span>
                             ))}
                             {sizes.filter((_, index) => selectedSizes[index]).map((size) => (
-                                <span key={size.sizeid} className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-slate-600 dark:bg-slate-800 dark:text-slate-200">
+                                <span key={size.sizeid} className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-slate-600">
                                     {size.sizename}
                                 </span>
                             ))}
@@ -214,7 +214,7 @@ export default function Page() {
                     <ProductList data={products} />
 
                     {totalProduct > 8 ? (
-                        <div className="mt-8 border-t border-slate-200 pt-5 dark:border-slate-800">
+                        <div className="mt-8 border-t border-slate-200 pt-5">
                             <CustomPagination
                                 currentPage={pageNo}
                                 total={Math.ceil(totalProduct / 8)}
@@ -236,7 +236,7 @@ export default function Page() {
                         aria-label="Close filters backdrop"
                         className="fixed inset-0 z-40 bg-slate-950/50"
                     />
-                    <div className="fixed inset-x-0 bottom-0 z-50 max-h-[85vh] overflow-y-auto rounded-t-[2rem] bg-white p-4 shadow-2xl dark:bg-slate-950">
+                    <div className="fixed inset-x-0 bottom-0 z-50 max-h-[85vh] overflow-y-auto rounded-t-[2rem] bg-white p-4 shadow-2xl">
                         {filterPanel}
                     </div>
                 </div>

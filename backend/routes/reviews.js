@@ -57,18 +57,11 @@ router.post("/createReview", validationFn.validateToken, refreshFn.refreshToken,
         return res.status(403).send({ error: "Unauthorized Access" });
     }
     const { orderID, rating, reviewDescription } = req.body;
-    console.log("INSIDE ROUTER");
-    console.log(orderID);
-    console.log(rating);
-    console.log(reviewDescription);
     return reviewsModel.getProductID(orderID).then(function (productID) {
-        console.log(productID);
         return reviewsModel.getProductDetailID(orderID).then(function (productDetailID) {
-            console.log(productDetailID);
             return reviewsModel
                 .createReview(rating, reviewDescription, id, productID, productDetailID, orderID)
                 .then(function (review) {
-                console.log("createReview() called.");
                 return res.json({ review });
             })
                 .catch(function (error) {
@@ -86,7 +79,6 @@ router.get("/review/:productID", (req, res) => {
     return reviewsModel
         .getReviewByProductId(productID)
         .then(function (review) {
-        console.log("getReviewByProductId() called.");
         return res.json({ review });
     })
         .catch(function (error) {
@@ -102,7 +94,6 @@ router.get("/review/:userID", (req, res) => {
     return reviewsModel
         .getReviewByUserId(userID)
         .then(function (review) {
-        console.log("getReviewByUserId() called.");
         return res.json({ review });
     })
         .catch(function (error) {
@@ -117,12 +108,9 @@ router.put("/updateReview/:reviewID", (req, res) => {
     const reviewID = req.params.reviewID;
     const rating = req.body.rating;
     const reviewDescription = req.body.reviewDescription;
-    console.log("rating: " + rating);
-    console.log("reviewDescription: " + reviewDescription);
     return reviewsModel
         .updateReview(rating, reviewDescription, reviewID)
         .then(function (review) {
-        console.log("updateReview() called.");
         return res.json({ review });
     })
         .catch(function (error) {
@@ -138,7 +126,6 @@ router.delete("/deleteReview/:reviewID", (req, res) => {
     return reviewsModel
         .deleteReview(reviewID)
         .then(function (review) {
-        console.log("deleteReview() called.");
         return res.json({ review });
     })
         .catch(function (error) {
@@ -153,7 +140,6 @@ router.get("/checkReviewExists/:orderID", async (req, res) => {
     const orderID = req.params.orderID;
     try {
         const reviewExists = await reviewsModel.checkReviewExists(orderID);
-        console.log("Review Exists:", reviewExists);
         res.json({ exists: reviewExists });
     }
     catch (error) {
@@ -166,7 +152,6 @@ router.get("/getReviewData/:orderID", (req, res) => {
     return reviewsModel
         .getReviewByOrderId(orderID)
         .then(function (review) {
-        console.log("getReviewByOrderId() called.");
         return res.json({ review });
     })
         .catch(function (error) {
@@ -179,21 +164,18 @@ router.get("/getReviewData/:orderID", (req, res) => {
 });
 router.get("/getAllReviews", validationFn.validateToken, refreshFn.refreshToken, function (req, res) {
     const userId = req.body.id;
-    console.log(userId);
     return reviewsModel
         .getAllReviewsByUserId(userId)
         .then(function (reviews) {
         return res.status(200).json({ reviews });
     })
         .catch(function (error) {
-        console.log(error);
         return res.status(500).json({ error: "Internal Server Error" });
     });
 });
 router.get("/getReview/:reviewID", validationFn.validateToken, refreshFn.refreshToken, function (req, res) {
     const reviewId = req.params.reviewId;
     const userId = req.body.id;
-    console.log("reviewid and userid: ", reviewId, userId);
     return reviewModel
         .getReviewDetails(reviewId, userId)
         .then((review) => {

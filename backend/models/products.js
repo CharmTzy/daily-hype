@@ -14,7 +14,6 @@ module.exports.getCategoryID = function getCategoryID(categoryName) {
     const sql = "SELECT categoryID FROM Category WHERE categoryName = $1";
     return query(sql, [categoryName])
         .then((result) => {
-        console.log(result);
         return result.rows.length > 0 ? result.rows[0].categoryid : null;
     })
         .catch((error) => {
@@ -49,7 +48,6 @@ module.exports.createProductAndGetID = function createProductAndGetID(product) {
     return query(sql, [name, description, unitPrice, categoryid, typeid])
         .then((result) => {
         const insertedProductID = result.rows[0].productid;
-        console.log("Product inserted successfully. Product ID:", insertedProductID);
         return insertedProductID;
     })
         .catch((error) => {
@@ -64,7 +62,6 @@ module.exports.createProductDetail = function createProductDetail(productID, col
     return query(sql, [productID, colour, size, qty, productStatus])
         .then(result => {
         const insertedId = result.id;
-        console.log(`Inserted ID: ${insertedId}`);
         return insertedId;
     })
         .catch((error) => {
@@ -443,7 +440,6 @@ module.exports.getSearchedProductCount = (searchText, filters, minPrice, maxPric
         params.push(`%${searchText.trim()}%`);
     }
     if (minPrice && maxPrice) {
-        console.log(minPrice, maxPrice);
         sql += " AND unitprice >= $" + (params.length + 1) + " AND unitprice <= $" + (params.length + 2);
         params.push(minPrice, maxPrice);
     }
@@ -459,7 +455,6 @@ module.exports.getSearchedProductCount = (searchText, filters, minPrice, maxPric
     });
 };
 module.exports.getTypes = function getTypes() {
-    console.log("inside type");
     const sql = `SELECT * FROM type ORDER BY typeid`;
     return query(sql)
         .then((result) => {

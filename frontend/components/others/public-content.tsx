@@ -9,7 +9,7 @@ export default function PublicContent({ children }: {
     return (
         <>
             {headerCanLoad && (
-                <div className="min-h-screen bg-white text-slate-950 dark:bg-slate-950 dark:text-slate-50">
+                <div className="min-h-screen bg-white text-slate-950">
                     <Header />
                     <main className="min-h-[calc(100vh-81px)]">{children}</main>
                     <Footer />

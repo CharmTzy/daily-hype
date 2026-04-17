@@ -4,7 +4,7 @@ import { Skeleton } from "@nextui-org/react";
 export default function CarouselItemSkeleton() {
     return (
         <div className="mx-auto w-full max-w-7xl px-4 pt-5 sm:px-6 lg:px-8 lg:pt-8">
-            <div className="grid overflow-hidden rounded-[2rem] border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900 lg:grid-cols-[1fr_0.9fr]">
+            <div className="grid overflow-hidden rounded-[2rem] border border-slate-200 bg-white lg:grid-cols-[1fr_0.9fr]">
                 <div className="order-2 flex flex-col gap-5 px-5 py-6 sm:px-8 sm:py-8 lg:order-1 lg:px-10 lg:py-12">
                     <Skeleton className="h-6 w-40 rounded-full" />
                     <Skeleton className="h-12 w-full max-w-[420px] rounded-2xl" />

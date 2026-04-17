@@ -18,7 +18,6 @@ const transporter = hasSmtpConfig
     : null;
 const sendMail = async ({ to, subject, html, text }) => {
     if (!transporter) {
-        console.log(`[mail disabled] ${subject} -> ${to}`);
         return {
             accepted: [to],
             messageId: "mail-disabled",
@@ -52,7 +51,6 @@ module.exports.sendEmailVerificationCode = async (IPAddress, code, email) => {
     `,
         text: `DailyHype verification code: ${code}`,
     });
-    console.log("Verification message sent:", info.messageId);
     return info;
 };
 module.exports.sendOrderConfirmation = async (orderID, product, email) => {
@@ -76,7 +74,6 @@ module.exports.sendOrderConfirmation = async (orderID, product, email) => {
     `,
         text: `DailyHype order confirmation #${orderID}`,
     });
-    console.log("Order confirmation sent:", info.messageId);
     return info;
 };
 

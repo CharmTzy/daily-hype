@@ -1,38 +1,44 @@
 "use client";
-import { Pagination, PaginationItemType, PaginationItemRenderProps } from "@nextui-org/react";
+import { Pagination } from "@nextui-org/react";
 import { clsx } from "clsx";
-export default function CustomPagination({ total, currentPage, className, onChange, labelClassName }: {
+
+export default function CustomPagination({
+    total,
+    currentPage,
+    className,
+    onChange,
+    labelClassName,
+    showTotalLabel = false,
+}: {
     total: number;
     currentPage: number;
     className?: string;
     onChange?: (current: number) => void;
     labelClassName?: string;
+    showTotalLabel?: boolean;
 }) {
-    const renderItem = ({ ref, key, value, isActive, onNext, onPrevious, setPage, className }: PaginationItemRenderProps) => {
-        if (value === PaginationItemType.NEXT) {
-            return (<button key={key} className={clsx(className, "bg-default-200/50 min-w-8 w-8 h-8")} onClick={onNext}>
-          &gt;
-        </button>);
-        }
-        if (value === PaginationItemType.PREV) {
-            return (<button key={key} className={clsx(className, "bg-default-200/50 min-w-8 w-8 h-8")} onClick={onPrevious}>
-          &lt;
-        </button>);
-        }
-        if (value === PaginationItemType.DOTS) {
-            return (<button key={key} className={className}>
-          ...
-        </button>);
-        }
-        return (<button ref={ref} key={key} className={clsx(className, isActive && "text-white bg-gradient-to-r from-custom-color1 to-custom-color2 font-bold")} onClick={() => setPage(value)}>
-        {value}
-      </button>);
-    };
-    return (<div className="flex w-full max-w-full justify-end">
-      <label className={clsx("mt-2 mr-5 text-slate-600", labelClassName)}>Total {total} pages</label>
-      <Pagination disableCursorAnimation showControls total={total} page={currentPage} className={clsx("gap-2", `${className} gap-2`)} onChange={(current) => {
-            onChange && onChange(current);
-        }} radius="full" renderItem={renderItem} variant="light"/>
-    </div>);
+    if (total <= 1) {
+        return null;
+    }
+
+    return (
+        <div className={clsx("flex w-full max-w-full items-center justify-end gap-4", className)}>
+            {showTotalLabel ? (
+                <label className={clsx("text-sm text-slate-600", labelClassName)}>Total {total} pages</label>
+            ) : null}
+            <Pagination
+                disableCursorAnimation
+                showControls
+                total={total}
+                page={currentPage}
+                color="primary"
+                size="sm"
+                radius="full"
+                onChange={(current) => {
+                    onChange && onChange(current);
+                }}
+            />
+        </div>
+    );
 }
 

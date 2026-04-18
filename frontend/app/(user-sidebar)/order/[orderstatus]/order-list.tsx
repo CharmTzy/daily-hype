@@ -1,19 +1,23 @@
 "use client";
-import { Button, Link, Tooltip, useDisclosure, Spinner } from "@nextui-org/react";
+
+import { Button, Link, Spinner, Tooltip, useDisclosure } from "@nextui-org/react";
 import { useState } from "react";
+import Image from "next/image";
+import clsx from "clsx";
+import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 import { IGetOrderData } from "@/enums/order-interfaces";
 import { capitaliseWord, formatDateByMonthDayYear, formatMoney } from "@/functions/formatter";
 import { URL } from "@/enums/global-enums";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
-import clsx from "clsx";
 import RefundRequest from "./refund-request";
-import dynamic from "next/dynamic";
+
 const OrderConfirmationModal = dynamic(() => import("./confirmation-modal"), { ssr: false });
+
 interface OrderListProps {
     orderData: IGetOrderData[];
     initialLoadComplete: boolean;
 }
+
 interface OrderStatusInfoText {
     "in progress": string;
     delivered: string;
@@ -22,90 +26,183 @@ interface OrderStatusInfoText {
     confirmed: string;
     refunded: string;
 }
+
 const orderStatusInfoText: OrderStatusInfoText = {
     "in progress": "If your order is not confirmed within a week, it will be automatically cancelled.",
-    delivered: "Your order is delivered and status will update to received automatically after 10 days.",
-    cancelled: "Your order is cancelled and will be refunded soon.",
-    confirmed: "Your order is confirmed and will be delivered soon.",
-    received: "You can request refund for the order if you are not satisfied with the product.",
+    delivered: "Confirm receipt once it arrives. Reviews and refunds become available after that step.",
+    cancelled: "Your order is cancelled and the refund is being processed.",
+    confirmed: "Your order is being prepared. Cancellation is still available before the parcel is delivered.",
+    received: "Received items can now be reviewed or included in a refund request.",
     refunded: "",
 };
+
 export default function OrderList({ orderData, initialLoadComplete }: OrderListProps) {
     const router = useRouter();
     const [selectedOrderID, setSelectedOrderID] = useState<number>(0);
-    const [selectedOrder2, setSelectedOrder2] = useState<IGetOrderData | null>(null);
-    const [processLoading, setProcessLoading] = useState<boolean>(false);
-    const { isOpen, onOpen, onClose } = useDisclosure();
-    const { isOpen: isOpen2, onOpen: onOpen2, onClose: onClose2 } = useDisclosure();
+    const [selectedOrder, setSelectedOrder] = useState<IGetOrderData | null>(null);
+    const [processLoading, setProcessLoading] = useState(false);
     const [action, setAction] = useState<"Cancel" | "Received">("Cancel");
-    return (<>
-      {orderData.map((order, index) => {
-            return (<div className="flex flex-col mb-8" key={index}>
-            <div className="flex justify-start py-4 items-center border-1 rounded-tl-lg rounded-tr-lg px-6">
-              <Link href={URL.UserOrderDetail + order.orderid} className="me-8 min-w-28 max-w-28 text-small cursor-pointer underline text-black" style={{ textUnderlineOffset: "3px" }}>
-                #{order.orderid}
-              </Link>
-              <label className="me-auto ms-2 text-small">{formatDateByMonthDayYear(order.createdat)}</label>
-              <label className="capitalize ms-auto text-small">{order.orderstatus}</label>
-              <Tooltip offset={12} content={<div className="px-2 py-2 ms-2 max-w-lg text-small">{orderStatusInfoText[order.orderstatus as keyof OrderStatusInfoText]}</div>}>
-                <div className="w-[15px] h-[15px] cursor-pointer relative ms-2">
-                  <Image src="/icons/info.svg" fill={true} alt="Info Icon"/>
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const {
+        isOpen: isConfirmationOpen,
+        onOpen: openConfirmation,
+        onClose: closeConfirmation,
+    } = useDisclosure();
+
+    return (
+        <>
+            {orderData.map((order) => {
+                const canCancel = order.orderstatus === "in progress" || order.orderstatus === "confirmed";
+
+                return (
+                    <div className="mb-8 flex flex-col" key={order.orderid}>
+                        <div className="flex items-center justify-start rounded-tl-lg rounded-tr-lg border px-6 py-4">
+                            <Link
+                                href={URL.UserOrderDetail + order.orderid}
+                                className="me-8 min-w-28 max-w-28 cursor-pointer text-small text-black underline"
+                                style={{ textUnderlineOffset: "3px" }}
+                            >
+                                #{order.orderid}
+                            </Link>
+                            <label className="me-auto ms-2 text-small">
+                                {formatDateByMonthDayYear(order.createdat)}
+                            </label>
+                            <label className="ms-auto text-small capitalize">{order.orderstatus}</label>
+                            <Tooltip
+                                offset={12}
+                                content={
+                                    <div className="ms-2 max-w-lg px-2 py-2 text-small">
+                                        {orderStatusInfoText[order.orderstatus as keyof OrderStatusInfoText]}
+                                    </div>
+                                }
+                            >
+                                <div className="relative ms-2 h-[15px] w-[15px] cursor-pointer">
+                                    <Image src="/icons/info.svg" fill alt="Info Icon" />
+                                </div>
+                            </Tooltip>
+                        </div>
+
+                        <div className="border pt-4">
+                            {order.productdetails.map((item) => (
+                                <div className="mb-4 flex items-center px-4" key={`${order.orderid}-${item.productdetailid}`}>
+                                    <div className="relative h-[90px] w-[80px] overflow-hidden rounded-lg border">
+                                        <Image fill src={item.image} alt={item.productname} />
+                                    </div>
+
+                                    <div className="ml-4 flex min-w-[350px] max-w-[350px] flex-col self-start">
+                                        <Link className="cursor-pointer text-medium text-black">
+                                            {item.productname}
+                                        </Link>
+                                        <label className="mt-2 text-[14px] text-slate-600">
+                                            Color: {capitaliseWord(item.colour)}, Size: {item.size}
+                                        </label>
+                                        <label className="mt-1 text-[14px]">x{item.qty}</label>
+                                    </div>
+
+                                    <label className={clsx("ms-56 self-center")}>
+                                        ${formatMoney(item.unitprice)}
+                                    </label>
+
+                                    {order.orderstatus === "received" ? (
+                                        <Button
+                                            className="ms-auto"
+                                            color="default"
+                                            variant="bordered"
+                                            onClick={() => {
+                                                router.push(
+                                                    `${URL.WriteReview}/${order.orderid}/${item.productdetailid}`,
+                                                );
+                                            }}
+                                        >
+                                            {item.reviewid ? "Edit Review" : "Write Review"}
+                                        </Button>
+                                    ) : null}
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="flex flex-col items-end rounded-br-lg rounded-bl-lg border px-4 py-3">
+                            <label className="mb-5 mr-1 font-semibold">
+                                Total: ${formatMoney(order.totalamount)}
+                            </label>
+
+                            <div className="flex justify-end">
+                                {canCancel ? (
+                                    <Button
+                                        className="mr-3 disabled:cursor-not-allowed"
+                                        size="md"
+                                        disabled={processLoading}
+                                        color="danger"
+                                        onClick={() => {
+                                            setAction("Cancel");
+                                            setSelectedOrder(order);
+                                            openConfirmation();
+                                        }}
+                                    >
+                                        {processLoading ? (
+                                            <Spinner size="sm" color="default" />
+                                        ) : (
+                                            "Cancel Order"
+                                        )}
+                                    </Button>
+                                ) : null}
+
+                                {order.orderstatus === "delivered" ? (
+                                    <Button
+                                        className="mr-3 disabled:cursor-not-allowed"
+                                        color="success"
+                                        disabled={processLoading}
+                                        size="md"
+                                        onClick={() => {
+                                            setSelectedOrder(order);
+                                            setAction("Received");
+                                            openConfirmation();
+                                        }}
+                                    >
+                                        Order Received
+                                    </Button>
+                                ) : null}
+
+                                {order.orderstatus === "received" ? (
+                                    <Button
+                                        className="mr-3"
+                                        size="md"
+                                        onClick={() => {
+                                            setSelectedOrderID(parseInt(order.orderid, 10));
+                                            onOpen();
+                                        }}
+                                    >
+                                        Request Refund
+                                    </Button>
+                                ) : null}
+                            </div>
+                        </div>
+                    </div>
+                );
+            })}
+
+            {initialLoadComplete && orderData.length <= 0 ? (
+                <div className="mb-16 flex max-w-full flex-col rounded-xl border py-4">
+                    <label className="text-center text-small font-medium text-red-700">
+                        No Order Found!
+                    </label>
                 </div>
-              </Tooltip>
-            </div>
-            <div className="border-1 pt-4">
-              {order.productdetails.map((item, index) => {
-                    return (<div className="flex px-4 mb-4 items-center" key={index}>
-                    <div className="w-[80px] h-[90px] relative border-1 overflow-hidden rounded-lg">
-                      <Image fill={true} src={item.image} alt={item.productname}/>
-                    </div>
-                    <div className="flex flex-col ml-4 self-start max-w-[350px] min-w-[350px]">
-                      <Link className="text-black text-medium cursor-pointer">{item.productname}</Link>
-                      <label className="text-[14px] mt-2 text-slate-600">
-                        Color: {capitaliseWord(item.colour)}, Size: {item.size}
-                      </label>
-                      <label className="mt-1 text-[14px]">x{item.qty}</label>
-                    </div>
-                    <label className={clsx("self-center ms-56")}>${formatMoney(item.unitprice)}</label>
-                    {order.orderstatus === "received" && (<Button className="ms-auto" color="default" variant="bordered" onClick={() => {
-                                router.push(URL.WriteReview + `/${order.orderid}/${item.productid}`);
-                            }}>
-                        Rate Now
-                      </Button>)}
-                  </div>);
-                })}
-            </div>
-            <div className="py-3 flex-col rounded-br-lg rounded-bl-lg border-1 flex items-end">
-              <label className="mr-5 mb-5 font-semibold">Total: ${formatMoney(order.totalamount)}</label>
-              <div className="flex justify-end">
-                {order.orderstatus === "in progress" && (<Button className="mr-3 disabled:cursor-not-allowed" size="md" disabled={processLoading} color="danger" onClick={() => {
-                        setAction("Cancel");
-                        setSelectedOrder2(order);
-                        onOpen2();
-                    }}>
-                    {processLoading ? <Spinner size="sm" color="default"/> : "Cancel Order"}
-                  </Button>)}
-                {order.orderstatus === "delivered" && (<Button className="mr-3 disabled:cursor-not-allowed" color="success" disabled={processLoading} size="md" onClick={() => {
-                        setSelectedOrder2(order);
-                        setAction("Received");
-                        onOpen2();
-                    }}>
-                    Order Received
-                  </Button>)}
-                {order.orderstatus === "received" && (<Button className="mr-3" size="md" onClick={() => {
-                        setSelectedOrderID(parseInt(order.orderid, 10));
-                        onOpen();
-                    }}>
-                    Request Refund
-                  </Button>)}
-              </div>
-            </div>
-          </div>);
-        })}
-      {initialLoadComplete && orderData.length <= 0 && (<div className="flex flex-col max-w-full mb-16 py-4 border-1 rounded-xl">
-          <label className="text-small text-center text-red-700 font-medium">No Order Found!</label>
-        </div>)}
-      {selectedOrderID !== 0 && <RefundRequest isOpen={isOpen} onClose={onClose} orderID={selectedOrderID}/>}
-      {selectedOrder2 !== null && <OrderConfirmationModal orderData={selectedOrder2} isOpen={isOpen2} onClose={onClose2} action={action} processLoading={processLoading} setProcessLoading={setProcessLoading}/>}
-    </>);
+            ) : null}
+
+            {selectedOrderID !== 0 ? (
+                <RefundRequest isOpen={isOpen} onClose={onClose} orderID={selectedOrderID} />
+            ) : null}
+
+            {selectedOrder !== null ? (
+                <OrderConfirmationModal
+                    orderData={selectedOrder}
+                    isOpen={isConfirmationOpen}
+                    onClose={closeConfirmation}
+                    action={action}
+                    processLoading={processLoading}
+                    setProcessLoading={setProcessLoading}
+                />
+            ) : null}
+        </>
+    );
 }

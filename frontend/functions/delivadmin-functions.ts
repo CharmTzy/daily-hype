@@ -57,6 +57,37 @@ export async function getAllDeliveriesAdmin(userId: any, filterOptions: any) {
         throw error;
     }
 }
+export async function getAllDeliveriesAdminCount(userId: any, filterOptions: any) {
+    try {
+        const { startDate, endDate, startOrderDate, endOrderDate, statusDetail, chatunread, username, product, userRegion, searchCategory, address, searchShipper } = filterOptions;
+        const queryString = new URLSearchParams({
+            startDate: startDate || "",
+            endDate: endDate || "",
+            startDateOrder: startOrderDate || "",
+            endDateOrder: endOrderDate || "",
+            statusDetail: statusDetail || "",
+            chatunread: chatunread || "",
+            username: username || "",
+            product: product || "",
+            userRegion: userRegion || "",
+            searchCategory: searchCategory || "",
+            address: address || "",
+            shipper: searchShipper || "",
+        }).toString();
+        const response = await fetch(`${process.env.BACKEND_URL}/api/AlldeliveriesPageAdmin/user/${userId}/count?${queryString}`, {
+            method: "GET",
+            credentials: "include",
+        });
+        if (!response.ok) {
+            throw new Error(`Failed to fetch delivery count. Status: ${response.status}`);
+        }
+        const data = await response.json();
+        return Number(data.count || 0);
+    }
+    catch (error) {
+        throw error;
+    }
+}
 export async function handleDeleteDeliverySequentially(deliveryId: any) {
     try {
         const cancellationResponse = await fetch(`${process.env.BACKEND_URL}/api/checkIfOrderCancelled/${deliveryId}`, { method: "POST", credentials: "include" });

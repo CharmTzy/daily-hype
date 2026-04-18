@@ -110,6 +110,7 @@ export interface IGetOrderData {
         size: string;
         productid: number;
         image: string;
+        reviewid: number | null;
     }[];
 }
 export type TGetOrder = {

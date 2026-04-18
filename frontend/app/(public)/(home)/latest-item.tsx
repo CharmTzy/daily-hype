@@ -60,10 +60,15 @@ export default function LatestItem({ data, setCart, title }: ILatestItemProps) {
                             <Button
                                 className="mt-4 h-11 rounded-full border border-slate-300 bg-transparent text-sm font-semibold text-slate-800"
                                 onClick={() => {
+                                    const preferredDetail = item.detail.find((detail) => detail.qty > 0) || item.detail[0];
+                                    if (!preferredDetail) {
+                                        return;
+                                    }
+
                                     setCart((prevCart) => {
                                         let tempCart = [...prevCart];
-                                        if (!tempCart.find((product) => product.productdetailid === item.detail[0].productdetailid)) {
-                                            tempCart.push({ productdetailid: item.detail[0].productdetailid, qty: 1 });
+                                        if (!tempCart.find((product) => product.productdetailid === preferredDetail.productdetailid)) {
+                                            tempCart.push({ productdetailid: preferredDetail.productdetailid, qty: 1 });
                                         }
                                         tempCart = removeDuplicateCartData(tempCart).cart;
                                         localStorage.setItem("cart", JSON.stringify(tempCart));

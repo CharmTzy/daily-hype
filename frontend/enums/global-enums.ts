@@ -19,6 +19,7 @@ export enum CurrentActivePage {
     CancelledOrder = "cancelled orders",
     ReturnedOrder = "returned orders",
     AllDelivery = "all deliveries",
+    MyReviews = "my reviews",
     UserForm = "user form",
     ProductForm = "product form",
     CategoryForm = "category form",
@@ -75,7 +76,10 @@ export enum URL {
     DeliveryStats = "/stats/deliverystats",
     Feedback = "/feedback",
     Help = "/help",
+    HelpFaq = "/help#faq",
+    ShippingInfo = "/help#delivery",
     PrivacyPolicy = "/privacypolicy",
+    ReturnPolicy = "/terms#returns-support",
     TermsNConditions = "/terms",
     SiteMap = "/sitemap",
     Dashboard = "/dashboard",
@@ -100,7 +104,8 @@ export enum URL {
     ProductStat = "/stats/product",
     ReviewStat = "/stats/review",
     AddressBook = "/addressbook",
-    CheckOut = "/checkout"
+    CheckOut = "/checkout",
+    SupportChat = "/delivery"
 }
 export enum ErrorMessage {
     UNAURHOTIZED = "Unauthorized Access",

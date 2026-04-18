@@ -40,7 +40,7 @@ router.post("/refund/:orderid/:productdetailid", validateFn.validateToken, refre
     else if (tempCategory === 5) {
         category = "Counterfeit product";
     }
-    return Promise.all([ordersModel.checkOrderItemExists(orderID, productDetailID), refundsModel.checkRefundExists(orderID, productDetailID), ordersModel.checkOrderStatus(orderID, "received")])
+    return Promise.all([ordersModel.checkOrderItemExists(orderID, productDetailID, id), refundsModel.checkRefundExists(orderID, productDetailID), ordersModel.checkOrderStatus(orderID, "received", id)])
         .then(async ([orderItem, refundItem, orderStatus]) => {
         if (orderItem && orderStatus) {
             if (!refundItem || refundItem.refundqty + qty <= orderItem.qty) {

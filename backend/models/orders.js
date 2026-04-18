@@ -151,7 +151,7 @@ module.exports.checkOrderExists = (orderID, status = "", userID = 0) => {
         params.push(userID);
     }
     return query(sql, [...params])
-        .then((result) => result.rows[0].orderid)
+        .then((result) => result.rows[0] || null)
         .catch((error) => {
         console.error(error);
         throw error;
@@ -222,20 +222,54 @@ module.exports.getOrderByIdStatusDate = (userid, offset, limit, status, month, y
         throw error;
     });
 };
-module.exports.getOrderItemByOrderId = (orderIDArr) => {
+module.exports.getOrderItemByOrderId = (orderIDArr, userID = 0) => {
     if (!orderIDArr || orderIDArr.length === 0)
         return Promise.resolve([]);
-    const sql = `
-        SELECT poi.productdetailid, poi.qty, poi.unitprice, p.productname, p.rating, c.colourname, s.sizename, poi.orderid, p.productid
+    const orderPlaceholders = orderIDArr.map((o, index) => `$${index + 1}`).join(", ");
+    const params = [...orderIDArr];
+    let sql = `
+        SELECT
+            poi.productdetailid,
+            poi.qty,
+            poi.unitprice,
+            p.productname,
+            p.rating,
+            c.colourname,
+            s.sizename,
+            poi.orderid,
+            p.productid,
+            MAX(r.reviewid) AS reviewid
         FROM productorderitem poi
         JOIN productdetail pd ON poi.productdetailid = pd.productdetailid
         JOIN product p ON pd.productid = p.productid
         JOIN colour c ON pd.colourid = c.colourid
         JOIN size s ON pd.sizeid = s.sizeid
+        LEFT JOIN review r ON r.orderid = poi.orderid AND r.productdetailid = poi.productdetailid
+    `;
+
+    if (userID !== 0) {
+        params.push(userID);
+        sql += ` AND r.userid = $${params.length}`;
+    }
+
+    sql += `
         WHERE poi.orderid IN (
     `;
-    const queryValues = orderIDArr.map((o, index) => `$${index + 1}`).join(", ") + ")";
-    return query(sql + queryValues, [...orderIDArr])
+
+    const queryValues = `${orderPlaceholders})
+        GROUP BY
+            poi.productdetailid,
+            poi.qty,
+            poi.unitprice,
+            p.productname,
+            p.rating,
+            c.colourname,
+            s.sizename,
+            poi.orderid,
+            p.productid
+    `;
+
+    return query(sql + queryValues, params)
         .then((result) => result.rows)
         .catch((error) => {
         console.error(error);
@@ -244,15 +278,40 @@ module.exports.getOrderItemByOrderId = (orderIDArr) => {
 };
 module.exports.getOrderItemByOrderIdForRefund = (orderID, userID) => {
     const sql = `
-        SELECT poi.productdetailid, poi.qty, poi.unitprice, p.productname, p.rating, c.colourname, s.sizename, poi.orderid, p.productid
+        SELECT
+            poi.productdetailid,
+            poi.qty,
+            poi.unitprice,
+            p.productname,
+            p.rating,
+            c.colourname,
+            s.sizename,
+            poi.orderid,
+            p.productid,
+            po.orderstatus,
+            MAX(r.reviewid) AS reviewid
         FROM productorderitem poi
         JOIN productorder po ON poi.orderid = po.orderid
         JOIN productdetail pd ON poi.productdetailid = pd.productdetailid
         JOIN product p ON pd.productid = p.productid
         JOIN colour c ON pd.colourid = c.colourid
         JOIN size s ON pd.sizeid = s.sizeid
+        LEFT JOIN review r ON r.orderid = poi.orderid
+            AND r.productdetailid = poi.productdetailid
+            AND r.userid = $1
         WHERE po.userid = $1
         AND poi.orderid = $2
+        GROUP BY
+            poi.productdetailid,
+            poi.qty,
+            poi.unitprice,
+            p.productname,
+            p.rating,
+            c.colourname,
+            s.sizename,
+            poi.orderid,
+            p.productid,
+            po.orderstatus
     `;
     return query(sql, [userID, orderID])
         .then((result) => result.rows)
@@ -442,22 +501,44 @@ module.exports.getProductOrderRevenueMonthDetail = (month, gender, year) => {
         throw error;
     });
 };
-module.exports.checkOrderItemExists = (orderID, productDetailID) => {
-    const sql = `
-      SELECT * FROM productorderitem WHERE orderid = $1 AND productdetailid = $2
+module.exports.checkOrderItemExists = (orderID, productDetailID, userID = 0) => {
+    let sql = `
+      SELECT poi.*
+      FROM productorderitem poi
   `;
-    return query(sql, [orderID, productDetailID])
+    const params = [];
+
+    if (userID !== 0) {
+        sql += ` JOIN productorder po ON poi.orderid = po.orderid`;
+    }
+
+    sql += ` WHERE poi.orderid = $1 AND poi.productdetailid = $2`;
+    params.push(orderID, productDetailID);
+
+    if (userID !== 0) {
+        params.push(userID);
+        sql += ` AND po.userid = $3`;
+    }
+
+    return query(sql, params)
         .then((result) => result.rows[0])
         .catch((error) => {
         console.error(error);
         throw error;
     });
 };
-module.exports.checkOrderStatus = (orderID, status) => {
-    const sql = `
+module.exports.checkOrderStatus = (orderID, status, userID = 0) => {
+    let sql = `
       SELECT * FROM productorder WHERE orderid = $1 AND orderstatus = $2
   `;
-    return query(sql, [orderID, status])
+    const params = [orderID, status];
+
+    if (userID !== 0) {
+        params.push(userID);
+        sql += ` AND userid = $3`;
+    }
+
+    return query(sql, params)
         .then((result) => result.rows[0])
         .catch((error) => {
         console.error(error);

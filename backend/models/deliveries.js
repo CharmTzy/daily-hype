@@ -723,6 +723,33 @@ module.exports.retrieveDistinctDeliveryIdsWithPagination = function retrieveDist
         return distinctDeliveryIds;
     });
 };
+module.exports.countDistinctDeliveryIdsWithPagination = function countDistinctDeliveryIdsWithPagination(userid, startDate, endDate, startDateOrder, endDateOrder, statusDetail) {
+    const sql = `
+    SELECT COUNT(DISTINCT delivery.deliveryid) AS total
+    FROM
+        appuser
+        JOIN productorder ON appuser.userid = productorder.userid
+        JOIN productorderitem ON productorder.orderid = productorderitem.orderid
+		JOIN delivery ON delivery.deliveryid = productorderitem.deliveryid
+        JOIN productdetail ON productorderitem.productdetailid = productdetail.productdetailid
+        JOIN product ON productdetail.productid = product.productid
+        JOIN productimage ON productimage.productid = product.productid
+        JOIN image ON productimage.imageid = image.imageid
+        JOIN deliveryshipper ON delivery.shipperid = deliveryshipper.shipperid
+    WHERE
+        appuser.userid = $1
+        AND delivery.deliverydate >= COALESCE($2, delivery.deliverydate)
+        AND delivery.deliverydate <= COALESCE($3, delivery.deliverydate)
+        AND delivery.deliverystatusdetail = COALESCE($4, delivery.deliverystatusdetail)
+        AND productorder.createdat >= COALESCE($5, productorder.createdat)
+        AND productorder.createdat <= COALESCE($6, productorder.createdat);
+    `;
+
+    return query(sql, [userid, startDate, endDate, statusDetail, startDateOrder, endDateOrder]).then(function (result) {
+        const total = result.rows[0] ? Number(result.rows[0].total) : 0;
+        return Number.isNaN(total) ? 0 : total;
+    });
+};
 module.exports.retrieveDeliveryDetails = function retrieveDeliveryDetails(deliveryIds, arrangeByOrder, arrangeByDelivery) {
     let sql = `
     SELECT 

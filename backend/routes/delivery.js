@@ -364,13 +364,26 @@ router.get("/AlldeliveriesPage/user/:part", validationFn.validateToken, refreshF
     try {
         const userId = req.body.id;
         const { startDate, endDate, startDateOrder, endDateOrder, statusDetail, createdAtSortOrder, deliveryDateSortOrder, limit, offset } = req.query;
-        const distinctDeliveryIds = await deliveryController.retrieveDistinctDeliveryIdsWithPagination(userId, startDate || null, endDate || null, startDateOrder || null, endDateOrder || null, statusDetail || null, limit || 10, offset || 0);
+        const limitValue = Number(limit) || 10;
+        const offsetValue = Number(offset) || 0;
+        const distinctDeliveryIds = await deliveryController.retrieveDistinctDeliveryIdsWithPagination(userId, startDate || null, endDate || null, startDateOrder || null, endDateOrder || null, statusDetail || null, limitValue, offsetValue);
         if (distinctDeliveryIds.length === 0) {
             res.status(200).json([]);
             return;
         }
         const deliveries = await deliveryController.retrieveDeliveryDetails(distinctDeliveryIds, createdAtSortOrder || null, deliveryDateSortOrder || null);
         res.status(200).json(deliveries);
+    }
+    catch (error) {
+        res.status(404).json({ error: error.message });
+    }
+});
+router.get("/AlldeliveriesPage/user/:part/count", validationFn.validateToken, refreshFn.refreshToken, async (req, res) => {
+    try {
+        const userId = req.body.id;
+        const { startDate, endDate, startDateOrder, endDateOrder, statusDetail } = req.query;
+        const count = await deliveryController.countDistinctDeliveryIdsWithPagination(userId, startDate || null, endDate || null, startDateOrder || null, endDateOrder || null, statusDetail || null);
+        res.status(200).json({ count });
     }
     catch (error) {
         res.status(404).json({ error: error.message });
@@ -551,16 +564,26 @@ router.get("/AlldeliveriesPageAdmin/user/:part", validationFn.validateToken, ref
     try {
         const userId = req.body.id;
         const { startDate, endDate, startDateOrder, endDateOrder, statusDetail, createdAtSortOrder, deliveryDateSortOrder, limit, offset, chatunread, username, product, userRegion, searchCategory, address, shipper } = req.query;
-        if (offset == null) {
-            offset = 0;
-        }
-        const distinctDeliveryIds = await deliveryController2.retrieveFilteredDeliveriesWithMessageReadAdmin(userId, startDate || null, endDate || null, startDateOrder || null, endDateOrder || null, statusDetail || null, limit || 10, offset || 0, chatunread || false, username || null, product || null, userRegion || null, searchCategory || null, address || null, shipper || null);
+        const limitValue = Number(limit) || 10;
+        const offsetValue = Number(offset) || 0;
+        const distinctDeliveryIds = await deliveryController2.retrieveFilteredDeliveriesWithMessageReadAdmin(userId, startDate || null, endDate || null, startDateOrder || null, endDateOrder || null, statusDetail || null, limitValue, offsetValue, chatunread || false, username || null, product || null, userRegion || null, searchCategory || null, address || null, shipper || null);
         if (distinctDeliveryIds.length === 0) {
             res.status(200).json([]);
             return;
         }
         const deliveries = await deliveryController2.retrieveDeliveryDetailsAdmin(distinctDeliveryIds, createdAtSortOrder || null, deliveryDateSortOrder || null);
         res.status(200).json(deliveries);
+    }
+    catch (error) {
+        res.status(404).json({ error: error.message });
+    }
+});
+router.get("/AlldeliveriesPageAdmin/user/:part/count", validationFn.validateToken, refreshFn.refreshToken, async (req, res) => {
+    try {
+        const userId = req.body.id;
+        const { startDate, endDate, startDateOrder, endDateOrder, statusDetail, chatunread, username, product, userRegion, searchCategory, address, shipper } = req.query;
+        const count = await deliveryController2.countFilteredDeliveriesWithMessageReadAdmin(userId, startDate || null, endDate || null, startDateOrder || null, endDateOrder || null, statusDetail || null, chatunread || false, username || null, product || null, userRegion || null, searchCategory || null, address || null, shipper || null);
+        res.status(200).json({ count });
     }
     catch (error) {
         res.status(404).json({ error: error.message });

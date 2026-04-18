@@ -55,6 +55,9 @@ router.get("/order/detail/:orderid", validationFn.validateToken, refreshFn.refre
     }
     return Promise.all([ordersModel.getOrderByIDAdmin(orderid), ordersModel.getOrderDetailByAdmin(orderid)])
         .then(function ([order, orderDetail]) {
+        if (!order || Number(order.userid) !== Number(id)) {
+            return res.status(404).json({ error: errorMessages.INVALID_ID });
+        }
         const productIDArr = [];
         orderDetail.forEach((detail) => {
             if (!productIDArr.includes(detail.productid))
@@ -230,7 +233,7 @@ router.get("/order", validationFn.validateToken, refreshFn.refreshToken, (req, r
         .then((order) => {
         const orderIDArr = order.map((o) => o.orderid);
         return ordersModel
-            .getOrderItemByOrderId(orderIDArr)
+            .getOrderItemByOrderId(orderIDArr, id)
             .then((orderitem) => {
             let productIDArr = [];
             orderitem.forEach((item) => {
@@ -247,6 +250,7 @@ router.get("/order", validationFn.validateToken, refreshFn.refreshToken, (req, r
                     colour: item.colourname,
                     size: item.sizename,
                     productid: item.productid,
+                    reviewid: item.reviewid,
                 };
                 if (index !== -1) {
                     if (!order[index].productdetails) {
@@ -302,7 +306,21 @@ router.get("/order/item/:orderid", validationFn.validateToken, refreshFn.refresh
     return ordersModel
         .getOrderItemByOrderIdForRefund(orderid, id)
         .then((result) => {
-        return res.status(200).json({ data: result });
+        return productsModel
+            .getProductImageByProductIDArr(result.map((item) => item.productid))
+            .then((productImages) => {
+            for (let i = 0; i < result.length; i++) {
+                const selectedImage = productImages.find((item) => item.productid === result[i].productid);
+                if (selectedImage) {
+                    result[i].image = selectedImage.url;
+                }
+            }
+            return res.status(200).json({ data: result });
+        })
+            .catch((error) => {
+            console.error(error);
+            throw error;
+        });
     })
         .catch((error) => {
         console.error(error);
@@ -398,9 +416,9 @@ router.put("/order/:orderid/cancel", validationFn.validateToken, refreshFn.refre
     if (!orderid || isNaN(orderid)) {
         return res.status(400).send({ error: errorMessages.INVALID_ID });
     }
-    return Promise.all([ordersModel.checkOrderExists(orderid, "in progress", id), paymentsModel.checkPaymentSuccess(orderid), ordersModel.getOrderItemQtyByOrderId(orderid)])
+    return Promise.all([ordersModel.checkOrderExists(orderid, "", id), paymentsModel.checkPaymentSuccess(orderid), ordersModel.getOrderItemQtyByOrderId(orderid)])
         .then(([orderExists, paymentSuccess, orderItem]) => {
-        if (orderExists && orderItem) {
+        if (orderExists && orderItem && ["in progress", "confirmed"].includes(orderExists.orderstatus)) {
             if (paymentSuccess) {
                 const transactionid = paymentSuccess.transactionid;
                 return paymentsModel.refundPayment(transactionid).then((result) => {

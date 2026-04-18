@@ -1,19 +1,19 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import Select from "react-select";
+import ReactSelect from "react-select";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import MapComponent from "./viewlocation/mapcomponent";
 require("dotenv").config();
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Progress, } from "@nextui-org/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure, Progress, Select as NextSelect, SelectItem, } from "@nextui-org/react";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Link, } from "@nextui-org/react";
-import { Pagination } from "@nextui-org/react";
 import { Card, CardBody } from "@nextui-org/react";
 import { useAppState } from "@/app/app-provider";
+import CustomPagination from "@/components/ui/pagination";
 import { CurrentActivePage, URL } from "@/enums/global-enums";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { getAllDeliveries, getCurrentUserId, updatechatleavestatus, } from "@/functions/deliv-functions";
-import { getAllDeliveriesAdmin, handleDeleteDeliverySequentially, updateSingleDeliveryCA2, } from "@/functions/delivadmin-functions";
+import { getAllDeliveriesAdmin, getAllDeliveriesAdminCount, handleDeleteDeliverySequentially, updateSingleDeliveryCA2, } from "@/functions/delivadmin-functions";
 interface Category {
     categoryid: number;
     categoryname: string;
@@ -76,20 +76,32 @@ export default function Page() {
         searchCategory: null,
     };
     const [filterOptions, setFilterOptions] = useState(filterOptionsDefault);
+    const [appliedFilters, setAppliedFilters] = useState(filterOptionsDefault);
+    const [totalDeliveryCount, setTotalDeliveryCount] = useState(0);
+    const normaliseFilterValue = (value: any) => {
+        if (value == null || value === "" || value === "Default" || value === "AllChats") {
+            return null;
+        }
+        return value;
+    };
     const handleFilterChange = (filterName: any, value: any) => {
         console.log("Value selected: " + value);
         setFilterOptions((prevOptions) => ({
             ...prevOptions,
-            [filterName]: value,
+            [filterName]: normaliseFilterValue(value),
         }));
     };
-    const handleApplyFilters = (filterOptions: any) => {
+    const handleApplyFilters = (nextFilterOptions: any) => {
         console.log("Filter options are");
-        console.log(filterOptions);
-        getAllDeliveriesAdmin(actualCurrentUserId, filterOptions)
-            .then((data) => {
+        console.log(nextFilterOptions);
+        Promise.all([
+            getAllDeliveriesAdmin(actualCurrentUserId, nextFilterOptions),
+            getAllDeliveriesAdminCount(actualCurrentUserId, nextFilterOptions),
+        ])
+            .then(([data, count]) => {
             console.log("Filtered delivery data:", data);
             setDeliveryData(data);
+            setTotalDeliveryCount(count);
             setSelectedDates(data.map((item: any) => new Date(item.deliveryTime).toISOString().split("T")[0]));
         })
             .catch((error) => {
@@ -146,6 +158,8 @@ export default function Page() {
     const [date, setDate] = useState(new Date());
     const [selectedDates, setSelectedDates] = useState<string[]>([]);
     const [deliveryData, setDeliveryData] = useState<any[]>([]);
+    const [page, setPage] = useState(1);
+    const [selectedLimit, setSelectedLimit] = useState(3);
     const [selectedDelivery, setSelectedDelivery] = useState<any | null>(null);
     const [selectedDateFilters, setSelectedDateFilters] = useState<string[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
@@ -287,21 +301,16 @@ export default function Page() {
     };
     const [forceRerender, setForceRerender] = useState(false);
     useEffect(() => {
-        getAllDeliveriesAdmin(1, filterOptions)
-            .then((data) => {
-            console.log("Received delivery data:", data);
-            if (data && Array.isArray(data)) {
-                setDeliveryData(data);
-                setSelectedDates(data.map((item: any) => new Date(item.deliveryTime).toISOString().split("T")[0]));
-            }
-            else {
-                console.error("Data is undefined or not an array:", data);
-            }
-        })
-            .catch((error) => {
-            console.error(error);
-        });
-    }, [forceRerender]);
+        if (actualCurrentUserId == null) {
+            return;
+        }
+        const nextFilterOptions = {
+            ...appliedFilters,
+            limit: selectedLimit,
+            offset: (page - 1) * selectedLimit,
+        };
+        handleApplyFilters(nextFilterOptions);
+    }, [actualCurrentUserId, appliedFilters, forceRerender, page, selectedLimit]);
     useEffect(() => {
         const updateLeaveStatus = async () => {
             try {
@@ -424,38 +433,22 @@ export default function Page() {
                 return 0;
         }
     };
-    const [page, setPage] = useState(1);
-    const [selectedLimit, setSelectedLimit] = useState(3);
-    const handleChangePage = (e: any) => {
-        console.log("old page", e);
-        setPage(e);
+    const totalPages = Math.max(1, Math.ceil(totalDeliveryCount / selectedLimit));
+    const handleChangePage = (nextPage: number) => {
+        setPage(nextPage);
     };
-    const handleChangeLimit = (e: any) => {
-        const newLimit = parseInt(e.target.value, 10);
+    const handleChangeLimit = (value: string) => {
+        const newLimit = parseInt(value, 10);
         if (!isNaN(newLimit) && newLimit > 0) {
             setSelectedLimit(newLimit);
             setPage(1);
         }
     };
     useEffect(() => {
-        const offsetTar = (page - 1) * selectedLimit;
-        console.log("page:", page);
-        console.log("selectedLimit:", selectedLimit);
-        Promise.resolve()
-            .then(() => {
-            const newFilterOptions = {
-                ...filterOptions,
-                limit: selectedLimit,
-                offset: offsetTar,
-            };
-            setFilterOptions(newFilterOptions);
-            return newFilterOptions;
-        })
-            .then((updatedFilterOptions) => {
-            handleApplyFilters(updatedFilterOptions);
-        });
-        console.log("offset is " + offsetTar);
-    }, [page, selectedLimit]);
+        if (page > totalPages) {
+            setPage(1);
+        }
+    }, [page, totalPages]);
     const [SelectedDeliveryID2, setSelectedDeliveryID2] = useState(false);
     const [selectedLoc, setSelectedLoc] = useState<LocState>(initialLocState);
     const [isEditModalOpen, setEditModalOpen] = useState(false);
@@ -639,7 +632,7 @@ export default function Page() {
                       Created At Sort Order:
                     </label>
                     <select id="createdAtSortOrder" className="form-control" onChange={(e) => handleFilterChange("createdAtSortOrder", e.target.value)}>
-                      <option value="Default">Default</option>
+                      <option value="">Default</option>
                       <option value="asc">Ascending</option>
                       <option value="desc">Descending</option>
                     </select>
@@ -652,7 +645,7 @@ export default function Page() {
                       Delivery Date Sort Order:
                     </label>
                     <select id="deliveryDateSortOrder" className="form-control" onChange={(e) => handleFilterChange("deliveryDateSortOrder", e.target.value)}>
-                      <option value="Default">Default</option>
+                      <option value="">Default</option>
                       <option value="asc">Ascending</option>
                       <option value="desc">Descending</option>
                     </select>
@@ -664,7 +657,7 @@ export default function Page() {
                   <div className="border border-gray-700 p-2 mb-4">
                     <label htmlFor="searchCategory">Search Category:</label>
                     <select id="searchCategory" className="form-control" onChange={(e) => handleFilterChange("searchCategory", e.target.value)}>
-                      <option value="Default">All Categories</option>
+                      <option value="">All Categories</option>
                       {categories.map((category) => (<option key={category.categoryid} value={category.categoryname}>
                           {category.categoryname}
                         </option>))}
@@ -676,7 +669,7 @@ export default function Page() {
                   <div className="border border-gray-700 p-2 mb-4">
                     <label htmlFor="userRegion">User Region:</label>
                     <select id="userRegion" className="form-control" onChange={(e) => handleFilterChange("userRegion", e.target.value)}>
-                      <option value="Default">All Regions</option>
+                      <option value="">All Regions</option>
                       {regions.map((region, index) => (<option key={index} value={region}>
                           {region}
                         </option>))}
@@ -686,7 +679,7 @@ export default function Page() {
                   <div className="border border-gray-700 p-2 mb-4">
                     <label htmlFor="chatunread">Chat Read Filter:</label>
                     <select id="chatunread" className="form-control" onChange={(e) => handleFilterChange("chatunread", e.target.value)}>
-                      <option value="AllChats">All Chats</option>
+                      <option value="">All Chats</option>
                       <option value="UnreadChats">Unread Chats</option>
                     </select>
                   </div>
@@ -695,7 +688,7 @@ export default function Page() {
                 <div className="w-full md:w-1/2 lg:w-1/4 px-2">
                   <div className="border border-gray-700 p-2 mb-4">
                     <label htmlFor="username">Search Delivery of User:</label>
-                    <Select id="username" className="form-control text-black" isClearable options={usernames.map((username) => ({
+                    <ReactSelect id="username" className="form-control text-black" isClearable options={usernames.map((username) => ({
             value: username,
             label: username,
         }))} onChange={(selectedOption) => handleFilterChange("username", selectedOption?.value || null)}/>
@@ -707,7 +700,7 @@ export default function Page() {
                     <label htmlFor="product">
                       Search Delivery Containing Product:
                     </label>
-                    <Select id="product" className="form-control text-black" isClearable options={product.map((productname) => ({
+                    <ReactSelect id="product" className="form-control text-black" isClearable options={product.map((productname) => ({
             value: productname,
             label: productname,
         }))} onChange={(selectedOption) => handleFilterChange("product", selectedOption?.value || null)}/>
@@ -717,7 +710,7 @@ export default function Page() {
                 <div className="w-full md:w-1/2 lg:w-1/4 px-2">
                   <div className="border border-gray-700 p-2 mb-4 ">
                     <label htmlFor="address">Search Delivery of Address:</label>
-                    <Select id="address" className="form-control text-black" isClearable options={address.map((addressname) => ({
+                    <ReactSelect id="address" className="form-control text-black" isClearable options={address.map((addressname) => ({
             value: addressname,
             label: addressname,
         }))} onChange={(selectedOption) => handleFilterChange("address", selectedOption?.value || null)}/>
@@ -729,7 +722,7 @@ export default function Page() {
                   <div className="border border-gray-700 p-2 mb-4">
                     <label htmlFor="searchShipper">Search Shipper:</label>
                     <select id="searchShipper" className="form-control" onChange={(e) => handleFilterChange("searchShipper", e.target.value)}>
-                      <option value="Default">All Shippers</option>
+                      <option value="">All Shippers</option>
                       {shippers.map((shipper) => (<option key={shipper.shipId} value={shipper.name}>
                           {shipper.name}
                         </option>))}
@@ -739,7 +732,10 @@ export default function Page() {
               </div>
 
               
-              <button type="button" className="btn btn-primary mb-2 border border-gray-700 p-2 mb-4 mx-5 text-gray-900" onClick={handleChangePage}>
+              <button type="button" className="btn btn-primary mb-2 border border-gray-700 p-2 mb-4 mx-5 text-gray-900" onClick={() => {
+            setPage(1);
+            setAppliedFilters({ ...filterOptions });
+        }}>
                 Apply Filters
               </button>
 
@@ -758,17 +754,19 @@ export default function Page() {
           <h2 id="cardsMainHeader"></h2>
           {renderDeliveryTable()}
 
-          <div className="relative h-32 w-37">
-            <div className="mb-2">
-              <span>Items per page:</span>
-              <select value={selectedLimit} onChange={handleChangeLimit}>
-                <option value={3}>3</option>
-                <option value={5}>5</option>
-                <option value={10}>10</option>
-              </select>
+            <div className="relative h-32 w-37">
+            <div className="mb-2 flex items-center gap-3">
+              <span className="text-sm font-medium text-slate-600">Items per page:</span>
+              <NextSelect aria-label="Admin delivery items per page" className="w-[140px]" selectedKeys={[String(selectedLimit)]} size="sm" variant="bordered" disallowEmptySelection onChange={(event) => {
+            handleChangeLimit(event.target.value);
+        }}>
+                {[3, 5, 10].map((value) => (<SelectItem key={String(value)} value={String(value)}>
+                    {value}
+                  </SelectItem>))}
+              </NextSelect>
             </div>
 
-            <Pagination color="primary" size="sm" total={30} onChange={handleChangePage} className="mb-20 absolute bottom-0 right-0"/>
+            <CustomPagination currentPage={page} total={totalPages} onChange={handleChangePage} className="justify-end"/>
           </div>
         </div>
       </div>

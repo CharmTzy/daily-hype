@@ -47,19 +47,19 @@ export default function SideBar() {
         </AccordionItem>
         <AccordionItem key="4" className="font-semibold" classNames={{ title: "text-[15px]" }} aria-label="My Reviews" title="My Reviews">
           <div className="flex flex-col cursor-default">
-            <SideBarLink url={URL.WriteReview} label="Review List" active={currentActivePage === CurrentActivePage.ReceivedOrder}/>
+            <SideBarLink url={URL.WriteReview} label="Review List" active={currentActivePage === CurrentActivePage.MyReviews}/>
           </div>
         </AccordionItem>
         <AccordionItem key="5" className="font-semibold" classNames={{ title: "text-[15px]" }} aria-label="Customer Service" title="Customer Service">
           <div className="flex flex-col cursor-default">
-            <SideBarLink url={URL.Delivery} label="Chat" active={currentActivePage === CurrentActivePage.AllDelivery}/>
-            <SideBarLink url={URL.ReturnedOrder} label="FAQ" active={currentActivePage === CurrentActivePage.ReturnedOrder}/>
+            <SideBarLink url={URL.SupportChat} label="Chat" active={false}/>
+            <SideBarLink url={URL.HelpFaq} label="FAQ" active={false}/>
           </div>
         </AccordionItem>
         <AccordionItem key="6" className="font-semibold" classNames={{ title: "text-[15px]" }} aria-label="Policy" title="Policy">
           <div className="flex flex-col cursor-default">
-            <SideBarLink url={URL.ReturnedOrder} label="Shipping Info" active={currentActivePage === CurrentActivePage.ReturnedOrder}/>
-            <SideBarLink url={URL.ReturnedOrder} label="Return Policy" active={currentActivePage === CurrentActivePage.ReturnedOrder}/>
+            <SideBarLink url={URL.ShippingInfo} label="Shipping Info" active={false}/>
+            <SideBarLink url={URL.ReturnPolicy} label="Return Policy" active={false}/>
           </div>
         </AccordionItem>
       </Accordion>

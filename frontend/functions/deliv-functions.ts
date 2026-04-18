@@ -65,6 +65,30 @@ export async function getAllDeliveries(userId: any, filterOptions: any) {
         throw error;
     }
 }
+export async function getAllDeliveriesCount(userId: any, filterOptions: any) {
+    try {
+        const { startDate, endDate, startOrderDate, endOrderDate, statusDetail } = filterOptions;
+        const queryString = new URLSearchParams({
+            startDate: startDate || "",
+            endDate: endDate || "",
+            startDateOrder: startOrderDate || "",
+            endDateOrder: endOrderDate || "",
+            statusDetail: statusDetail || "",
+        }).toString();
+        const response = await fetch(`${process.env.BACKEND_URL}/api/AlldeliveriesPage/user/${userId}/count?${queryString}`, {
+            method: "GET",
+            credentials: "include",
+        });
+        if (!response.ok) {
+            throw new Error(`Failed to fetch delivery count. Status: ${response.status}`);
+        }
+        const data = await response.json();
+        return Number(data.count || 0);
+    }
+    catch (error) {
+        throw error;
+    }
+}
 export async function getCurrentUserId() {
     try {
         const responseUserId = await fetch(`${process.env.BACKEND_URL}/api/getCurrentUserId/`, {

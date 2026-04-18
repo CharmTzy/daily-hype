@@ -61,21 +61,21 @@ export default function OrderFilter({ searchMonth, setSearchMonth, searchYear, s
         }}/>
       </div>
       <div className="flex w-full justify-end">
-        <Select label="Show" className="max-w-[120px] mr-3" selectedKeys={[showOrderNo + ""]} variant="bordered" size="sm" onChange={(e) => {
+        <Select label="Show" className="max-w-[120px] mr-3" selectedKeys={[String(showOrderNo)]} variant="bordered" size="sm" disallowEmptySelection onChange={(e) => {
             setShowOrderNo(mapStringToNoOfOrder(e.target.value));
         }}>
           {noOfOrderOptions.map((item) => (<SelectItem value={item.value} key={item.value}>
               {item.label}
             </SelectItem>))}
         </Select>
-        <Select label="Month" className="max-w-[125px] mr-3" variant="bordered" size="sm" selectedKeys={[searchMonth]} defaultSelectedKeys={["0"]} onChange={(e) => {
+        <Select label="Month" className="max-w-[125px] mr-3" variant="bordered" size="sm" selectedKeys={[searchMonth]} disallowEmptySelection onChange={(e) => {
             setSearchMonth(mapStringToMonthValue(e.target.value));
         }}>
           {monthOptions.map((item) => (<SelectItem value={item.value} key={item.value}>
               {item.label}
             </SelectItem>))}
         </Select>
-        <Select label="Year" className="max-w-[100px]" variant="bordered" size="sm" selectedKeys={[searchYear]} defaultSelectedKeys={["0"]} onChange={(e) => {
+        <Select label="Year" className="max-w-[100px]" variant="bordered" size="sm" selectedKeys={[searchYear]} disallowEmptySelection onChange={(e) => {
             setSearchYear(e.target.value);
         }}>
           {yearOptions.map((item) => (<SelectItem value={item.value} key={item.value}>

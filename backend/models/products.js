@@ -879,6 +879,27 @@ module.exports.getProductDetailByProductDetailID = (productDetailID) => {
         throw error;
     });
 };
+module.exports.syncProductRating = function syncProductRating(productID) {
+    const sql = `
+        UPDATE product
+        SET rating = COALESCE((
+            SELECT ROUND(AVG(rating)::numeric, 2)
+            FROM review
+            WHERE productid = $1
+        ), 0),
+        updatedat = NOW()
+        WHERE productid = $1
+        RETURNING rating;
+    `;
+
+    return query(sql, [productID]).then((result) => {
+        if (result.rowCount === 0) {
+            throw new EMPTY_RESULT_ERROR("Product Not Found");
+        }
+
+        return result.rows[0].rating;
+    });
+};
 module.exports.getProductDetailByIds = function getProductDetailByIds(productDetailIDArr) {
     const sql = `
         SELECT pd.productdetailid, pd.qty, p.productname, p.unitprice, p.productid, c.colourname as colour, s.sizename as size

@@ -9,6 +9,9 @@ export interface IGetOrderItemByOrderIDData {
     sizename: string;
     orderid: string;
     productid: number;
+    orderstatus: "confirmed" | "in progress" | "cancelled" | "received" | "delivered" | "returned";
+    reviewid: number | null;
+    image?: string;
 }
 export type TGetOrderItemByOrderID = {
     data: IGetOrderItemByOrderIDData[];

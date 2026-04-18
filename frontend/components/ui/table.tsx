@@ -1,26 +1,19 @@
-import { useTheme } from "@mui/material/styles";
-import Box from "@mui/material/Box";
+"use client";
+
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
-import TableFooter from "@mui/material/TableFooter";
-import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import IconButton from "@mui/material/IconButton";
-import FirstPageIcon from "@mui/icons-material/FirstPage";
-import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
-import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
-import LastPageIcon from "@mui/icons-material/LastPage";
 import { TableHead } from "@mui/material";
-import { useState } from "react";
+import { Select, SelectItem } from "@nextui-org/react";
+import { useEffect, useMemo, useState } from "react";
+import CustomPagination from "@/components/ui/pagination";
+
 interface ITableProps {
     columns?: string[];
-    rows: [
-        string,
-        ...React.ReactNode[]
-    ][];
+    rows: [string, ...React.ReactNode[]][];
     totalCount?: number;
     rowsPerPage?: number;
     setRowsPerPage?: React.Dispatch<React.SetStateAction<number>>;
@@ -29,107 +22,180 @@ interface ITableProps {
     onClick?: (clickedValue: string) => void;
     onDoubleClick?: (clickedValue: string) => void;
 }
-interface TablePaginationActionsProps {
-    count: number;
-    page: number;
-    rowsPerPage: number;
-    onPageChange: (event: React.MouseEvent<HTMLButtonElement>, newPage: number) => void;
-}
-function TablePaginationActions(props: TablePaginationActionsProps) {
-    const theme = useTheme();
-    const { count, page, rowsPerPage, onPageChange } = props;
-    const handleFirstPageButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-        onPageChange(event, 0);
-    };
-    const handleBackButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-        onPageChange(event, page - 1);
-    };
-    const handleNextButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-        onPageChange(event, page + 1);
-    };
-    const handleLastPageButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-        onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
-    };
-    return (<Box sx={{ flexShrink: 0, ml: 2.5 }}>
-      <IconButton onClick={handleFirstPageButtonClick} disabled={page === 0} aria-label="first page">
-        {theme.direction === "rtl" ? <LastPageIcon /> : <FirstPageIcon />}
-      </IconButton>
-      <IconButton onClick={handleBackButtonClick} disabled={page === 0} aria-label="previous page">
-        {theme.direction === "rtl" ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
-      </IconButton>
-      <IconButton onClick={handleNextButtonClick} disabled={page >= Math.ceil(count / rowsPerPage) - 1} aria-label="next page">
-        {theme.direction === "rtl" ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
-      </IconButton>
-      <IconButton onClick={handleLastPageButtonClick} disabled={page >= Math.ceil(count / rowsPerPage) - 1} aria-label="last page">
-        {theme.direction === "rtl" ? <FirstPageIcon /> : <LastPageIcon />}
-      </IconButton>
-    </Box>);
-}
-export default function CustomTable({ rowsPerPage, columns, rows, totalCount, setRowsPerPage, page, setPage, onClick, onDoubleClick }: ITableProps) {
-    const [localPage, setLocalPage] = useState(page ? page : 0);
+
+const rowsPerPageOptions = ["5", "10", "15"];
+
+export default function CustomTable({
+    rowsPerPage,
+    columns,
+    rows,
+    totalCount,
+    setRowsPerPage,
+    page,
+    setPage,
+    onClick,
+    onDoubleClick,
+}: ITableProps) {
+    const [localPage, setLocalPage] = useState(page ?? 0);
     const [localRowsPerPage, setLocalRowsPerPage] = useState(rowsPerPage ?? 10);
-    rows = rows.filter((r, index) => index < localRowsPerPage);
-    if (typeof totalCount === "string") {
-        totalCount = parseInt(totalCount);
-    }
-    const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
-        setLocalPage(newPage);
+
+    useEffect(() => {
+        setLocalPage(page ?? 0);
+    }, [page]);
+
+    useEffect(() => {
+        setLocalRowsPerPage(rowsPerPage ?? 10);
+    }, [rowsPerPage]);
+
+    const resolvedTotalCount = useMemo(() => {
+        if (typeof totalCount === "string") {
+            const parsedCount = parseInt(totalCount, 10);
+            return Number.isNaN(parsedCount) ? 0 : parsedCount;
+        }
+
+        return totalCount ?? rows.length;
+    }, [rows.length, totalCount]);
+
+    const totalPages = Math.max(1, Math.ceil(Math.max(resolvedTotalCount, 0) / localRowsPerPage));
+
+    useEffect(() => {
+        const maxPage = Math.max(0, totalPages - 1);
+
+        if (localPage > maxPage) {
+            setLocalPage(maxPage);
+
+            if (setPage) {
+                setPage(maxPage);
+            }
+        }
+    }, [localPage, setPage, totalPages]);
+
+    const visibleRows = useMemo(() => {
         if (setPage) {
-            setPage(newPage);
+            return rows.slice(0, localRowsPerPage);
+        }
+
+        const startIndex = localPage * localRowsPerPage;
+        return rows.slice(startIndex, startIndex + localRowsPerPage);
+    }, [localPage, localRowsPerPage, rows, setPage]);
+
+    const handlePaginationChange = (nextPage: number) => {
+        const nextPageIndex = nextPage - 1;
+        setLocalPage(nextPageIndex);
+
+        if (setPage) {
+            setPage(nextPageIndex);
         }
     };
-    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        if (rowsPerPage === undefined)
-            setLocalRowsPerPage(parseInt(event.target.value, 10));
-        setLocalPage(0);
-        if (setRowsPerPage) {
-            setRowsPerPage(parseInt(event.target.value, 10));
+
+    const handleRowsPerPageChange = (value: string) => {
+        const nextRowsPerPage = parseInt(value, 10);
+
+        if (Number.isNaN(nextRowsPerPage)) {
+            return;
         }
+
+        setLocalRowsPerPage(nextRowsPerPage);
+        setLocalPage(0);
+
+        if (setRowsPerPage) {
+            setRowsPerPage(nextRowsPerPage);
+        }
+
         if (setPage) {
             setPage(0);
         }
     };
-    return (<TableContainer className="mb-4" component={Paper}>
-      <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
-        {columns && columns.length > 0 && (<TableHead>
-            <TableRow>
-              {columns.map((item, index) => (<TableCell key={index} style={{ fontWeight: "bold" }} align="center">
-                  {item}
-                </TableCell>))}
-            </TableRow>
-          </TableHead>)}
-        <TableBody>
-          {rows.map((row, index) => (<TableRow onClick={() => {
-                if (onClick) {
-                    onClick(row[0]);
-                }
-            }} onDoubleClick={() => {
-                if (onDoubleClick) {
-                    onDoubleClick(row[0]);
-                }
-            }} className="hover:bg-slate-100 cursor-pointer" key={index}>
-              {row.map((item, index) => (<TableCell style={{ textAlign: "center" }} key={index}>
-                  {item}
-                </TableCell>))}
-            </TableRow>))}
-          {rows.length <= 0 && (<TableRow>
-              <TableCell colSpan={columns ? columns.length : 6} style={{ textAlign: "center" }} className="hover:bg-slate-100 cursor-pointer">
-                No Data Available
-              </TableCell>
-            </TableRow>)}
-        </TableBody>
-        <TableFooter>
-          <TableRow>
-            <TablePagination rowsPerPageOptions={[5, 10, 15]} colSpan={columns && columns.length > 0 ? columns.length : 3} count={totalCount ? totalCount : rows.length > 0 ? rows.length : 1} rowsPerPage={localRowsPerPage} page={localPage} slotProps={{
-            select: {
-                inputProps: {
-                    "aria-label": "rows per page",
-                },
-                native: true,
-            },
-        }} onPageChange={handleChangePage} onRowsPerPageChange={handleChangeRowsPerPage} ActionsComponent={TablePaginationActions}/>
-          </TableRow>
-        </TableFooter>
-      </Table>
-    </TableContainer>);
+
+    const showingFrom = resolvedTotalCount === 0 ? 0 : localPage * localRowsPerPage + 1;
+    const showingTo = resolvedTotalCount === 0 ? 0 : Math.min(resolvedTotalCount, (localPage + 1) * localRowsPerPage);
+
+    return (
+        <TableContainer className="mb-4 overflow-hidden rounded-xl border border-slate-200 shadow-sm" component={Paper}>
+            <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
+                {columns && columns.length > 0 ? (
+                    <TableHead>
+                        <TableRow>
+                            {columns.map((item, index) => (
+                                <TableCell key={index} style={{ fontWeight: "bold", textAlign: "center" }}>
+                                    {item}
+                                </TableCell>
+                            ))}
+                        </TableRow>
+                    </TableHead>
+                ) : null}
+
+                <TableBody>
+                    {visibleRows.map((row, index) => (
+                        <TableRow
+                            onClick={() => {
+                                if (onClick) {
+                                    onClick(row[0]);
+                                }
+                            }}
+                            onDoubleClick={() => {
+                                if (onDoubleClick) {
+                                    onDoubleClick(row[0]);
+                                }
+                            }}
+                            className="cursor-pointer hover:bg-slate-100"
+                            key={index}
+                        >
+                            {row.map((item, cellIndex) => (
+                                <TableCell style={{ textAlign: "center" }} key={cellIndex}>
+                                    {item}
+                                </TableCell>
+                            ))}
+                        </TableRow>
+                    ))}
+
+                    {visibleRows.length <= 0 ? (
+                        <TableRow>
+                            <TableCell
+                                colSpan={columns ? columns.length : 6}
+                                style={{ textAlign: "center" }}
+                                className="cursor-pointer hover:bg-slate-100"
+                            >
+                                No Data Available
+                            </TableCell>
+                        </TableRow>
+                    ) : null}
+                </TableBody>
+            </Table>
+
+            <div className="flex flex-col gap-4 border-t border-slate-200 bg-white px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-3">
+                    <span className="text-sm font-medium text-slate-600">Rows per page</span>
+                    <Select
+                        aria-label="Rows per page"
+                        className="w-[140px]"
+                        selectedKeys={[String(localRowsPerPage)]}
+                        size="sm"
+                        variant="bordered"
+                        disallowEmptySelection
+                        onChange={(event) => {
+                            handleRowsPerPageChange(event.target.value);
+                        }}
+                    >
+                        {rowsPerPageOptions.map((value) => (
+                            <SelectItem key={value} value={value}>
+                                {value}
+                            </SelectItem>
+                        ))}
+                    </Select>
+                </div>
+
+                <div className="flex flex-col gap-3 sm:items-end">
+                    <p className="text-sm text-slate-500">
+                        Showing {showingFrom}-{showingTo} of {resolvedTotalCount}
+                    </p>
+                    <CustomPagination
+                        currentPage={localPage + 1}
+                        total={totalPages}
+                        onChange={handlePaginationChange}
+                    />
+                </div>
+            </div>
+        </TableContainer>
+    );
 }

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Switch } from "@nextui-org/react";
+import { Select, SelectItem, Switch } from "@nextui-org/react";
 import CustomPagination from "@/components/ui/pagination";
 import Image from "next/image";
 import { capitaliseWord, formatMoney } from "@/functions/formatter";
@@ -126,12 +126,15 @@ export default function SearchList({ searchInput, selectedFilters }: SearchListP
     const [productArr, setProductArr] = useState<Product[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [totalResults, setTotalResults] = useState(0);
     const [noOfItems, setNoOfItems] = useState(10);
     const [displayText, setDisplayText] = useState(false);
     const [isInStock, setIsInStock] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
     const itemsPerPage = [10, 20, 30, 40, 50];
     const router = useRouter();
-    const hasActiveSearch = searchInput.trim() !== "" || Object.values(selectedFilters).some((value) => value !== "");
+    const hasActiveSearch =
+        searchInput.trim() !== "" || Object.values(selectedFilters).some((value) => value !== "");
 
     const colourRender = (hex: string[], colour: string[]) => {
         const items: JSX.Element[] = [];
@@ -158,24 +161,30 @@ export default function SearchList({ searchInput, selectedFilters }: SearchListP
             setProductArr([]);
             setCurrentPage(1);
             setTotalPages(1);
+            setTotalResults(0);
+            setIsLoading(false);
             return;
         }
 
         const firstPage = 1;
         setCurrentPage(firstPage);
+        setIsLoading(true);
+
         Promise.all([
             searchAndFilterProduct(searchInput, selectedFilters, noOfItems, firstPage, isInStock),
             getProductCount(searchInput, selectedFilters, isInStock),
         ])
             .then(([productDataArray, count]: [Product[], number]) => {
                 setDisplayText(true);
-                setTotalPages(Math.max(1, Math.ceil(count / noOfItems)));
-                if (productDataArray) {
-                    setProductArr(productDataArray);
-                }
+                setTotalResults(count || 0);
+                setTotalPages(Math.max(1, Math.ceil((count || 0) / noOfItems)));
+                setProductArr(productDataArray || []);
             })
             .catch((error) => {
                 console.log(error);
+            })
+            .finally(() => {
+                setIsLoading(false);
             });
     }, [hasActiveSearch, isInStock, noOfItems, searchInput, selectedFilters]);
 
@@ -184,20 +193,31 @@ export default function SearchList({ searchInput, selectedFilters }: SearchListP
             return;
         }
 
+        setIsLoading(true);
+
         searchAndFilterProduct(searchInput, selectedFilters, noOfItems, currentPage, isInStock)
             .then((productDataArray: Product[]) => {
                 setDisplayText(true);
-                if (productDataArray) {
-                    setProductArr(productDataArray);
-                }
+                setProductArr(productDataArray || []);
             })
             .catch((error) => {
                 console.log(error);
+            })
+            .finally(() => {
+                setIsLoading(false);
             });
     }, [currentPage, hasActiveSearch, isInStock, noOfItems, searchInput, selectedFilters]);
 
     if (!displayText) {
         return <div className="mt-10" />;
+    }
+
+    if (isLoading) {
+        return (
+            <div className="mt-10 flex min-h-[320px] items-center justify-center rounded-[24px] border border-slate-200 bg-slate-50">
+                <p className="text-sm font-medium text-slate-600">Searching the catalog...</p>
+            </div>
+        );
     }
 
     if (productArr.length === 0) {
@@ -221,6 +241,8 @@ export default function SearchList({ searchInput, selectedFilters }: SearchListP
                         Search results{searchInput === "" ? "" : ` for "${searchInput}"`}
                     </p>
                     <p className="mt-2 text-sm text-slate-500">
+                        {totalResults} item{totalResults === 1 ? "" : "s"} found
+                        {" • "}
                         Page {currentPage} of {totalPages}
                     </p>
                 </div>
@@ -294,20 +316,23 @@ export default function SearchList({ searchInput, selectedFilters }: SearchListP
             <div className="mt-8 flex flex-col gap-4 border-t border-slate-200 pt-5 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex flex-col gap-2">
                     <div className="text-sm text-slate-500">Items per page</div>
-                    <select
-                        title="Items Limit"
-                        className="w-[120px] rounded-full border border-slate-300 bg-white px-4 py-2 text-sm outline-none"
-                        value={noOfItems}
-                        onChange={(e) => {
-                            setNoOfItems(parseInt(e.target.value));
+                    <Select
+                        aria-label="Search results per page"
+                        className="w-[140px]"
+                        selectedKeys={[String(noOfItems)]}
+                        size="sm"
+                        variant="bordered"
+                        disallowEmptySelection
+                        onChange={(event) => {
+                            setNoOfItems(parseInt(event.target.value, 10));
                         }}
                     >
                         {itemsPerPage.map((value) => (
-                            <option key={value} value={value}>
-                                {value}
-                            </option>
+                            <SelectItem key={String(value)} value={String(value)}>
+                                {value} per page
+                            </SelectItem>
                         ))}
-                    </select>
+                    </Select>
                 </div>
                 <CustomPagination
                     total={totalPages}

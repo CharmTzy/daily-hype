@@ -7,13 +7,37 @@ import TwitterIcon from "@/icons/twitter-icon";
 import YoutubeIcon from "@/icons/youtube-icon";
 import LinkedInIcon from "@/icons/linkedin-icon";
 import BrandLogo from "@/components/brand/brand-logo";
+
+const shopLinks = [
+    { label: "Explore All", url: URL.Explore },
+    { label: "New Arrivals", url: "/#new-arrivals" },
+    { label: "Most Popular", url: "/#most-popular" },
+    { label: "Shop by Collection", url: "/#shop-by-collection" },
+];
+
+const supportLinks = [
+    { label: "Payment Methods", url: "/help#payment" },
+    { label: "How to Buy", url: "/help#buy" },
+    { label: "Return and Refund", url: "/help#returns" },
+    { label: "Contact Us", url: URL.Contact },
+];
+
+const policyLinks = [
+    { label: "Privacy Policy", url: URL.PrivacyPolicy },
+    { label: "Terms and Conditions", url: URL.TermsNConditions },
+    { label: "Sitemap", url: URL.SiteMap },
+];
+
 export default function Footer() {
+    const currentYear = new Date().getFullYear();
+
     return (<footer className="w-full border-t border-slate-200 bg-slate-50">
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
         <div className="grid gap-10 lg:grid-cols-[1.2fr_0.7fr_0.7fr_1fr]">
           <div className="max-w-sm">
             <BrandLogo
               size="md"
+              tagline="Curated fashion, shopper-first flow"
             />
             <p className="mt-4 text-sm leading-6 text-slate-500">
               DailyHype brings together fresh drops, easy browsing, and a cleaner shopping experience across mobile, tablet, and desktop.
@@ -23,19 +47,18 @@ export default function Footer() {
           <div className="flex flex-col">
             <label className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Shop</label>
             <div className="mt-4 flex flex-col gap-1">
-              <FooterLink label="About Us" url={URL.About}/>
-              <FooterLink label="Payment Methods" url={URL.About}/>
-              <FooterLink label="How to Buy" url={URL.About}/>
-              <FooterLink label="Return and Refund" url={URL.About}/>
+              {shopLinks.map((link) => (
+                <FooterLink key={link.label} label={link.label} url={link.url}/>
+              ))}
             </div>
           </div>
 
           <div className="flex flex-col">
             <label className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Support</label>
             <div className="mt-4 flex flex-col gap-1">
-              <FooterLink label="Feedback" url={URL.Feedback}/>
-              <FooterLink label="Help and Support" url={URL.Help}/>
-              <FooterLink label="Contact Us" url={URL.Contact}/>
+              {supportLinks.map((link) => (
+                <FooterLink key={link.label} label={link.label} url={link.url}/>
+              ))}
             </div>
           </div>
 
@@ -65,17 +88,13 @@ export default function Footer() {
         </div>
 
         <div className="mt-10 flex flex-col gap-4 border-t border-slate-200 pt-6 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between">
-          <label>&copy; 2023 DailyHype. All rights reserved</label>
+          <label>&copy; {currentYear} DailyHype. All rights reserved</label>
           <div className="flex flex-wrap gap-x-6 gap-y-2">
-            <Link className="cursor-pointer transition hover:text-slate-900" href={URL.PrivacyPolicy}>
-              Privacy Policy
-            </Link>
-            <Link className="cursor-pointer transition hover:text-slate-900" href={URL.TermsNConditions}>
-              Terms and Conditions
-            </Link>
-            <Link className="cursor-pointer transition hover:text-slate-900" href={URL.SiteMap}>
-              Sitemap
-            </Link>
+            {policyLinks.map((link) => (
+              <Link key={link.label} className="cursor-pointer transition hover:text-slate-900" href={link.url}>
+                {link.label}
+              </Link>
+            ))}
           </div>
           <label>Country & Region: Singapore</label>
         </div>

@@ -121,9 +121,6 @@ export default function Cart() {
                         <div>
                             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Shopping Cart</p>
                             <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">Your DailyHype bag</h1>
-                            <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-500">
-                                Review your saved pieces, update the variations you want, and move only the selected items to checkout.
-                            </p>
                         </div>
                         <div className="flex flex-col gap-3 sm:flex-row">
                             <div className="rounded-[22px] border border-[#f0ddd4] bg-[#fff8f3] px-4 py-3 text-sm text-slate-600">

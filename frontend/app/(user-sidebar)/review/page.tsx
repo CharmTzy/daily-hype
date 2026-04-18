@@ -1,239 +1,169 @@
 "use client";
-import { Button, Checkbox, Input, Link, Modal, ModalBody, ModalContent, ModalHeader, useDisclosure, } from "@nextui-org/react";
+
+import Link from "next/link";
+import { Button, Spinner } from "@nextui-org/react";
 import { useEffect, useState } from "react";
-interface Review {
-    reviewid: number;
-    name: string;
-    productname: string;
-    rating: number;
-    reviewdescription: string;
-    createdat: string;
-    updatedat: string;
+import { useRouter } from "next/navigation";
+import { useAppState } from "@/app/app-provider";
+import ReviewStars from "@/components/review/review-stars";
+import { CurrentActivePage, SuccessMessage, URL } from "@/enums/global-enums";
+import { ICustomerReview } from "@/enums/review-interfaces";
+import { capitaliseWord } from "@/functions/formatter";
+import { deleteCustomerReview, getCustomerReviews } from "@/functions/review-functions";
+
+function formatReviewDate(value: string) {
+    return new Intl.DateTimeFormat("en-SG", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+    }).format(new Date(value));
 }
-export default function PostedReviews() {
-    const [reviews, setReviews] = useState<Review[]>([]);
-    const [rating, setRating] = useState("");
-    const [reviewdescription, setReviewDescription] = useState("");
-    const [selectedReview, setSelectedReview] = useState<Review | null>(null);
-    const [isAddMode, setAddMode] = useState(true);
-    const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+
+export default function CustomerReviewsPage() {
+    const router = useRouter();
+    const { setCurrentActivePage } = useAppState();
+    const [reviews, setReviews] = useState<ICustomerReview[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [deletingReviewID, setDeletingReviewID] = useState<number | null>(null);
+
+    const loadReviews = async () => {
+        setIsLoading(true);
+        const result = await getCustomerReviews();
+
+        if (result.error) {
+            alert(result.error);
+            setReviews([]);
+        } else {
+            setReviews(result.data || []);
+        }
+
+        setIsLoading(false);
+    };
+
     useEffect(() => {
-        fetchReviews();
+        setCurrentActivePage(CurrentActivePage.MyReviews);
+    }, [setCurrentActivePage]);
+
+    useEffect(() => {
+        loadReviews();
     }, []);
-    const fetchReviews = () => {
-        fetch(`${process.env.BACKEND_URL}/api/getAllReviews`, {
-            method: "GET",
-            credentials: "include",
-        })
-            .then((response) => {
-            if (!response.ok) {
-                alert("Review Error");
-            }
-            return response.json();
-        })
-            .then((data) => {
-            console.log(data.reviews);
-            setReviews(data.reviews);
-        })
-            .catch((error) => {
-            console.error("Error fetching reviews", error);
-        });
-    };
-    const deleteReview = (reviewid: number) => {
-        fetch(`${process.env.BACKEND_URL}/api/deleteReview/${reviewid}`, {
-            method: "DELETE",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ reviewid }),
-        })
-            .then((response) => {
-            if (!response.ok) {
-                throw new Error("Failed to delete review");
-            }
-            return response.json();
-        })
-            .then((data) => {
-            console.log(data);
-            window.location.reload();
-        })
-            .catch((error) => {
-            console.error(error);
-        });
-    };
-    const openEditModal = (reviewid: number) => {
-        setAddMode(false);
-        onOpen();
-    };
-    const getReview = (reviewid: number) => {
-        console.log("reviewid: ", reviewid);
-        fetch(`${process.env.BACKEND_URL}/api/getReview/${reviewid}`, {
-            method: "GET",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        })
-            .then((response) => {
-            if (!response.ok) {
-                throw new Error("Failed to fetch review details");
-            }
-            return response.json();
-        })
-            .then((data) => {
-            console.log(data);
-            setRating(data.review);
-            setReviewDescription(data.review.reviewdescription);
-        })
-            .catch((error) => {
-            console.error("Error fetching review details:", error);
-        });
-    };
-    const editReview = (reviewid: number) => {
-        if (!selectedReview) {
-            console.error("No review selected for editing");
+
+    const handleDelete = async (reviewID: number) => {
+        const confirmed = window.confirm("Delete this review?");
+        if (!confirmed) {
             return;
         }
-        fetch(`${process.env.BACKEND_URL}/api/updateReview/${reviewid}`, {
-            method: "PUT",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                reviewid: selectedReview.reviewid,
-                rating,
-                reviewdescription,
-            }),
-        })
-            .then((response) => {
-            return response.json();
-        })
-            .then((data) => {
-            if (data.error == "Review already exists") {
-                alert("Review already exists. Edit with new one!");
-            }
-            console.log("Review edited successfully:", data);
-            onClose();
-            fetchReviews();
-            setSelectedReview(null);
-        })
-            .catch((error) => {
-            console.error("Error editing review:", error);
-        });
-    };
-    const addOrEditReview = () => {
-        console.log("Inside addOrEditReview");
-        if (isAddMode) {
-        }
-        else {
-            editReview(165);
-        }
-    };
-    const calculateElapsedTime = (createdAt: string): string => {
-        const createdTime = new Date(createdAt);
-        const now = new Date();
-        const elapsedTime = now.getTime() - createdTime.getTime();
-        const seconds = Math.floor(elapsedTime / 1000);
-        const minutes = Math.floor(seconds / 60);
-        const hours = Math.floor(minutes / 60);
-        const days = Math.floor(hours / 24);
-        if (days > 0) {
-            return `${days} days ago`;
-        }
-        else if (hours > 0) {
-            return `${hours} hours ago`;
-        }
-        else if (minutes > 0) {
-            return `${minutes} minutes ago`;
-        }
-        else {
-            return `${seconds} seconds ago`;
-        }
-    };
-    return (<div className="w-full max-w-2xl mx-auto px-4 py-6">
-      <div className="divide-y divide-gray-200">
-        {reviews.map((review, index) => (<div key={index} className="flex gap-4 p-4">
-            <div className="grid gap-4 flex-1">
-              <div className="flex gap-4 items-start">
-                <div className="grid gap-0.5 text-sm">
-                  <h3 className="font-semibold">{review.productname}</h3>
-                  <time className="text-xs text-gray-500">
-                    {calculateElapsedTime(review.createdat)}
-                  </time>
-                </div>
 
-                <div className="flex items-center gap-0.5 ml-auto">
-                  
-                  {Array.from({ length: review.rating }, (_, i) => (<StarIcon key={i} className="w-5 h-5 fill-primary"/>))}
-                  {Array.from({ length: 5 - review.rating }, (_, i) => (<StarIcon key={i + review.rating} className="w-5 h-5 fill-muted stroke-muted-foreground"/>))}
-                </div>
-              </div>
-              <div className="text-sm leading-loose text-gray-500">
-                <p>{review.reviewdescription}</p>
-              </div>
-              <div className="flex justify-end gap-2 mt-2">
-                <Button className="text-primary border-primary hover:bg-primary hover:text-white" onClick={() => {
-                openEditModal(review.reviewid);
-                setAddMode(false);
-                getReview(review.reviewid);
-            }}>
-                  Edit
-                </Button>
-                <Button className="text-red-500 border-red-500 hover:bg-red-500 hover:text-white" onClick={() => deleteReview(review.reviewid)}>
-                  Delete
-                </Button>
-              </div>
+        setDeletingReviewID(reviewID);
+        const result = await deleteCustomerReview(reviewID);
+        setDeletingReviewID(null);
+
+        if (result.error) {
+            alert(result.error);
+            return;
+        }
+
+        if (result.message === SuccessMessage.DELETE_SUCCESS) {
+            await loadReviews();
+        }
+    };
+
+    if (isLoading) {
+        return (
+            <div className="flex min-h-[60vh] items-center justify-center px-4">
+                <Spinner size="lg" />
             </div>
-          </div>))}
-      </div>
-      {isOpen && (<>
-          <Modal size="4xl" isOpen={isOpen} onOpenChange={onOpenChange} backdrop="blur" scrollBehavior="inside">
-            <ModalContent>
-              {(onClose) => (<>
-                  <ModalHeader>Edit Review</ModalHeader>
-                  <ModalBody>
-                    <form className="space-y-4 my-8">
-                      
-                      <div className="flex flex-col">
-                        <label className="text-gray-600">
-                          Rating*
-                        </label>
-                        <select className="w-full p-2 border border-gray-300 rounded-none" value={rating} onChange={(e) => setRating(e.target.value)}>
-                          {[1, 2, 3, 4, 5].map((value) => (<option key={value} value={value}>
-                              {value}
-                            </option>))}
-                        </select>
-                      </div>
+        );
+    }
 
-                      
-                      <div className="flex">
-                        <div className="flex flex-col w-full">
-                          <label className="text-gray-600">
-                            Description*
-                          </label>
-                          <textarea className="w-full p-2 border border-gray-300 rounded-none" value={reviewdescription} onChange={(e) => setReviewDescription(e.target.value)} rows={4}/>
-                        </div>
-                      </div>
+    return (
+        <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
+            <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_16px_36px_rgba(15,23,42,0.04)] sm:p-8">
+                <div className="flex flex-col gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <p className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-500">
+                            My Reviews
+                        </p>
+                        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-900">
+                            Reviews you have already posted.
+                        </h1>
+                        <p className="mt-2 text-sm text-slate-500">
+                            You can edit reviews for received orders and remove ones you no longer want to keep.
+                        </p>
+                    </div>
 
-                      <div className="flex items-center" style={{ marginTop: "3xrem" }}>
-                        <Button className="w-52 h-10 bg-black text-white rounded-none text-lg" onClick={addOrEditReview}>
-                          {isAddMode ? "Save" : "Confirm"}
-                        </Button>
-                      </div>
-                    </form>
-                  </ModalBody>
-                </>)}
-            </ModalContent>
-          </Modal>
-        </>)}
-    </div>);
+                    <Link
+                        href={URL.ReceivedOrder}
+                        className="inline-flex h-11 items-center justify-center rounded-full border border-slate-300 px-5 text-sm font-semibold text-slate-700"
+                    >
+                        Back to Orders
+                    </Link>
+                </div>
+
+                {reviews.length === 0 ? (
+                    <div className="mt-6 rounded-[1.5rem] border border-dashed border-slate-200 bg-slate-50 px-6 py-8 text-center">
+                        <p className="text-lg font-medium text-slate-900">No reviews posted yet</p>
+                        <p className="mt-2 text-sm text-slate-500">
+                            Once you receive an order, the review action will appear on that item.
+                        </p>
+                    </div>
+                ) : (
+                    <div className="mt-6 space-y-5">
+                        {reviews.map((review) => (
+                            <article
+                                key={review.reviewid}
+                                className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5"
+                            >
+                                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                                    <div>
+                                        <Link
+                                            href={`${URL.ProductDetail}${review.productid}`}
+                                            className="text-xl font-semibold text-slate-900 underline-offset-4 hover:underline"
+                                        >
+                                            {review.productname}
+                                        </Link>
+                                        <p className="mt-2 text-sm text-slate-500">
+                                            Order #{review.orderid} / {capitaliseWord(review.colourname)} / {review.sizename}
+                                        </p>
+                                        <div className="mt-3 flex items-center gap-3">
+                                            <ReviewStars value={review.rating} />
+                                            <span className="text-sm text-slate-500">
+                                                {formatReviewDate(review.updatedat || review.createdat)}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex flex-wrap gap-3">
+                                        <Button
+                                            className="h-11 rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-700"
+                                            onClick={() =>
+                                                router.push(`${URL.WriteReview}/${review.orderid}/${review.productdetailid}`)
+                                            }
+                                        >
+                                            Edit Review
+                                        </Button>
+                                        <Button
+                                            className="h-11 rounded-full border border-rose-300 bg-white px-5 text-sm font-semibold text-rose-700"
+                                            onClick={() => handleDelete(review.reviewid)}
+                                            isDisabled={deletingReviewID === review.reviewid}
+                                        >
+                                            {deletingReviewID === review.reviewid ? (
+                                                <Spinner size="sm" color="default" />
+                                            ) : (
+                                                "Delete Review"
+                                            )}
+                                        </Button>
+                                    </div>
+                                </div>
+
+                                <p className="mt-4 text-sm leading-7 text-slate-600">
+                                    {review.reviewdescription}
+                                </p>
+                            </article>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
 }
-function StarIcon(props: React.SVGProps<SVGSVGElement>) {
-    return (<svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-         
-    </svg>);
-}
-

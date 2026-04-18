@@ -1,6 +1,15 @@
 const { query } = require('../database');
 const { DUPLICATE_ENTRY_ERROR, EMPTY_RESULT_ERROR, SQL_ERROR_CODE, TABLE_ALREADY_EXISTS_ERROR } = require('../errors');
 const { use } = require('../routes/delivery');
+
+function normaliseAdminFilterValue(value) {
+    if (value == null || value === '' || value === 'Default') {
+        return null;
+    }
+
+    return value;
+}
+
 module.exports.retrieveFilteredDeliveriesWithMessageReadAdmin = function retrieveFilteredDeliveriesWithMessageReadAdmin(userId, startDate, endDate, startDateOrder, endDateOrder, statusDetail, limit, offset, chatunread, userName, productName, region, categoryName, address, shipper) {
     var filterunread = ``;
     if (chatunread == "UnreadChats") {
@@ -10,24 +19,12 @@ module.exports.retrieveFilteredDeliveriesWithMessageReadAdmin = function retriev
         offset = 0;
         limit = 3;
     }
-    if (categoryName == "Default") {
-        categoryName = null;
-    }
-    if (address == "Default") {
-        address = null;
-    }
-    if (region == "Default") {
-        region = null;
-    }
-    if (userName == "Default") {
-        userName = null;
-    }
-    if (productName == "Default") {
-        productName = null;
-    }
-    if (shipper == "Default") {
-        shipper = null;
-    }
+    categoryName = normaliseAdminFilterValue(categoryName);
+    address = normaliseAdminFilterValue(address);
+    region = normaliseAdminFilterValue(region);
+    userName = normaliseAdminFilterValue(userName);
+    productName = normaliseAdminFilterValue(productName);
+    shipper = normaliseAdminFilterValue(shipper);
     let sql = `
     SELECT 
         delivery.deliveryid,
@@ -76,6 +73,56 @@ module.exports.retrieveFilteredDeliveriesWithMessageReadAdmin = function retriev
         }
         const distinctDeliveryIds = rows.map(row => row.deliveryid);
         return distinctDeliveryIds;
+    });
+};
+module.exports.countFilteredDeliveriesWithMessageReadAdmin = function countFilteredDeliveriesWithMessageReadAdmin(userId, startDate, endDate, startDateOrder, endDateOrder, statusDetail, chatunread, userName, productName, region, categoryName, address, shipper) {
+    let filterunread = ``;
+
+    if (chatunread == "UnreadChats") {
+        filterunread = `AND (CASE WHEN NOT message.messagereadadmin THEN 1 END) > 0`;
+    }
+
+    categoryName = normaliseAdminFilterValue(categoryName);
+    address = normaliseAdminFilterValue(address);
+    region = normaliseAdminFilterValue(region);
+    userName = normaliseAdminFilterValue(userName);
+    productName = normaliseAdminFilterValue(productName);
+    shipper = normaliseAdminFilterValue(shipper);
+
+    const sql = `
+    SELECT COUNT(DISTINCT delivery.deliveryid) AS total
+    FROM
+        appuser
+        JOIN productorder ON appuser.userid = productorder.userid
+		JOIN productorderitem ON productorder.orderid = productorderitem.orderid
+        JOIN delivery ON delivery.deliveryid = productorderitem.deliveryid
+        JOIN chat ON delivery.deliveryid = chat.deliveryid
+        JOIN message ON message.roomid = chat.roomid
+        JOIN productdetail ON productorderitem.productdetailid = productdetail.productdetailid
+        JOIN product ON productdetail.productid = product.productid
+        JOIN productimage ON productimage.productid = product.productid
+        JOIN image ON productimage.imageid = image.imageid
+        JOIN deliveryshipper ON delivery.shipperid = deliveryshipper.shipperid
+        JOIN address ON address.userid = appuser.userid
+        JOIN category ON category.categoryid = product.categoryid
+    WHERE
+        delivery.deliverydate >= COALESCE($1, delivery.deliverydate)
+        AND delivery.deliverydate <= COALESCE($2, delivery.deliverydate)
+        AND delivery.deliverystatusdetail = COALESCE($3, delivery.deliverystatusdetail)
+        AND productorder.createdat >= COALESCE($4, productorder.createdat)
+        AND productorder.createdat <= COALESCE($5, productorder.createdat)
+        AND appuser.name = COALESCE($6, appuser.name)
+        AND address.region = COALESCE($7, address.region)
+        AND product.productname = COALESCE($8, product.productname)
+        AND productorder.deliveryaddress = COALESCE($9, productorder.deliveryaddress)
+        AND deliveryshipper.name = COALESCE($10, deliveryshipper.name)
+        AND category.categoryname = COALESCE($11, category.categoryname)
+        ${filterunread};
+    `;
+
+    return query(sql, [startDate, endDate, statusDetail, startDateOrder, endDateOrder, userName, region, productName, address, shipper, categoryName]).then(function (result) {
+        const total = result.rows[0] ? Number(result.rows[0].total) : 0;
+        return Number.isNaN(total) ? 0 : total;
     });
 };
 module.exports.retrieveDeliveryDetailsAdmin = function retrieveDeliveryDetails(deliveryIds, arrangeByOrder, arrangeByDelivery) {

@@ -124,7 +124,7 @@ export default function Page({ params }: ProductFormProps) {
         <div className="flex gap-5 items-center">
           <div className="flex w-[400px]">
             {types && selectedType &&
-            <Select isRequired label="Type" classNames={{ base: "bg-custom-color1 rounded-lg", trigger: 'bg-custom-color5' }} selectedKeys={[selectedType + ""]} value={selectedType} onChange={(e) => {
+            <Select isRequired label="Type" classNames={{ base: "bg-custom-color1 rounded-lg", trigger: 'bg-custom-color5' }} selectedKeys={selectedType ? [selectedType] : []} onChange={(e) => {
                     setSelectedType(e.target.value);
                 }}>
                 {types.map((types) => (<SelectItem key={types.typeid} value={types.typeid}>
@@ -136,7 +136,7 @@ export default function Page({ params }: ProductFormProps) {
 
         <div className="flex gap-5 items-center">
           <div className="flex w-[400px]">
-            <Select isRequired label="Category" classNames={{ base: "bg-custom-color1 rounded-lg", trigger: 'bg-custom-color5' }} selectedKeys={[selectedCategory + ""]} value={selectedCategory} onChange={(e) => {
+            <Select isRequired label="Category" classNames={{ base: "bg-custom-color1 rounded-lg", trigger: 'bg-custom-color5' }} selectedKeys={selectedCategory ? [selectedCategory] : []} onChange={(e) => {
             setSelectedCategory(e.target.value);
         }}>
               {categories.map((category) => (<SelectItem key={category.categoryid} value={category.categoryid}>
@@ -199,7 +199,7 @@ export default function Page({ params }: ProductFormProps) {
 
         <div className="flex justify-around font-medium	text-lg	pb-5 items-start	w-full">
           <div className="w-[150px] ">
-            <Select isRequired label="Colour" value={selectedColour} onChange={(e) => {
+            <Select isRequired label="Colour" selectedKeys={selectedColour ? [selectedColour] : []} onChange={(e) => {
             setSelectedColour(e.target.value);
         }}>
               {colours.map((colour) => (<SelectItem style={{ backgroundColor: `#${colour.hex}`, margin: '3px' }} key={colour.colourid} value={colour.colourid}>
@@ -208,7 +208,7 @@ export default function Page({ params }: ProductFormProps) {
             </Select>
           </div>
           <div className="w-[150px] ">
-            <Select isRequired label="Size" value={selectedType} onChange={(e) => {
+            <Select isRequired label="Size" selectedKeys={selectedSize ? [selectedSize] : []} onChange={(e) => {
             setSelectedSize(e.target.value);
         }}>
               {sizes.map((size) => (<SelectItem key={size.sizeid} value={size.sizeid}>

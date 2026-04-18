@@ -1,9 +1,11 @@
 "use client";
-import { useEffect, useState } from "react";
+
+import { useEffect, useMemo, useState } from "react";
 import { capitaliseWord } from "@/functions/formatter";
 
 interface SearchFilterProps {
     onFilterChange: (selectedOptions: SelectedOptions) => void;
+    value: SelectedOptions;
 }
 
 interface Options {
@@ -51,9 +53,9 @@ const defaultSelectedOptions: SelectedOptions = {
     size: "",
 };
 
-export default function SearchFilter({ onFilterChange }: SearchFilterProps) {
+export default function SearchFilter({ onFilterChange, value }: SearchFilterProps) {
     const [openSection, setOpenSection] = useState<keyof SelectedOptions | "">("");
-    const [selectedOptions, setSelectedOptions] = useState<SelectedOptions>(defaultSelectedOptions);
+    const [selectedOptions, setSelectedOptions] = useState<SelectedOptions>(value);
     const [options, setOptions] = useState<Options>({
         sort: [
             { sortid: "unitprice ASC", sortname: "price-low-to-high" },
@@ -75,6 +77,10 @@ export default function SearchFilter({ onFilterChange }: SearchFilterProps) {
     });
 
     useEffect(() => {
+        setSelectedOptions(value);
+    }, [value]);
+
+    useEffect(() => {
         onFilterChange(selectedOptions);
     }, [onFilterChange, selectedOptions]);
 
@@ -94,6 +100,11 @@ export default function SearchFilter({ onFilterChange }: SearchFilterProps) {
                 console.error(error);
             });
     }, []);
+
+    const hasActiveSelection = useMemo(
+        () => Object.values(selectedOptions).some((option) => option !== ""),
+        [selectedOptions],
+    );
 
     const getOptionName = (category: keyof SelectedOptions, option: string): string => {
         switch (category) {
@@ -144,7 +155,7 @@ export default function SearchFilter({ onFilterChange }: SearchFilterProps) {
                 ))}
             </div>
 
-            <div className="mt-4 flex flex-wrap gap-2">
+            <div className="mt-4 flex flex-wrap items-center gap-2">
                 {(Object.entries(selectedOptions) as [keyof SelectedOptions, string][]).map(([category, option]) =>
                     option ? (
                         <button
@@ -158,11 +169,23 @@ export default function SearchFilter({ onFilterChange }: SearchFilterProps) {
                             }}
                             className="inline-flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.16em] text-slate-700"
                         >
-                            <span>{category}: {capitaliseWord(getOptionName(category, option))}</span>
-                            <span aria-hidden="true">✕</span>
+                            <span>
+                                {category}: {capitaliseWord(getOptionName(category, option))}
+                            </span>
+                            <span aria-hidden="true">x</span>
                         </button>
                     ) : null,
                 )}
+
+                {hasActiveSelection ? (
+                    <button
+                        type="button"
+                        onClick={() => setSelectedOptions(defaultSelectedOptions)}
+                        className="text-sm font-semibold text-slate-600 transition hover:text-slate-950"
+                    >
+                        Clear all
+                    </button>
+                ) : null}
             </div>
 
             {openSection ? (

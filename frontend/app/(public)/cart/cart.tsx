@@ -115,102 +115,98 @@ export default function Cart() {
 
     return (
         <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-            <div className="rounded-[34px] border border-[#efe6dc] bg-[#faf8f5] px-4 py-6 shadow-[0_20px_48px_rgba(15,23,42,0.04)] sm:px-6 lg:px-8">
-                <section className="rounded-[28px] border border-[#ece5dc] bg-white px-5 py-5 sm:px-6">
-                    <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
-                        <div>
-                            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Shopping Cart</p>
-                            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">Your DailyHype bag</h1>
+            {/* Header */}
+            <section className="rounded-2xl border border-slate-200 bg-white px-5 py-5 sm:px-6">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Shopping Cart</p>
+                        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">Your DailyHype bag</h1>
+                    </div>
+                    <div className="flex gap-3">
+                        <div className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-600">
+                            <span className="font-semibold text-slate-900">{cartDetail.length}</span> item{cartDetail.length === 1 ? "" : "s"}
                         </div>
-                        <div className="flex flex-col gap-3 sm:flex-row">
-                            <div className="rounded-[22px] border border-[#f0ddd4] bg-[#fff8f3] px-4 py-3 text-sm text-slate-600">
-                                <span className="font-semibold text-slate-900">{cartDetail.length}</span> item{cartDetail.length === 1 ? "" : "s"} in bag
-                            </div>
-                            <div className="rounded-[22px] border border-[#ffd9d2] bg-[#fff5f2] px-4 py-3 text-sm text-[#d45540]">
-                                <span className="font-semibold">{selectedItemCount}</span> selected for checkout
-                            </div>
+                        <div className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-600">
+                            <span className="font-semibold text-[#d45540]">{selectedItemCount}</span> selected
                         </div>
                     </div>
-                </section>
+                </div>
+            </section>
 
-                {!loading && cartDetail.length === 0 ? (
-                    <div className="mt-6 rounded-[28px] border border-dashed border-slate-300 bg-white px-6 py-12 text-center">
-                        <h2 className="text-2xl font-semibold text-slate-900">Your cart is empty</h2>
-                        <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-slate-500">
-                            Browse new arrivals and add a few favourites. We&apos;ll keep them here until you&apos;re ready to check out.
-                        </p>
-                        <Link
-                            href={URL.Explore}
-                            className="mt-6 inline-flex min-h-[48px] items-center justify-center rounded-full bg-slate-900 px-6 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-slate-800"
-                        >
-                            Explore Products
-                        </Link>
-                    </div>
-                ) : (
-                    <div className="mt-6 space-y-4">
-                        <SelectAllCheckBox
-                            toShow={!loading && cartDetail.length > 0}
-                            checkAll={checkAll}
-                            setCheckAll={setCheckAll}
-                            setCart={setCart}
-                            disabled={disableCheckBox.some((isDisabled) => isDisabled === true)}
-                            itemCount={cartDetail.length}
-                            selectedCount={selectedItemCount}
-                        />
+            {!loading && cartDetail.length === 0 ? (
+                <div className="mt-4 rounded-2xl border border-dashed border-slate-200 bg-white px-6 py-14 text-center">
+                    <h2 className="text-xl font-semibold text-slate-900">Your cart is empty</h2>
+                    <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">
+                        Browse new arrivals and add a few favourites.
+                    </p>
+                    <Link
+                        href={URL.Explore}
+                        className="mt-5 inline-flex h-11 items-center justify-center rounded-full bg-slate-900 px-6 text-sm font-semibold text-white transition hover:bg-slate-800"
+                    >
+                        Explore Products
+                    </Link>
+                </div>
+            ) : (
+                <div className="mt-4 space-y-4">
+                    <SelectAllCheckBox
+                        toShow={!loading && cartDetail.length > 0}
+                        checkAll={checkAll}
+                        setCheckAll={setCheckAll}
+                        setCart={setCart}
+                        disabled={disableCheckBox.some((isDisabled) => isDisabled === true)}
+                        itemCount={cartDetail.length}
+                        selectedCount={selectedItemCount}
+                    />
 
-                        <section className="overflow-hidden rounded-[28px] border border-[#ece5dc] bg-white shadow-[0_18px_40px_rgba(15,23,42,0.04)]">
-                            <div className="flex flex-col gap-3 border-b border-[#efe7de] bg-[#fffaf6] px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-                                <div>
-                                    <p className="text-sm font-semibold text-slate-900">DailyHype Store</p>
-                                    <p className="mt-1 text-sm text-slate-500">Marketplace-inspired cart layout with your selected fashion pieces grouped in one place.</p>
-                                </div>
-                                <div className="inline-flex items-center rounded-full bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#d45540] shadow-[0_8px_20px_rgba(251,96,80,0.08)]">
-                                    Ready for checkout
-                                </div>
-                            </div>
+                    <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                        <div className="flex flex-col gap-3 border-b border-slate-100 bg-slate-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                            <p className="text-sm font-semibold text-slate-900">DailyHype Store</p>
+                            <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-[#d45540]">
+                                Ready for checkout
+                            </span>
+                        </div>
 
-                            <div className="divide-y divide-[#f1e9e2]">
-                                {!loading &&
-                                    cartDetail.map((item: ICartDetail, index: number) => (
-                                        <CartItem
-                                            isAuthenticated={isAuthenticated}
-                                            data={item}
-                                            cart={cart[index]}
-                                            disabledCheckBox={disableCheckBox[index]}
-                                            setDisableCheckBox={setDisableCheckBox}
-                                            setCart={setCart}
-                                            setDeleteIndex={setDeleteIndex}
-                                            setReload={setReload}
-                                            index={index}
-                                            key={`${item.productid}-${cart[index]?.productdetailid || index}`}
-                                        />
-                                    ))}
-                            </div>
+                        <div className="divide-y divide-slate-100">
+                            {!loading &&
+                                cartDetail.map((item: ICartDetail, index: number) => (
+                                    <CartItem
+                                        isAuthenticated={isAuthenticated}
+                                        data={item}
+                                        cart={cart[index]}
+                                        disabledCheckBox={disableCheckBox[index]}
+                                        setDisableCheckBox={setDisableCheckBox}
+                                        setCart={setCart}
+                                        setDeleteIndex={setDeleteIndex}
+                                        setReload={setReload}
+                                        index={index}
+                                        key={`${item.productid}-${cart[index]?.productdetailid || index}`}
+                                    />
+                                ))}
+                        </div>
 
-                            <div className="flex flex-col gap-3 border-t border-[#efe7de] bg-[#fffaf6] px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-                                <p className="text-sm text-slate-600">
-                                    Shipping perks and final tax calculations appear at checkout. Orders above <span className="font-semibold text-slate-900">$50.00</span> unlock your best delivery value.
-                                </p>
-                                <Link
-                                    href={URL.Explore}
-                                    className="inline-flex min-h-[44px] items-center justify-center rounded-full border border-slate-300 bg-white px-5 text-sm font-semibold text-slate-900 transition hover:border-slate-400 hover:bg-slate-50"
-                                >
-                                    Continue Shopping
-                                </Link>
-                            </div>
-                        </section>
+                        <div className="flex flex-col gap-3 border-t border-slate-100 bg-slate-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                            <p className="text-sm text-slate-500">
+                                Shipping and taxes calculated at checkout.
+                            </p>
+                            <Link
+                                href={URL.Explore}
+                                className="inline-flex h-10 items-center justify-center rounded-full border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                            >
+                                Continue Shopping
+                            </Link>
+                        </div>
+                    </section>
 
-                        <CartSummary
-                            toShow={!loading && cartDetail.length > 0}
-                            disabled={!cart.some((item) => item.checked === true)}
-                            subTotal={subTotal}
-                            isAuthenticated={isAuthenticated}
-                            itemCount={cartDetail.length}
-                            selectedCount={selectedItemCount}
-                        />
-                    </div>
-                )}
-            </div>
+                    <CartSummary
+                        toShow={!loading && cartDetail.length > 0}
+                        disabled={!cart.some((item) => item.checked === true)}
+                        subTotal={subTotal}
+                        isAuthenticated={isAuthenticated}
+                        itemCount={cartDetail.length}
+                        selectedCount={selectedItemCount}
+                    />
+                </div>
+            )}
         </div>
     );
 }

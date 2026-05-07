@@ -138,7 +138,7 @@ export default function ReviewFormPage({ params }: ReviewFormProps) {
 
     return (
         <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
-            <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_16px_36px_rgba(15,23,42,0.04)] sm:p-8">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_16px_36px_rgba(15,23,42,0.04)] sm:p-8">
                 <div className="flex flex-col gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <p className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-500">
@@ -161,8 +161,8 @@ export default function ReviewFormPage({ params }: ReviewFormProps) {
                 </div>
 
                 {item ? (
-                    <div className="mt-6 flex flex-col gap-5 rounded-[1.5rem] border border-slate-200 bg-slate-50 p-5 sm:flex-row sm:items-center">
-                        <div className="relative h-28 w-24 overflow-hidden rounded-[1.25rem] bg-white">
+                    <div className="mt-6 flex flex-col gap-5 rounded-2xl border border-slate-200 bg-slate-50 p-5 sm:flex-row sm:items-center">
+                        <div className="relative h-28 w-24 overflow-hidden rounded-xl bg-white">
                             {item.image ? (
                                 <ResilientImage
                                     src={item.image}
@@ -187,7 +187,7 @@ export default function ReviewFormPage({ params }: ReviewFormProps) {
                 ) : null}
 
                 {errorMessage ? (
-                    <div className="mt-6 rounded-[1.25rem] border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
+                    <div className="mt-6 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
                         {errorMessage}
                     </div>
                 ) : null}
@@ -223,7 +223,7 @@ export default function ReviewFormPage({ params }: ReviewFormProps) {
                         onChange={(event) => setReviewDescription(event.target.value)}
                         rows={6}
                         maxLength={1000}
-                        className="mt-3 w-full rounded-[1.5rem] border border-slate-200 px-4 py-4 text-sm text-slate-700 outline-none transition focus:border-slate-400"
+                        className="mt-3 w-full rounded-2xl border border-slate-200 px-4 py-4 text-sm text-slate-700 outline-none transition focus:border-slate-400"
                         placeholder="Tell other shoppers about the fit, colour, quality, and overall experience."
                         disabled={!item || item.orderstatus !== "received" || isSaving}
                     />

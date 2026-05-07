@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Button, Checkbox, Select, SelectItem, Spinner, Switch } from "@nextui-org/react";
+import { Button, Checkbox, Spinner, Switch } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import { useAppState } from "@/app/app-provider";
 import { CurrentActivePage, URL } from "@/enums/global-enums";
@@ -210,22 +210,25 @@ export default function TypeCatalogPage({ typeId, title, activePage }: TypeCatal
                     />
                 </div>
 
-                <Select
-                    aria-label="Items per page"
-                    className="w-full"
-                    selectedKeys={[String(pageSize)]}
-                    onSelectionChange={(keys) => {
-                        const value = Number(Array.from(keys)[0] || 12);
-                        setCurrentPage(1);
-                        setPageSize(value);
-                    }}
-                >
-                    {[8, 12, 16, 20].map((value) => (
-                        <SelectItem key={String(value)} value={String(value)}>
-                            {value} per page
-                        </SelectItem>
-                    ))}
-                </Select>
+                <div>
+                    <p className="mb-2 text-xs font-semibold text-slate-500">Show per page</p>
+                    <div className="flex gap-1.5">
+                        {[8, 12, 16, 20].map((value) => (
+                            <button
+                                key={value}
+                                type="button"
+                                onClick={() => { setCurrentPage(1); setPageSize(value); }}
+                                className={`h-8 flex-1 rounded-lg text-xs font-semibold transition ${
+                                    pageSize === value
+                                        ? "bg-slate-900 text-white"
+                                        : "border border-slate-200 text-slate-600 hover:bg-slate-50"
+                                }`}
+                            >
+                                {value}
+                            </button>
+                        ))}
+                    </div>
+                </div>
             </div>
         </aside>
     );

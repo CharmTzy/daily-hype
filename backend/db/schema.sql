@@ -174,7 +174,7 @@ CREATE TABLE IF NOT EXISTS payment (
   paymentmethod TEXT NOT NULL,
   amount NUMERIC(10, 2) NOT NULL,
   paymentstatus TEXT NOT NULL,
-  transactionid TEXT,
+  transactionid TEXT UNIQUE,
   createdat TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -251,6 +251,20 @@ CREATE INDEX IF NOT EXISTS idx_orderitem_deliveryid ON productorderitem(delivery
 CREATE INDEX IF NOT EXISTS idx_delivery_shipperid ON delivery(shipperid);
 CREATE INDEX IF NOT EXISTS idx_chat_deliveryid ON chat(deliveryid);
 CREATE INDEX IF NOT EXISTS idx_message_roomid ON message(roomid);
+
+CREATE TABLE IF NOT EXISTS delivery_status_step (
+  step_order INTEGER PRIMARY KEY,
+  label TEXT NOT NULL,
+  full_name TEXT NOT NULL UNIQUE
+);
+
+INSERT INTO delivery_status_step (step_order, label, full_name) VALUES
+  (1, 'Confirmed', 'Delivery slot confirmed and awaiting pickup'),
+  (2, 'Packing', 'Warehouse team is packing the order'),
+  (3, 'On the way', 'Courier is arriving today'),
+  (4, 'Delivered', 'Delivered to customer'),
+  (5, 'Received', 'Delivered and received')
+ON CONFLICT (step_order) DO NOTHING;
 
 CREATE OR REPLACE VIEW product_details_view AS
 WITH image_agg AS (

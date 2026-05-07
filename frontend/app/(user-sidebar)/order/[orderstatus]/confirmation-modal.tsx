@@ -49,37 +49,32 @@ export default function OrderConfirmationModal({ orderData, isOpen, onClose, act
               <Button color={action === "Cancel" ? "danger" : "success"} disabled={processLoading} className="disabled:cursor-not-allowed" onClick={() => {
                 setProcessLoading(true);
                 if (action === "Cancel") {
-                    cancelOrder(parseInt(orderData.orderid, 10)).then((result) => {
-                        if (result.error) {
-                            alert("Error in cancelling order " + orderData.orderid + "!");
-                        }
-                        else {
-                            if (result.message === SuccessMessage.UPDATE_SUCCESS) {
+                    cancelOrder(parseInt(orderData.orderid, 10))
+                        .then((result) => {
+                            if (result.error) {
+                                alert("Error in cancelling order " + orderData.orderid + "!");
+                            } else if (result.message === SuccessMessage.UPDATE_SUCCESS) {
                                 alert("Order " + orderData.orderid + " has been cancelled successfully!");
                                 window.location.reload();
-                            }
-                            else {
+                            } else {
                                 alert("Error in cancelling order " + orderData.orderid + "!");
                             }
-                        }
-                        window.location.reload();
-                    });
+                        })
+                        .finally(() => setProcessLoading(false));
                 }
                 else {
-                    receiveOrder(parseInt(orderData.orderid, 10)).then((result) => {
-                        if (result.error) {
-                            alert("Error in updating order " + orderData.orderid + "!");
-                        }
-                        else {
-                            if (result.message === SuccessMessage.UPDATE_SUCCESS) {
+                    receiveOrder(parseInt(orderData.orderid, 10))
+                        .then((result) => {
+                            if (result.error) {
+                                alert("Error in updating order " + orderData.orderid + "!");
+                            } else if (result.message === SuccessMessage.UPDATE_SUCCESS) {
                                 alert("Order " + orderData.orderid + " has been updated to received successfully!");
                                 window.location.reload();
-                            }
-                            else {
+                            } else {
                                 alert("Error in updating order " + orderData.orderid + "!");
                             }
-                        }
-                    });
+                        })
+                        .finally(() => setProcessLoading(false));
                 }
             }}>
                 {processLoading ? <Spinner color="default" size="sm"/> : <>{action}</>}

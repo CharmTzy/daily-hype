@@ -67,19 +67,19 @@ export default function Page() {
         const pendingCheckout = sessionStorage.getItem("pendingCheckout");
 
         if (returnedPaymentIntent && redirectStatus === "succeeded" && pendingCheckout) {
+            sessionStorage.removeItem("pendingCheckout");
+
             let restoredCheckout: { selectedAddressId?: number; cartData?: ICheckOutCart[] } | null = null;
 
             try {
                 restoredCheckout = JSON.parse(pendingCheckout);
             } catch {
-                sessionStorage.removeItem("pendingCheckout");
                 setLoadError("We could not restore your payment confirmation. Please try checking out again.");
                 setIsLoading(false);
                 return;
             }
 
             if (!restoredCheckout?.selectedAddressId || !Array.isArray(restoredCheckout.cartData) || restoredCheckout.cartData.length === 0) {
-                sessionStorage.removeItem("pendingCheckout");
                 setLoadError("We could not restore your checkout items. Please try again.");
                 setHasInitialisedCheckout(true);
                 setIsLoading(false);
@@ -150,7 +150,7 @@ export default function Page() {
 
     return (
         <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-            <section className="rounded-[34px] border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-[#fff4f1] p-6 shadow-[0_16px_40px_rgba(15,23,42,0.05)] sm:p-8">
+            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                     <div>
                         <p className="text-xs font-semibold uppercase tracking-[0.28em] text-slate-400">Secure Checkout</p>
@@ -169,13 +169,13 @@ export default function Page() {
             </section>
 
             {loadError ? (
-                <div className="mt-8 rounded-[28px] border border-red-200 bg-red-50 p-6 text-sm text-red-700">
+                <div className="mt-8 rounded-2xl border border-red-200 bg-red-50 p-6 text-sm text-red-700">
                     {loadError}
                 </div>
             ) : (
                 <div className="mt-8 grid gap-8 xl:grid-cols-[minmax(0,1.1fr)_420px]">
                     <div className="space-y-6">
-                        <section className="rounded-[30px] border border-slate-200 bg-white p-6 shadow-[0_16px_36px_rgba(15,23,42,0.05)]">
+                        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                 <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Delivery</p>
@@ -193,7 +193,7 @@ export default function Page() {
                             </div>
 
                             {!isLoading && !selectedAddress ? (
-                                <div className="mt-5 rounded-[24px] border border-dashed border-slate-300 bg-slate-50 p-5">
+                                <div className="mt-5 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-5">
                                     <p className="text-sm font-semibold text-slate-900">No address selected yet</p>
                                     <p className="mt-2 text-sm leading-6 text-slate-500">
                                         Add a saved address before paying so we know exactly where this order should go.
@@ -212,7 +212,7 @@ export default function Page() {
                             )}
                         </section>
 
-                        <section className="rounded-[30px] border border-slate-200 bg-white p-6 shadow-[0_16px_36px_rgba(15,23,42,0.05)]">
+                        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                             <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                                 <div>
                                     <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Order Review</p>
@@ -227,13 +227,13 @@ export default function Page() {
                     </div>
 
                     <div className="xl:sticky xl:top-28 xl:self-start">
-                        <section className="rounded-[30px] border border-slate-200 bg-white p-6 shadow-[0_16px_36px_rgba(15,23,42,0.06)]">
+                        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Payment</p>
                             <h2 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">Pay securely</h2>
                             <p className="mt-3 text-sm leading-6 text-slate-500">
                                 Your payment is processed by Stripe. The order will only be created after the payment is successfully confirmed.
                             </p>
-                            <div className="mt-6 rounded-[22px] bg-[#faf7f3] p-4">
+                            <div className="mt-6 rounded-xl bg-slate-50 p-4">
                                 <div className="flex items-center justify-between">
                                     <span className="text-sm text-slate-600">Total due now</span>
                                     <span className="text-2xl font-semibold tracking-tight text-slate-900">${totals.total.toFixed(2)}</span>

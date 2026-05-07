@@ -16,7 +16,7 @@ export default function CartItemProduct({ productid, productname, qty, url }: IC
 
     return (
         <div className="flex min-w-0 items-start gap-4">
-            <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-[20px] border border-[#e8e1d8] bg-slate-100 sm:h-28 sm:w-28">
+            <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-2xl border border-slate-200 bg-slate-100 sm:h-28 sm:w-28">
                 <ResilientImage
                     src={url}
                     quality={70}

@@ -177,25 +177,47 @@ router.post("/createReview", validationFn.validateToken, refreshFn.refreshToken,
     }
 });
 
-router.get("/review/:productID", (req, res) => {
+router.get("/review/:productID/stats", (req, res) => {
     const productID = Number(req.params.productID);
-
     if (isNaN(productID)) {
         return res.status(400).json({ error: errorMessages.INVALID_ID });
     }
-
+    return reviewsModel
+        .getReviewStatsByProductId(productID)
+        .then((stats) => res.json({ stats }))
+        .catch((error) => {
+            console.error(error);
+            return res.status(500).json({ error: errorMessages.UNKNOWN_ERROR });
+        });
+});
+router.get("/review/:productID", (req, res) => {
+    const productID = Number(req.params.productID);
+    if (isNaN(productID)) {
+        return res.status(400).json({ error: errorMessages.INVALID_ID });
+    }
+    const rating = req.query.rating !== undefined ? Number(req.query.rating) : null;
+    const limit = Number(req.query.limit) || null;
+    const offset = Number(req.query.offset) || 0;
+    if (limit !== null) {
+        const ratingFilter = rating !== null && !isNaN(rating) ? rating : null;
+        return reviewsModel
+            .getReviewByProductIdFiltered(productID, ratingFilter, limit, offset)
+            .then((review) => res.json({ review }))
+            .catch((error) => {
+                console.error(error);
+                return res.status(500).json({ error: errorMessages.UNKNOWN_ERROR });
+            });
+    }
     return reviewsModel
         .getReviewByProductId(productID)
-        .then((review) => {
-        return res.json({ review });
-    })
+        .then((review) => res.json({ review }))
         .catch((error) => {
-        console.error(error);
-        if (error instanceof EMPTY_RESULT_ERROR) {
-            return res.status(404).json({ error: error.message });
-        }
-        return res.status(500).json({ error: errorMessages.UNKNOWN_ERROR });
-    });
+            console.error(error);
+            if (error instanceof EMPTY_RESULT_ERROR) {
+                return res.status(404).json({ error: error.message });
+            }
+            return res.status(500).json({ error: errorMessages.UNKNOWN_ERROR });
+        });
 });
 
 router.get("/reviews/product/:productID", (req, res) => {

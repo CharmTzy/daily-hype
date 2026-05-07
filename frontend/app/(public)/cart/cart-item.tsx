@@ -175,7 +175,7 @@ export default function CartItem({
                     </div>
                 </div>
 
-                <div className="flex items-center justify-between rounded-[18px] bg-[#faf7f3] px-4 py-3 lg:block lg:rounded-none lg:bg-transparent lg:px-0 lg:py-0">
+                <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 lg:block lg:rounded-none lg:bg-transparent lg:px-0 lg:py-0">
                     <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400 lg:hidden">Unit Price</span>
                     <div className="text-right lg:text-left">
                         <p className="text-lg font-semibold text-slate-900">${formatMoney(data.unitprice)}</p>
@@ -183,7 +183,7 @@ export default function CartItem({
                     </div>
                 </div>
 
-                <div className="flex items-center justify-between rounded-[18px] bg-[#faf7f3] px-4 py-3 lg:block lg:rounded-none lg:bg-transparent lg:px-0 lg:py-0">
+                <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 lg:block lg:rounded-none lg:bg-transparent lg:px-0 lg:py-0">
                     <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400 lg:hidden">Quantity</span>
                     <CartItemQty
                         qty={cart.qty}
@@ -219,7 +219,7 @@ export default function CartItem({
                     />
                 </div>
 
-                <div className="flex items-center justify-between rounded-[18px] bg-[#fff8f3] px-4 py-3 lg:block lg:rounded-none lg:bg-transparent lg:px-0 lg:py-0">
+                <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 lg:block lg:rounded-none lg:bg-transparent lg:px-0 lg:py-0">
                     <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400 lg:hidden">Total</span>
                     <div className="text-right lg:text-left">
                         <p className="text-lg font-semibold text-[#d45540]">${formatMoney(lineTotal.toString())}</p>
@@ -227,7 +227,7 @@ export default function CartItem({
                     </div>
                 </div>
 
-                <div className="flex items-center justify-between rounded-[18px] bg-[#faf7f3] px-4 py-3 lg:block lg:rounded-none lg:bg-transparent lg:px-0 lg:py-0">
+                <div className="flex items-center justify-between rounded-xl bg-slate-50 px-4 py-3 lg:block lg:rounded-none lg:bg-transparent lg:px-0 lg:py-0">
                     <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400 lg:hidden">Actions</span>
                     <div className="flex items-center gap-4 lg:flex-col lg:items-start lg:gap-2">
                         <button

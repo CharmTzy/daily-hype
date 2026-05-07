@@ -67,7 +67,7 @@ export default function SearchProduct() {
 
     return (
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-            <div className="rounded-[2rem] border border-slate-200 bg-white p-5 sm:p-6 lg:p-8">
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 lg:p-8">
                 <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                     <div>
                         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">Search</p>
@@ -109,7 +109,7 @@ export default function SearchProduct() {
 
                 {!hasActiveSearch ? (
                     <section className="mt-8 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-                        <div className="rounded-[28px] border border-[#efe6dc] bg-[#faf8f5] p-6">
+                        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
                             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
                                 Popular searches
                             </p>
@@ -122,7 +122,7 @@ export default function SearchProduct() {
                                         key={term}
                                         type="button"
                                         onClick={() => setSearchInput(term)}
-                                        className="rounded-full border border-[#ece5dc] bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+                                        className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
                                     >
                                         {term}
                                     </button>
@@ -130,7 +130,7 @@ export default function SearchProduct() {
                             </div>
                         </div>
 
-                        <div className="rounded-[28px] border border-slate-200 bg-slate-50 p-6">
+                        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
                             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
                                 Quick starting points
                             </p>
@@ -145,7 +145,7 @@ export default function SearchProduct() {
                                                 ...preset.filters,
                                             }))
                                         }
-                                        className="rounded-[22px] border border-slate-200 bg-white px-4 py-4 text-left transition hover:border-slate-300 hover:bg-slate-50"
+                                        className="rounded-xl border border-slate-200 bg-white px-4 py-4 text-left transition hover:border-slate-300 hover:bg-slate-50"
                                     >
                                         <p className="text-sm font-semibold text-slate-900">{preset.title}</p>
                                         <p className="mt-2 text-sm leading-6 text-slate-500">

@@ -31,8 +31,8 @@ export default function PaymentForm({
     const stripe = useStripe();
 
     const handlePaymentFormChange = (event: StripePaymentElementChangeEvent) => {
-        const { complete, empty } = event;
-        setDisabled(empty || !complete);
+        const { complete } = event;
+        setDisabled(!complete);
         if (submitError) {
             setSubmitError("");
         }
@@ -86,12 +86,12 @@ export default function PaymentForm({
     };
 
     if (!stripe || !elements || !userInfo) {
-        return <div className="mt-6 rounded-[22px] border border-slate-200 bg-slate-50 p-4 text-sm text-slate-500">Loading secure payment form...</div>;
+        return <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-500">Loading secure payment form...</div>;
     }
 
     return (
         <form className="mt-6 flex flex-col" onSubmit={handleSubmit}>
-            <div className="rounded-[24px] border border-slate-200 bg-white p-4">
+            <div className="rounded-2xl border border-slate-200 bg-white p-4">
                 <PaymentElement
                     onChange={handlePaymentFormChange}
                     options={{
@@ -101,7 +101,7 @@ export default function PaymentForm({
             </div>
 
             {submitError ? (
-                <div className="mt-4 rounded-[18px] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                     {submitError}
                 </div>
             ) : null}

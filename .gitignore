@@ -32,6 +32,17 @@ yarn-error.log*
 # vercel
 .vercel
 
+# claude code
+.claude/
+
+# editor / OS
+.DS_Store
+*.swp
+
+# uploads (runtime artefacts)
+backend/uploads/
+backend/tmp/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

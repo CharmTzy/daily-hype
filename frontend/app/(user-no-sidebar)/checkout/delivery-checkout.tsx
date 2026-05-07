@@ -8,7 +8,7 @@ interface IDeliveryCheckoutProps {
 
 export default function DeliveryCheckout({ addressData }: IDeliveryCheckoutProps) {
     return (
-        <div className="rounded-[24px] border border-slate-200 bg-[#faf7f3] p-5">
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
             <div className="flex flex-wrap items-center gap-3">
                 <Chip color="primary" className="font-semibold">
                     {addressData.fullname}

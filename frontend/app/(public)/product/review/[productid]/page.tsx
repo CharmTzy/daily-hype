@@ -6,12 +6,27 @@ import { Spinner } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import ProductReviewSection from "@/components/review/product-review-section";
 import { URL } from "@/enums/global-enums";
-import { IProductReview } from "@/enums/review-interfaces";
-import { getProductReviews } from "@/functions/review-functions";
+import { IProductReviewStats } from "@/enums/review-interfaces";
+import { getProductAndDetail } from "@/functions/product-functions";
+import { getProductReviewStats } from "@/functions/review-functions";
+
+const emptyReviewStats: IProductReviewStats = {
+    total: 0,
+    average: 0,
+    countsByRating: [
+        { star: 5, count: 0 },
+        { star: 4, count: 0 },
+        { star: 3, count: 0 },
+        { star: 2, count: 0 },
+        { star: 1, count: 0 },
+    ],
+};
 
 export default function ProductReviewsPage() {
     const { productid } = useParams<{ productid: string }>();
-    const [reviews, setReviews] = useState<IProductReview[]>([]);
+    const [productName, setProductName] = useState("this item");
+    const [productRating, setProductRating] = useState(0);
+    const [reviewStats, setReviewStats] = useState<IProductReviewStats>(emptyReviewStats);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -19,19 +34,22 @@ export default function ProductReviewsPage() {
 
         if (isNaN(parsedProductID)) {
             setIsLoading(false);
-            setReviews([]);
             return;
         }
 
         setIsLoading(true);
-        getProductReviews(parsedProductID)
-            .then((result) => {
-                if (result.error) {
-                    setReviews([]);
-                    return;
+        Promise.all([getProductReviewStats(parsedProductID), getProductAndDetail(productid)])
+            .then(([statsResult, detailResult]) => {
+                setReviewStats(statsResult.error ? emptyReviewStats : statsResult.data || emptyReviewStats);
+                const resolvedName = detailResult.data?.[0]?.productname;
+                if (resolvedName) {
+                    setProductName(resolvedName);
                 }
-
-                setReviews(result.data || []);
+                setProductRating(Number(detailResult.data?.[0]?.rating || 0));
+            })
+            .catch((error) => {
+                console.error(error);
+                setReviewStats(emptyReviewStats);
             })
             .finally(() => {
                 setIsLoading(false);
@@ -57,7 +75,12 @@ export default function ProductReviewsPage() {
                 </Link>
             </div>
 
-            <ProductReviewSection productName="this item" reviews={reviews} />
+            <ProductReviewSection
+                productName={productName}
+                productID={Number(productid)}
+                initialStats={reviewStats}
+                fallbackAverage={productRating}
+            />
         </div>
     );
 }

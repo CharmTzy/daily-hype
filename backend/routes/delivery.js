@@ -33,6 +33,23 @@ router.put("/updateDeliveryStatusBatch", validationFn.validateToken, refreshFn.r
         res.status(400).json({ error: error.message });
     }
 });
+router.get("/userChatRooms", validationFn.validateToken, refreshFn.refreshToken, async (req, res) => {
+    try {
+        const userId = req.body.id;
+        const rooms = await deliveryController.getUserChatRooms(userId);
+        res.json(rooms);
+    } catch (error) {
+        res.status(500).json({ error: "Failed to retrieve chat rooms" });
+    }
+});
+router.get("/deliveryStatusSteps", async (req, res) => {
+    try {
+        const steps = await deliveryController.getDeliveryStatusSteps();
+        res.json(steps);
+    } catch (error) {
+        res.status(500).json({ error: "Failed to retrieve delivery status steps" });
+    }
+});
 router.get("/categoriesForDelivery", async (req, res) => {
     try {
         const categories = await deliveryController.retrieveAllCurrentProductsCat();

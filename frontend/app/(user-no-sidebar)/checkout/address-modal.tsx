@@ -15,7 +15,7 @@ export default function AddressModal({ isOpen, onClose, addressData, selectedAdd
         {(onClose) => (<>
             <ModalHeader className="flex flex-col gap-1">Choose a delivery address</ModalHeader>
             <ModalBody>
-              {addressData.map((a, index) => (<div key={index} className={clsx("flex flex-col w-full rounded-[22px] border border-slate-200 p-4 transition cursor-pointer hover:border-slate-300 hover:bg-slate-50", index === selectedAddress && "border-slate-900 bg-slate-50")} onClick={() => setSelectedAddress(index)}>
+              {addressData.map((a, index) => (<div key={index} className={clsx("flex flex-col w-full rounded-xl border border-slate-200 p-4 transition cursor-pointer hover:border-slate-300 hover:bg-slate-50", index === selectedAddress && "border-slate-900 bg-slate-50")} onClick={() => setSelectedAddress(index)}>
                   <div className="flex items-center ms-4 gap-3">
                     <Chip className="font-semibold" color="primary">
                       {a.fullname}

@@ -8,6 +8,7 @@ import {
     TCustomerReviewFetch,
     TDeleteReview,
     TProductReviewFetch,
+    TProductReviewStatsFetch,
     TReviewMutation,
 } from "@/enums/review-interfaces";
 
@@ -87,22 +88,45 @@ export async function getAdminReviewStat(year: number): Promise<IAdminReviewStat
     }
 }
 
-export async function getProductReviews(productID: number): Promise<TProductReviewFetch> {
+export async function getProductReviews(
+    productID: number,
+    options?: { rating?: number | null; limit?: number; offset?: number },
+): Promise<TProductReviewFetch> {
     try {
-        const response = await fetch(`${process.env.BACKEND_URL}/api/review/${productID}`, {
+        const params = new URLSearchParams();
+        if (options?.limit !== undefined) params.set("limit", String(options.limit));
+        if (options?.offset !== undefined) params.set("offset", String(options.offset));
+        if (options?.rating !== null && options?.rating !== undefined) params.set("rating", String(options.rating));
+        const qs = params.toString();
+        const response = await fetch(`${process.env.BACKEND_URL}/api/review/${productID}${qs ? `?${qs}` : ""}`, {
             method: "GET",
             credentials: "include",
         });
         const result = await response.json();
-
         if (result.error) {
             return { data: null, error: result.error } as TProductReviewFetch;
         }
-
         return { data: result.review || [], error: null } as TProductReviewFetch;
     } catch (error) {
         console.error(error);
         return { data: null, error: ErrorMessage.FetchError } as TProductReviewFetch;
+    }
+}
+
+export async function getProductReviewStats(productID: number): Promise<TProductReviewStatsFetch> {
+    try {
+        const response = await fetch(`${process.env.BACKEND_URL}/api/review/${productID}/stats`, {
+            method: "GET",
+            credentials: "include",
+        });
+        const result = await response.json();
+        if (result.error) {
+            return { data: null, error: result.error } as TProductReviewStatsFetch;
+        }
+        return { data: result.stats, error: null } as TProductReviewStatsFetch;
+    } catch (error) {
+        console.error(error);
+        return { data: null, error: ErrorMessage.FetchError } as TProductReviewStatsFetch;
     }
 }
 

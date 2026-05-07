@@ -1,3 +1,33 @@
+export async function getUserChatRooms(): Promise<{
+    roomid: number;
+    deliveryid: number;
+    trackingnumber: string;
+    deliverystatusdetail: string;
+    deliverydate: string;
+    orderid: number;
+    unread_count: number;
+    last_message_at: string | null;
+    last_message: string | null;
+}[]> {
+    const response = await fetch(`${process.env.BACKEND_URL}/api/userChatRooms`, {
+        method: "GET",
+        credentials: "include",
+    });
+    if (!response.ok) {
+        throw new Error(`Failed to fetch chat rooms. Status: ${response.status}`);
+    }
+    return response.json();
+}
+export async function getDeliveryStatusSteps(): Promise<{ label: string; full: string }[]> {
+    const response = await fetch(`${process.env.BACKEND_URL}/api/deliveryStatusSteps`, {
+        method: "GET",
+        credentials: "include",
+    });
+    if (!response.ok) {
+        throw new Error(`Failed to fetch delivery status steps. Status: ${response.status}`);
+    }
+    return response.json();
+}
 export async function getDeliveryDetail(deliveryId: any) {
     try {
         const response = await fetch(`${process.env.BACKEND_URL}/api/deliveries/${deliveryId}`, {
@@ -19,7 +49,6 @@ export async function getDeliveryDetail(deliveryId: any) {
     }
 }
 export async function getAllMessages(roomID: any) {
-    console.log("Current roomID is " + roomID);
     const response = await fetch(`${process.env.BACKEND_URL}/api/getAllMessages/${roomID}`, {
         method: "GET",
         credentials: "include",
@@ -99,11 +128,8 @@ export async function getCurrentUserId() {
             throw new Error(`Failed to fetch current user id. Status: ${responseUserId.status}`);
         }
         const currentUserIdData = await responseUserId.json();
-        console.log("hello");
-        console.log(currentUserIdData);
         const actualCurrentUserId = currentUserIdData.userId;
         const actualCurrentUserRole = currentUserIdData.userRole;
-        console.log(actualCurrentUserId);
         return [actualCurrentUserId, actualCurrentUserRole];
     }
     catch (error) {
@@ -195,7 +221,6 @@ export async function updateDeliveryForOrderItem(deliveryId: any, orderID: any, 
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.json();
-        console.log(data.message);
         return data.productdetailid;
     }
     catch (error) {
@@ -236,8 +261,6 @@ export async function updateOrderStatusAndCreateChatRoom(deliveryId: any, orderI
                 return await response.json();
             })(),
         ]);
-        console.log("Order status updated successfully:", updatedOrderId);
-        console.log("Chat room added successfully:", roomResult);
         return { updatedOrderId, roomResult };
     }
     catch (error: any) {

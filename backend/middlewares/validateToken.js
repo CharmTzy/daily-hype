@@ -6,7 +6,6 @@ module.exports.validateToken = (req, res, next) => {
     if (token) {
         jwtFunctions.verifyJWTToken(token, process.env.JWT_SECRET_KEY, (err, data) => {
             if (err) {
-                console.error(`\n${err}`);
                 if (err.name === "TokenExpiredError") {
                     try {
                         const decoded = jwtFunctions.decodeJWTToken(token);
@@ -21,9 +20,11 @@ module.exports.validateToken = (req, res, next) => {
                     }
                 }
                 else if (err.name === "JsonWebTokenError") {
+                    console.error(`\n${err}`);
                     return res.status(401).send({ error: errorMessages.INVALID_TOKEN });
                 }
                 else {
+                    console.error(`\n${err}`);
                     return res.status(403).send({ error: errorMessages.UNAURHOTIZED });
                 }
             }

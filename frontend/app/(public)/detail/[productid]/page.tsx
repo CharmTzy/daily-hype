@@ -8,7 +8,7 @@ import { useAppState } from "@/app/app-provider";
 import { CurrentActivePage, URL } from "@/enums/global-enums";
 import { ICartLocalStorage } from "@/enums/global-interfaces";
 import { ILatestProductsByLimitData, ProductDetail } from "@/enums/product-interfaces";
-import { IProductReview } from "@/enums/review-interfaces";
+import { IProductReviewStats } from "@/enums/review-interfaces";
 import { removeDuplicateCartData } from "@/functions/cart-functions";
 import { capitaliseWord, formatMoney } from "@/functions/formatter";
 import {
@@ -16,7 +16,7 @@ import {
     getLatestProductsByLimit,
     getProductAndDetail,
 } from "@/functions/product-functions";
-import { getProductReviews } from "@/functions/review-functions";
+import { getProductReviewStats } from "@/functions/review-functions";
 import LatestItem from "@/app/(public)/(home)/latest-item";
 import ProductReviewSection from "@/components/review/product-review-section";
 import ResilientImage from "@/components/ui/resilient-image";
@@ -37,12 +37,24 @@ function getPreferredDetail(items: ProductDetail[]) {
     return items.find((item) => Number(item.qty) > 0) || items[0] || null;
 }
 
+const emptyReviewStats: IProductReviewStats = {
+    total: 0,
+    average: 0,
+    countsByRating: [
+        { star: 5, count: 0 },
+        { star: 4, count: 0 },
+        { star: 3, count: 0 },
+        { star: 2, count: 0 },
+        { star: 1, count: 0 },
+    ],
+};
+
 export default function ProductDetailPage({ params }: ProductDetailPageProps) {
     const router = useRouter();
     const { setCart, setCurrentActivePage } = useAppState();
     const [productDetails, setProductDetails] = useState<ProductDetail[]>([]);
     const [recommendedProducts, setRecommendedProducts] = useState<ILatestProductsByLimitData[]>([]);
-    const [productReviews, setProductReviews] = useState<IProductReview[]>([]);
+    const [productReviewStats, setProductReviewStats] = useState<IProductReviewStats>(emptyReviewStats);
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const [selectedColour, setSelectedColour] = useState("");
     const [selectedProductDetailId, setSelectedProductDetailId] = useState("");
@@ -59,12 +71,12 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
             getProductAndDetail(params.productid),
             getLatestProductsByLimit(8),
             getBestSellingByLimit(8),
-            getProductReviews(Number(params.productid)),
+            getProductReviewStats(Number(params.productid)),
         ])
-            .then(([detailResult, latestResult, bestSellingResult, reviewResult]) => {
+            .then(([detailResult, latestResult, bestSellingResult, reviewStatsResult]) => {
                 const nextProductDetails = detailResult.data || [];
                 setProductDetails(nextProductDetails);
-                setProductReviews(reviewResult.error ? [] : reviewResult.data || []);
+                setProductReviewStats(reviewStatsResult.error ? emptyReviewStats : reviewStatsResult.data || emptyReviewStats);
 
                 if (nextProductDetails.length > 0) {
                     const preferredDetail = getPreferredDetail(nextProductDetails);
@@ -94,7 +106,7 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
                 console.error(error);
                 setProductDetails([]);
                 setRecommendedProducts([]);
-                setProductReviews([]);
+                setProductReviewStats(emptyReviewStats);
             })
             .finally(() => {
                 setIsLoading(false);
@@ -139,11 +151,8 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
     const maxQty = Math.max(0, Number(selectedDetail?.qty || 0));
     const totalStock = productDetails.reduce((total, item) => total + Number(item.qty || 0), 0);
     const inStockSizeCount = productDetails.filter((item) => Number(item.qty) > 0).length;
-    const reviewCount = productReviews.length;
-    const averageRating =
-        reviewCount > 0
-            ? productReviews.reduce((total, review) => total + Number(review.rating || 0), 0) / reviewCount
-            : Number(product?.rating || 0);
+    const reviewCount = productReviewStats.total;
+    const averageRating = reviewCount > 0 ? productReviewStats.average : Number(product?.rating || 0);
 
     useEffect(() => {
         if (!selectedDetail) {
@@ -461,7 +470,12 @@ export default function ProductDetailPage({ params }: ProductDetailPageProps) {
                     </section>
                 </div>
 
-                <ProductReviewSection productName={product.productname} reviews={productReviews} />
+                    <ProductReviewSection
+                        productName={product.productname}
+                        productID={Number(params.productid)}
+                        initialStats={productReviewStats}
+                        fallbackAverage={Number(product.rating || 0)}
+                    />
             </div>
 
             {recommendedProducts.length > 0 ? (

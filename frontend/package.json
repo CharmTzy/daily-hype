@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbo",
-    "build": "next build",
+    "build": "node --stack-size=8000 ./node_modules/.bin/next build",
     "start": "next start",
     "lint": "next lint"
   },
@@ -39,7 +39,6 @@
     "react-leaflet": "^4.2.1",
     "react-router-dom": "^6.21.1",
     "react-select": "^5.8.0",
-    "sharp": "^0.33.1",
     "socket.io-client": "^4.7.4",
     "tailwind-merge": "^2.2.0",
     "tailwindcss-animate": "^1.0.7"

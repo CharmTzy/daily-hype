@@ -9,6 +9,7 @@ const nextConfig = {
         STRIPE_ID: stripeId,
     },
     images: {
+        unoptimized: true,
         remotePatterns: [
             {
                 protocol: parsedBackendUrl.protocol.replace(":", ""),
@@ -84,11 +85,15 @@ const nextConfig = {
     experimental: {
         outputFileTracingExcludes: {
             "*": [
-                "node_modules/@swc/core-linux-x64-gnu",
-                "node_modules/@swc/core-linux-x64-musl",
-                "node_modules/@esbuild/linux-x64",
-                "node_modules/sharp/vendor/**",
+                "**/node_modules/@swc/**",
+                "**/node_modules/@esbuild/**",
+                "**/node_modules/sharp/**",
+                "**/node_modules/@next/swc-*/**",
+                "**/node_modules/canvas/**",
+                "**/node_modules/typescript/**",
+                "**/node_modules/.cache/**",
                 "**/*.tsbuildinfo",
+                "**/*.map",
             ],
         },
     },

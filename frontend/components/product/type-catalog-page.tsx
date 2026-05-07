@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Button, Checkbox, Spinner, Switch } from "@nextui-org/react";
+import { Button, Checkbox, Select, SelectItem, Spinner, Switch } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import { useAppState } from "@/app/app-provider";
 import { CurrentActivePage, URL } from "@/enums/global-enums";

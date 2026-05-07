@@ -1,5 +1,5 @@
 {
-  "buildCommand": "next build",
+  "buildCommand": "NODE_OPTIONS='--stack-size=8000' next build",
   "framework": "nextjs",
   "installCommand": "npm install"
 }

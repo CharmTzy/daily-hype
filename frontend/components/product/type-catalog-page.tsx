@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Button, Checkbox, Select, SelectItem, Spinner, Switch } from "@nextui-org/react";
+import { Button, Checkbox, Spinner, Switch } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import { useAppState } from "@/app/app-provider";
 import { CurrentActivePage, URL } from "@/enums/global-enums";
@@ -98,7 +98,7 @@ export default function TypeCatalogPage({ typeId, title, activePage }: TypeCatal
             .then((result) => {
                 setCategories(result);
                 if (result.length > 0) {
-                    setSelectedCategoryIds(new Set([String(result[0].categoryid)]));
+                    setSelectedCategoryIds(new Set(result.map((category) => String(category.categoryid))));
                 }
             })
             .catch((error) => {
@@ -296,24 +296,6 @@ export default function TypeCatalogPage({ typeId, title, activePage }: TypeCatal
                             <p className="mt-1 text-xs uppercase tracking-[0.2em] text-slate-400">
                                 Responsive grid inspired by marketplace browsing
                             </p>
-                        </div>
-                        <div className="hidden lg:block">
-                            <Select
-                                aria-label="Desktop items per page"
-                                className="w-[160px]"
-                                selectedKeys={[String(pageSize)]}
-                                onSelectionChange={(keys) => {
-                                    const value = Number(Array.from(keys)[0] || 12);
-                                    setCurrentPage(1);
-                                    setPageSize(value);
-                                }}
-                            >
-                                {[8, 12, 16, 20].map((value) => (
-                                    <SelectItem key={String(value)} value={String(value)}>
-                                        {value} per page
-                                    </SelectItem>
-                                ))}
-                            </Select>
                         </div>
                     </div>
 

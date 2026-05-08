@@ -996,7 +996,7 @@ const products = [
         soldqty: 38,
         createdAtDaysAgo: 17,
         images: createImageSet("girl-zip-hoodie", "Girl's Pastel Zip Hoodie", [
-            { label: "front", url: "https://images.unsplash.com/photo-1543087903-1ac2364c7188?w=1200" },
+            { label: "front", url: "https://images.unsplash.com/photo-1769421516040-0c9b69ce3b27?ixlib=rb-4.1.0&q=85&fm=jpg&crop=entropy&cs=srgb&dl=olha-sobetska-IcJPrBQuc3E-unsplash.jpg&w=1200" },
         ]),
         details: [
             { colour: "rose", size: "XS", qty: 9 },
@@ -1214,7 +1214,7 @@ const products = [
         soldqty: 31,
         createdAtDaysAgo: 8,
         images: createImageSet("women-pleated-skirt", "High-Waist Pleated Skirt", [
-            { label: "front", url: "https://images.unsplash.com/photo-1583496661160-fb5886a13d44?w=1200" },
+            { label: "front", url: "https://images.unsplash.com/photo-1763652309790-c0f90e5c6bd8?ixlib=rb-4.1.0&q=85&fm=jpg&crop=entropy&cs=srgb&dl=lo-lindo-cWTr0yQY094-unsplash.jpg&w=1200" },
         ]),
         details: [
             { colour: "black", size: "S", qty: 9 },
@@ -1351,7 +1351,7 @@ const products = [
         soldqty: 64,
         createdAtDaysAgo: 20,
         images: createImageSet("men-leather-belt", "Italian Leather Belt", [
-            { label: "front", url: "https://images.unsplash.com/photo-1624222247344-550fb60583ce?w=1200" },
+            { label: "front", url: "https://images.unsplash.com/photo-1664286074176-5206ee5dc878?ixlib=rb-4.1.0&q=85&fm=jpg&crop=entropy&cs=srgb&dl=seeetz-eNEa7Gsfzzs-unsplash.jpg&w=1200" },
         ]),
         details: [
             { colour: "cocoa", size: "M", qty: 14 },
@@ -1409,7 +1409,7 @@ const products = [
         soldqty: 56,
         createdAtDaysAgo: 14,
         images: createImageSet("girl-floral-romper", "Girl's Floral Romper", [
-            { label: "front", url: "https://images.unsplash.com/photo-1503944168849-8bf86875ce41?w=1200" },
+            { label: "front", url: "https://images.unsplash.com/photo-1599152450785-aa6bfa58d85e?ixlib=rb-4.1.0&q=85&fm=jpg&crop=entropy&cs=srgb&dl=enis-yavuz-No20658JqCk-unsplash.jpg&w=1200" },
         ]),
         details: [
             { colour: "rose", size: "XS", qty: 13 },
@@ -1447,7 +1447,7 @@ const products = [
         soldqty: 67,
         createdAtDaysAgo: 11,
         images: createImageSet("boy-cargo-shorts", "Boy's Cargo Shorts", [
-            { label: "front", url: "https://images.unsplash.com/photo-1505022379456-c1f74e62b13d?w=1200" },
+            { label: "front", url: "https://images.unsplash.com/photo-1657979591417-4b59744c84d3?ixlib=rb-4.1.0&q=85&fm=jpg&crop=entropy&cs=srgb&dl=manoj-sharma-tX7-35M5GaU-unsplash.jpg&w=1200" },
         ]),
         details: [
             { colour: "sand", size: "S", qty: 14 },
@@ -1491,25 +1491,6 @@ const products = [
             { colour: "white", size: "XS", qty: 22 },
             { colour: "butter", size: "XS", qty: 16 },
             { colour: "sky", size: "XS", qty: 13 },
-        ],
-    },
-    {
-        key: "baby-soft-beanie",
-        name: "Baby Soft Beanie",
-        description: "Snug ribbed beanie in soft organic cotton - keeps tiny ears warm without irritation.",
-        unitPrice: 14.9,
-        type: "baby",
-        category: "accessories",
-        rating: 4.8,
-        soldqty: 95,
-        createdAtDaysAgo: 30,
-        images: createImageSet("baby-soft-beanie", "Baby Soft Beanie", [
-            { label: "front", url: "https://images.unsplash.com/photo-1606851094291-6efae152bb87?w=1200" },
-        ]),
-        details: [
-            { colour: "butter", size: "XS", qty: 26 },
-            { colour: "sage", size: "XS", qty: 22 },
-            { colour: "rose", size: "XS", qty: 18 },
         ],
     },
 ];

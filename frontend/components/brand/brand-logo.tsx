@@ -16,7 +16,7 @@ type BrandLogoProps = {
 
 const sizeStyles = {
     xs: {
-        width: 118,
+        width: 104,
         tagline: "text-[0.55rem]",
         gap: "gap-1",
     },
@@ -58,14 +58,17 @@ export default function BrandLogo({
     const selectedVariant = variantStyles[variant];
 
     return (
-        <span className={clsx("inline-flex flex-col leading-none", selectedSize.gap, className)}>
+        <span
+            className={clsx("inline-flex flex-col leading-none", selectedSize.gap, className)}
+            style={{ width: selectedSize.width }}
+        >
             <Image
                 src={selectedVariant.image}
                 alt="DailyHype logo"
                 width={selectedSize.width}
-                height={Math.round((selectedSize.width * 180) / 411)}
+                height={Math.round((selectedSize.width * 187) / 394)}
                 priority
-                className="h-auto w-auto max-w-full"
+                className="block h-auto w-full"
             />
             {tagline ? (
                 <span

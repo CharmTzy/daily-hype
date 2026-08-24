@@ -1,5 +1,8 @@
 # DailyHype
 
+> 📄 **Case study:** https://waiyanaung.dev/projects/daily-hype
+> 🔗 **Live demo:** https://daily-hype-one.vercel.app/
+
 DailyHype is a restored full-stack ecommerce project with a public storefront, customer account area, and admin tools for catalog, orders, users, reviews, refunds, and delivery workflows.
 
 ## Stack

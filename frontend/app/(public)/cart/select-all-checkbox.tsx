@@ -35,7 +35,7 @@ export default function SelectAllCheckBox({
     };
 
     return (
-        <div className="overflow-hidden rounded-[24px] border border-[#ece5dc] bg-white shadow-[0_12px_30px_rgba(15,23,42,0.04)]">
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
             <div className="hidden lg:grid lg:grid-cols-[minmax(0,1.8fr)_140px_140px_140px_120px] lg:items-center lg:gap-4 lg:px-6 lg:py-4">
                 <div className="flex items-center gap-3">
                     <CheckBox

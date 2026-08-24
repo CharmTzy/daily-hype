@@ -985,6 +985,39 @@ module.exports.updateProductOrderItemDeliveryId = function updateProductOrderIte
         return rows[0].orderid;
     });
 };
+module.exports.getUserChatRooms = function getUserChatRooms(userId) {
+    const sql = `
+        SELECT
+            c.roomid,
+            c.deliveryid,
+            d.trackingnumber,
+            d.deliverystatusdetail,
+            d.deliverydate,
+            po.orderid,
+            COUNT(CASE WHEN m.messagereaduser = false THEN 1 END) AS unread_count,
+            MAX(m.messagedatetime) AS last_message_at,
+            (SELECT m2.msgcontent FROM message m2 WHERE m2.roomid = c.roomid ORDER BY m2.messagedatetime DESC LIMIT 1) AS last_message
+        FROM chat c
+        LEFT JOIN delivery d ON c.deliveryid = d.deliveryid
+        LEFT JOIN productorder po ON po.deliveryid = d.deliveryid
+        LEFT JOIN message m ON m.roomid = c.roomid
+        WHERE c.useruserid = $1
+        GROUP BY c.roomid, c.deliveryid, d.trackingnumber, d.deliverystatusdetail, d.deliverydate, po.orderid
+        ORDER BY last_message_at DESC NULLS LAST, c.roomid DESC
+    `;
+    return query(sql, [userId])
+        .then((result) => result.rows)
+        .catch((error) => {
+            console.error(error);
+            throw error;
+        });
+};
+module.exports.getDeliveryStatusSteps = function getDeliveryStatusSteps() {
+    const sql = `SELECT step_order, label, full_name FROM delivery_status_step ORDER BY step_order ASC`;
+    return query(sql).then((result) =>
+        result.rows.map((row) => ({ label: row.label, full: row.full_name }))
+    );
+};
 module.exports.updateOrderStatus = function updateOrderStatus(orderId) {
     const updateOrderStatusQuery = `
         UPDATE productorder

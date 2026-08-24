@@ -28,6 +28,72 @@ module.exports.createReview = function createReview(
     });
 };
 
+module.exports.getReviewStatsByProductId = function getReviewStatsByProductId(productID) {
+    const sql = `
+        SELECT
+            COUNT(*) AS total,
+            COALESCE(ROUND(AVG(rating)::numeric, 2), 0) AS average,
+            COUNT(CASE WHEN rating = 5 THEN 1 END) AS five_star,
+            COUNT(CASE WHEN rating = 4 THEN 1 END) AS four_star,
+            COUNT(CASE WHEN rating = 3 THEN 1 END) AS three_star,
+            COUNT(CASE WHEN rating = 2 THEN 1 END) AS two_star,
+            COUNT(CASE WHEN rating = 1 THEN 1 END) AS one_star
+        FROM review
+        WHERE productID = $1
+    `;
+    return query(sql, [productID]).then((result) => {
+        const row = result.rows[0];
+        const names = { 1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five' };
+        return {
+            total: Number(row.total),
+            average: Number(row.average),
+            countsByRating: [5, 4, 3, 2, 1].map((star) => ({
+                star,
+                count: Number(row[`${names[star]}_star`]),
+            })),
+        };
+    });
+};
+module.exports.getReviewByProductIdFiltered = function getReviewByProductIdFiltered(productID, rating, limit, offset) {
+    const params = [productID];
+    let ratingClause = '';
+    if (rating !== null && rating !== undefined) {
+        params.push(Number(rating));
+        ratingClause = `AND R.rating = $${params.length}`;
+    }
+    params.push(Math.min(Number(limit) || 10, 50));
+    const limitIdx = params.length;
+    params.push(Number(offset) || 0);
+    const offsetIdx = params.length;
+    const sql = `
+        SELECT
+            R.reviewid,
+            AU.name,
+            COALESCE(UI.url, '/icons/avatar-placeholder.svg') AS profileurl,
+            R.rating,
+            R.reviewDescription,
+            ARRAY_REMOVE(ARRAY_AGG(I.url ORDER BY I.imageID), NULL) AS urls,
+            R.createdAt,
+            R.updatedAt,
+            C.colourname AS colorname,
+            S.sizename AS sizename
+        FROM review R
+        LEFT JOIN reviewimage RI ON R.reviewID = RI.reviewID
+        LEFT JOIN image I ON RI.imageID = I.imageID
+        LEFT JOIN appuser AU ON R.userid = AU.userid
+        LEFT JOIN image UI ON AU.imageid = UI.imageid
+        LEFT JOIN productdetail PD ON R.productDetailID = PD.productDetailID
+        LEFT JOIN colour C ON PD.colourid = C.colourid
+        LEFT JOIN size S ON PD.sizeid = S.sizeid
+        WHERE R.productID = $1 ${ratingClause}
+        GROUP BY
+            R.reviewid, R.rating, R.reviewDescription, AU.name, UI.url,
+            R.createdAt, R.updatedAt, C.colourname, S.sizename
+        ORDER BY R.createdAt DESC, R.reviewid DESC
+        LIMIT $${limitIdx} OFFSET $${offsetIdx}
+    `;
+    return query(sql, params).then((result) => result.rows);
+};
 module.exports.getReviewByProductId = function getReviewByProductId(productID) {
     const sql = `
         SELECT

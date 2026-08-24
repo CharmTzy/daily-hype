@@ -4,7 +4,7 @@ const cookieFunctions = require("../functions/cookies");
 const { errorMessages } = require("../errors");
 module.exports.refreshToken = (req, res, next) => {
     const userID = req.body.id;
-    if (userID === null) {
+    if (userID == null) {
         return res.status(403).send({ error: errorMessages.UNAURHOTIZED });
     }
     if (req.body.tokenExpired) {

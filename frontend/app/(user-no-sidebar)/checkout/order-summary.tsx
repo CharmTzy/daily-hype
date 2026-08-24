@@ -15,8 +15,8 @@ export default function OrderSummary({ productData, cartData, totals }: IProduct
         <div className="mt-6">
             <div className="space-y-4">
                 {cartData.map((cartItem, index) => (
-                    <div key={`${cartItem.productdetailid}-${index}`} className="flex gap-4 rounded-[24px] border border-slate-200 bg-[#faf7f3] p-4">
-                        <div className="relative h-24 w-24 overflow-hidden rounded-[20px] border border-slate-200 bg-white">
+                    <div key={`${cartItem.productdetailid}-${index}`} className="flex gap-4 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                        <div className="relative h-24 w-24 overflow-hidden rounded-xl border border-slate-200 bg-white">
                             <ResilientImage
                                 src={productData[index]?.image}
                                 alt={productData[index]?.productname || "Product image"}
@@ -48,7 +48,7 @@ export default function OrderSummary({ productData, cartData, totals }: IProduct
             </div>
 
             {cartData.length > 0 ? (
-                <div className="mt-6 rounded-[24px] border border-slate-200 bg-slate-50 p-5">
+                <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-5">
                     <div className="space-y-3 text-sm">
                         <div className="flex items-center justify-between text-slate-600">
                             <span>Subtotal</span>

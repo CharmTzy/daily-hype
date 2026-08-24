@@ -4,7 +4,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
-import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Progress } from "@nextui-org/react";
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from "@nextui-org/react";
+import { CalendarDays, CheckCircle2, MapPin, Package } from "lucide-react";
 import { Socket, io } from "socket.io-client";
 import { URL } from "@/enums/global-enums";
 import {
@@ -39,6 +40,77 @@ interface DeliverySummary {
     items: DeliveryItem[];
 }
 
+const deliverySteps = [
+    { label: "Confirmed", full: "Order confirmed" },
+    { label: "Pickup", full: "Ready for pickup by company" },
+    { label: "On the way", full: "On the way" },
+    { label: "Delivered", full: "Product delivered" },
+];
+
+function getDeliveryStageIndex(statusDetail: string) {
+    const index = deliverySteps.findIndex((s) => s.full === statusDetail);
+    return index === -1 ? 0 : index;
+}
+
+function getStatusBadgeClass(statusDetail: string) {
+    switch (statusDetail) {
+        case "Order confirmed": return "bg-amber-50 text-amber-700 border-amber-200";
+        case "Ready for pickup by company": return "bg-sky-50 text-sky-700 border-sky-200";
+        case "On the way": return "bg-violet-50 text-violet-700 border-violet-200";
+        case "Product delivered": return "bg-emerald-50 text-emerald-700 border-emerald-200";
+        default: return "bg-slate-50 text-slate-600 border-slate-200";
+    }
+}
+
+function getStatusDotClass(statusDetail: string) {
+    switch (statusDetail) {
+        case "Order confirmed": return "bg-amber-400";
+        case "Ready for pickup by company": return "bg-sky-400";
+        case "On the way": return "bg-violet-400";
+        case "Product delivered": return "bg-emerald-400";
+        default: return "bg-slate-400";
+    }
+}
+
+function DeliveryStepBar({ statusDetail }: { statusDetail: string }) {
+    const stageIndex = getDeliveryStageIndex(statusDetail);
+    return (
+        <div className="mt-1">
+            <div className="flex items-center gap-0">
+                {deliverySteps.map((step, index) => {
+                    const isCompleted = index <= stageIndex;
+                    const isCurrent = index === stageIndex;
+                    return (
+                        <div key={step.full} className="flex flex-1 items-center">
+                            <div className="flex flex-1 flex-col items-center gap-1.5">
+                                <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-semibold ${
+                                    isCompleted
+                                        ? isCurrent
+                                            ? "bg-[#fb6050] text-white shadow-[0_4px_12px_rgba(251,96,80,0.35)]"
+                                            : "bg-slate-900 text-white"
+                                        : "border border-slate-200 bg-white text-slate-400"
+                                }`}>
+                                    {isCompleted && !isCurrent ? (
+                                        <CheckCircle2 className="h-3.5 w-3.5" />
+                                    ) : (
+                                        <span>{index + 1}</span>
+                                    )}
+                                </div>
+                                <span className={`text-center text-[10px] font-semibold leading-tight ${isCompleted ? "text-slate-900" : "text-slate-400"}`}>
+                                    {step.label}
+                                </span>
+                            </div>
+                            {index < deliverySteps.length - 1 && (
+                                <div className={`mx-1 h-[2px] flex-1 rounded-full ${index < stageIndex ? "bg-slate-900" : "bg-slate-200"}`} />
+                            )}
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
+
 function formatMessageTime(value: Date) {
     return new Intl.DateTimeFormat("en-SG", {
         day: "numeric",
@@ -48,20 +120,6 @@ function formatMessageTime(value: Date) {
     }).format(value);
 }
 
-function getProgressValue(statusDetail: string) {
-    switch (statusDetail) {
-        case "Order confirmed":
-            return 25;
-        case "Ready for pickup by company":
-            return 50;
-        case "On the way":
-            return 75;
-        case "Product delivered":
-            return 99;
-        default:
-            return 0;
-    }
-}
 
 export default function ChatRoomPage() {
     const { testid } = useParams<{ testid: string }>();
@@ -233,7 +291,7 @@ export default function ChatRoomPage() {
 
     return (
         <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
-            <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_16px_36px_rgba(15,23,42,0.04)]">
+            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
                 <div className="border-b border-slate-200 px-6 py-5 sm:px-8">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <div>
@@ -275,7 +333,7 @@ export default function ChatRoomPage() {
 
                 <div className="max-h-[560px] space-y-4 overflow-y-auto bg-slate-50 px-6 py-6 sm:px-8">
                     {messages.length === 0 ? (
-                        <div className="rounded-[1.5rem] border border-dashed border-slate-200 bg-white px-6 py-8 text-center">
+                        <div className="rounded-2xl border border-dashed border-slate-200 bg-white px-6 py-8 text-center">
                             <p className="text-lg font-medium text-slate-900">No messages yet</p>
                             <p className="mt-2 text-sm text-slate-500">
                                 Start the conversation with the first message.
@@ -291,16 +349,16 @@ export default function ChatRoomPage() {
                                     className={`flex ${isOwnMessage ? "justify-end" : "justify-start"}`}
                                 >
                                     <div
-                                        className={`max-w-[80%] rounded-[1.5rem] px-4 py-3 ${
+                                        className={`max-w-[80%] rounded-2xl px-4 py-3 ${
                                             isOwnMessage
-                                                ? "bg-slate-900 text-white"
+                                                ? "bg-blue-600 text-white"
                                                 : "border border-slate-200 bg-white text-slate-700"
                                         }`}
                                     >
                                         <p className="text-sm leading-6">{message.text}</p>
                                         <p
                                             className={`mt-2 text-xs ${
-                                                isOwnMessage ? "text-slate-300" : "text-slate-400"
+                                                isOwnMessage ? "text-blue-200" : "text-slate-400"
                                             }`}
                                         >
                                             {formatMessageTime(message.messagedatetime)}
@@ -339,64 +397,108 @@ export default function ChatRoomPage() {
                 </div>
             </div>
 
-            <Modal isOpen={isDetailsOpen} onClose={() => setIsDetailsOpen(false)}>
+            <Modal size="2xl" isOpen={isDetailsOpen} onClose={() => setIsDetailsOpen(false)} scrollBehavior="inside">
                 <ModalContent>
-                    <ModalHeader className="flex flex-col gap-1">Delivery Details</ModalHeader>
-                    <ModalBody>
-                        {deliveryDetails ? (
-                            <>
-                                <p>
-                                    <strong>Delivery #:</strong> {deliveryDetails.deliveryId}
-                                </p>
-                                <p>
-                                    <strong>Estimated delivery date:</strong>{" "}
-                                    {new Date(deliveryDetails.deliveryTime).toDateString()}
-                                </p>
-                                <p>
-                                    <strong>Address:</strong> {deliveryDetails.deliveryAddress}
-                                </p>
-                                <p>
-                                    <strong>Status:</strong> {deliveryDetails.deliveryStatusDetail}
-                                </p>
-                                <Progress
-                                    label={`${getProgressValue(deliveryDetails.deliveryStatusDetail)}% Progress`}
-                                    value={getProgressValue(deliveryDetails.deliveryStatusDetail)}
-                                    className="max-w-md"
-                                />
-                                <p>
-                                    <strong>Tracking number:</strong> {deliveryDetails.trackingNumber}
-                                </p>
-
-                                <div className="grid grid-cols-2 gap-4">
-                                    {deliveryDetails.items.map((item, index) => (
-                                        <div key={index} className="rounded-[1rem] border border-slate-200 p-3">
-                                            <div className="relative mb-3 h-28 w-full overflow-hidden rounded-lg">
-                                                <Image
-                                                    src={item.image}
-                                                    alt={item.name}
-                                                    fill
-                                                    sizes="(max-width: 768px) 100vw, 220px"
-                                                    className="object-cover"
-                                                />
-                                            </div>
-                                            <p className="text-sm font-semibold text-slate-900">
-                                                {item.name} x {item.quantity}
-                                            </p>
-                                            <p className="mt-1 text-sm text-slate-500">
-                                                {item.colour}, {item.size}
-                                            </p>
-                                            <p className="mt-1 text-sm text-slate-700">${item.price}</p>
-                                        </div>
-                                    ))}
+                    {(onClose) => (
+                        <>
+                            <ModalHeader className="border-b border-slate-100 pb-4">
+                                <div>
+                                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Shipment</p>
+                                    <p className="mt-1 text-xl font-semibold text-slate-900">
+                                        Delivery #{deliveryDetails?.deliveryId}
+                                    </p>
                                 </div>
-                            </>
-                        ) : null}
-                    </ModalBody>
-                    <ModalFooter>
-                        <Button color="primary" onPress={() => setIsDetailsOpen(false)}>
-                            Close
-                        </Button>
-                    </ModalFooter>
+                            </ModalHeader>
+
+                            <ModalBody className="py-5">
+                                {deliveryDetails ? (
+                                    <div className="space-y-4">
+                                        {/* Status badge */}
+                                        <div className="flex items-center gap-2">
+                                            <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${getStatusBadgeClass(deliveryDetails.deliveryStatusDetail)}`}>
+                                                <span className={`h-1.5 w-1.5 rounded-full ${getStatusDotClass(deliveryDetails.deliveryStatusDetail)}`} />
+                                                {deliveryDetails.deliveryStatusDetail || "Pending"}
+                                            </span>
+                                        </div>
+
+                                        {/* Info tiles */}
+                                        <div className="grid gap-3 sm:grid-cols-2">
+                                            <div className="rounded-xl border border-slate-200 bg-slate-50 p-3.5">
+                                                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
+                                                    <CalendarDays className="h-3.5 w-3.5" />
+                                                    Estimated Arrival
+                                                </div>
+                                                <p className="mt-2 text-sm font-semibold text-slate-900">
+                                                    {deliveryDetails.deliveryTime
+                                                        ? new Intl.DateTimeFormat("en-SG", { day: "numeric", month: "short", year: "numeric" }).format(new Date(deliveryDetails.deliveryTime))
+                                                        : "TBC"}
+                                                </p>
+                                            </div>
+
+                                            <div className="rounded-xl border border-slate-200 bg-slate-50 p-3.5">
+                                                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
+                                                    <Package className="h-3.5 w-3.5" />
+                                                    Tracking
+                                                </div>
+                                                <p className="mt-2 text-sm font-semibold text-slate-900">
+                                                    {deliveryDetails.trackingNumber || "Pending"}
+                                                </p>
+                                            </div>
+
+                                            <div className="rounded-xl border border-slate-200 bg-slate-50 p-3.5 sm:col-span-2">
+                                                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
+                                                    <MapPin className="h-3.5 w-3.5" />
+                                                    Delivery Address
+                                                </div>
+                                                <p className="mt-2 text-sm text-slate-700">{deliveryDetails.deliveryAddress}</p>
+                                            </div>
+                                        </div>
+
+                                        {/* Step progress */}
+                                        <DeliveryStepBar statusDetail={deliveryDetails.deliveryStatusDetail} />
+
+                                        {/* Items */}
+                                        {deliveryDetails.items.length > 0 && (
+                                            <div>
+                                                <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+                                                    Packed Items · {deliveryDetails.items.length}
+                                                </p>
+                                                <div className="grid gap-3 sm:grid-cols-2">
+                                                    {deliveryDetails.items.map((item, index) => (
+                                                        <div key={index} className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
+                                                            <div className="relative h-36 w-full overflow-hidden bg-slate-100">
+                                                                <Image
+                                                                    src={item.image}
+                                                                    alt={item.name}
+                                                                    fill
+                                                                    sizes="(max-width: 640px) 100vw, 220px"
+                                                                    className="object-cover"
+                                                                />
+                                                            </div>
+                                                            <div className="p-3">
+                                                                <p className="text-sm font-semibold text-slate-900">{item.name}</p>
+                                                                <p className="mt-1 text-xs text-slate-500">{item.colour}, {item.size} · x{item.quantity}</p>
+                                                                <p className="mt-2 text-sm font-semibold text-[#d45540]">${item.price}</p>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                ) : null}
+                            </ModalBody>
+
+                            <ModalFooter className="border-t border-slate-100">
+                                <Button
+                                    className="rounded-full bg-slate-900 px-6 text-sm font-semibold text-white"
+                                    onPress={onClose}
+                                >
+                                    Close
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
                 </ModalContent>
             </Modal>
         </div>

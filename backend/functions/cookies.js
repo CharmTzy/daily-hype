@@ -5,7 +5,7 @@ module.exports.setHttpOnlyCookieHeader = function setHttpOnlyCookieHeader(name, 
         sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
         secure: process.env.NODE_ENV === "production" ? true : false,
         path: "/",
-        maxAge: 1000 * 3600 * 24 * 5,
+        maxAge: 3600 * 24 * 7,
     });
     res.setHeader("Set-Cookie", cookieValue);
 };

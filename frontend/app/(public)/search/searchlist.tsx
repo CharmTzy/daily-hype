@@ -214,7 +214,7 @@ export default function SearchList({ searchInput, selectedFilters }: SearchListP
 
     if (isLoading) {
         return (
-            <div className="mt-10 flex min-h-[320px] items-center justify-center rounded-[24px] border border-slate-200 bg-slate-50">
+            <div className="mt-10 flex min-h-[320px] items-center justify-center rounded-2xl border border-slate-200 bg-slate-50">
                 <p className="text-sm font-medium text-slate-600">Searching the catalog...</p>
             </div>
         );
@@ -270,7 +270,7 @@ export default function SearchList({ searchInput, selectedFilters }: SearchListP
                         onClick={() => {
                             router.push(URL.ProductDetail + item.productid);
                         }}
-                        className="group overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white text-left transition duration-200 hover:-translate-y-1 hover:shadow-xl"
+                        className="group overflow-hidden rounded-2xl border border-slate-200 bg-white text-left transition duration-200 hover:-translate-y-1 hover:shadow-xl"
                     >
                         <div className="relative aspect-[4/5] w-full bg-slate-100">
                             <Image

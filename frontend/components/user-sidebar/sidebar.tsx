@@ -52,7 +52,7 @@ export default function SideBar() {
         </AccordionItem>
         <AccordionItem key="5" className="font-semibold" classNames={{ title: "text-[15px]" }} aria-label="Customer Service" title="Customer Service">
           <div className="flex flex-col cursor-default">
-            <SideBarLink url={URL.SupportChat} label="Chat" active={false}/>
+            <SideBarLink url={URL.SupportChat} label="Chat" active={currentActivePage === CurrentActivePage.SupportChat}/>
             <SideBarLink url={URL.HelpFaq} label="FAQ" active={false}/>
           </div>
         </AccordionItem>

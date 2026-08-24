@@ -189,7 +189,7 @@ export default function SearchFilter({ onFilterChange, value }: SearchFilterProp
             </div>
 
             {openSection ? (
-                <div className="mt-5 rounded-[1.5rem] border border-slate-200 bg-slate-50 p-4 sm:p-5">
+                <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
                     <div className="flex items-center justify-between gap-3">
                         <div>
                             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">

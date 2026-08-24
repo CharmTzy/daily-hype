@@ -94,6 +94,20 @@ export type TProductReviewFetch = {
     error: string | ErrorMessage;
 };
 
+export interface IProductReviewStats {
+    total: number;
+    average: number;
+    countsByRating: { star: number; count: number }[];
+}
+
+export type TProductReviewStatsFetch = {
+    data: IProductReviewStats;
+    error: null;
+} | {
+    data: null;
+    error: string | ErrorMessage;
+};
+
 export type TCustomerReviewFetch = {
     data: ICustomerReview[];
     error: null;

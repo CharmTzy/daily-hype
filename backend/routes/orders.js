@@ -423,11 +423,13 @@ router.put("/order/:orderid/cancel", validationFn.validateToken, refreshFn.refre
                 const transactionid = paymentSuccess.transactionid;
                 return paymentsModel.refundPayment(transactionid).then((result) => {
                     if (result) {
+                        const productDetailIDArr = orderItem.map((item) => item.productdetailid);
                         const updateProductQtyExecute = orderItem.map((item) => productsModel.increaseProductQtyById(item.qty, item.productdetailid));
                         return Promise.all([ordersModel.updateOrderStatusByAdmin(orderid, "cancelled"), ...updateProductQtyExecute])
                             .then(([result, ...updateProductQtyResult]) => {
                             if (result === 1 && updateProductQtyResult.every((r) => r === 1)) {
-                                return res.status(201).json({ message: successMessages.UPDATE_SUCCESS });
+                                return productsModel.updateProductStatus(productDetailIDArr)
+                                    .then(() => res.status(201).json({ message: successMessages.UPDATE_SUCCESS }));
                             }
                             else {
                                 return res.status(500).json({ error: errorMessages.UNKNOWN_ERROR });
@@ -444,11 +446,13 @@ router.put("/order/:orderid/cancel", validationFn.validateToken, refreshFn.refre
                 });
             }
             else {
+                const productDetailIDArr = orderItem.map((item) => item.productdetailid);
                 const updateProductQtyExecute = orderItem.map((item) => productsModel.increaseProductQtyById(item.qty, item.productdetailid));
                 return Promise.all([ordersModel.updateOrderStatusByAdmin(orderid, "cancelled"), ...updateProductQtyExecute])
                     .then(([result, ...updateProductQtyResult]) => {
                     if (result === 1 && updateProductQtyResult.every((r) => r === 1)) {
-                        return res.status(201).json({ message: successMessages.UPDATE_SUCCESS });
+                        return productsModel.updateProductStatus(productDetailIDArr)
+                            .then(() => res.status(201).json({ message: successMessages.UPDATE_SUCCESS }));
                     }
                     else {
                         return res.status(500).json({ error: errorMessages.UNKNOWN_ERROR });
@@ -645,11 +649,13 @@ router.put("/order/:orderid/cancel/admin", validationFn.validateToken, refreshFn
                 const transactionid = paymentSuccess.transactionid;
                 return paymentsModel.refundPayment(transactionid).then((result) => {
                     if (result) {
+                        const productDetailIDArr = orderItem.map((item) => item.productdetailid);
                         const updateProductQtyExecute = orderItem.map((item) => productsModel.increaseProductQtyById(item.qty, item.productdetailid));
                         return Promise.all([ordersModel.updateOrderStatusByAdmin(orderid, "cancelled"), ...updateProductQtyExecute])
                             .then(([result, ...updateProductQtyResult]) => {
                             if (result === 1 && updateProductQtyResult.every((r) => r === 1)) {
-                                return res.status(201).json({ message: successMessages.UPDATE_SUCCESS });
+                                return productsModel.updateProductStatus(productDetailIDArr)
+                                    .then(() => res.status(201).json({ message: successMessages.UPDATE_SUCCESS }));
                             }
                             else {
                                 return res.status(500).json({ error: errorMessages.UNKNOWN_ERROR });
@@ -666,11 +672,13 @@ router.put("/order/:orderid/cancel/admin", validationFn.validateToken, refreshFn
                 });
             }
             else {
+                const productDetailIDArr = orderItem.map((item) => item.productdetailid);
                 const updateProductQtyExecute = orderItem.map((item) => productsModel.increaseProductQtyById(item.qty, item.productdetailid));
                 return Promise.all([ordersModel.updateOrderStatusByAdmin(orderid, "cancelled"), ...updateProductQtyExecute])
                     .then(([result, ...updateProductQtyResult]) => {
                     if (result === 1 && updateProductQtyResult.every((r) => r === 1)) {
-                        return res.status(201).json({ message: successMessages.UPDATE_SUCCESS });
+                        return productsModel.updateProductStatus(productDetailIDArr)
+                            .then(() => res.status(201).json({ message: successMessages.UPDATE_SUCCESS }));
                     }
                     else {
                         return res.status(500).json({ error: errorMessages.UNKNOWN_ERROR });

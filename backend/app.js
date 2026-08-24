@@ -20,11 +20,17 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 app.use(express.json({ limit: "10mb" }));
-const uploadsFolder = path.join(__dirname, "uploads");
-fileFn.deleteAllFilesFolders(uploadsFolder);
-fileFn.createFolder(uploadsFolder);
+const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+if (!isServerless) {
+    const uploadsFolder = path.join(__dirname, "uploads");
+    fileFn.deleteAllFilesFolders(uploadsFolder);
+    fileFn.createFolder(uploadsFolder);
+}
 app.get("/health", function (req, res) {
     return res.status(200).json({ status: "ok" });
+});
+app.get("/", function (req, res) {
+    return res.status(200).json({ name: "DailyHype API", status: "ok" });
 });
 app.use("/api", usersRoute);
 app.use("/api", ordersRoute);

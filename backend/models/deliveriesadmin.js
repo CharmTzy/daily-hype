@@ -1,6 +1,5 @@
 const { query } = require('../database');
 const { DUPLICATE_ENTRY_ERROR, EMPTY_RESULT_ERROR, SQL_ERROR_CODE, TABLE_ALREADY_EXISTS_ERROR } = require('../errors');
-const { use } = require('../routes/delivery');
 
 function normaliseAdminFilterValue(value) {
     if (value == null || value === '' || value === 'Default') {
@@ -408,4 +407,3 @@ module.exports.removeduplicatechat = async function removeduplicatechat(updatedr
         throw new Error('Failed to remove duplicate chat rows');
     }
 };
-

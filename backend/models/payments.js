@@ -75,19 +75,19 @@ module.exports.getPaymentTransactionID = (userID, orderID) => {
     });
 };
 module.exports.refundPayment = async (chargeID) => {
-    if (chargeID) {
+    if (!chargeID) {
+        return false;
+    }
+    try {
         const refund = await getStripe().refunds.create({
             payment_intent: chargeID,
         });
-        if (refund.status === 'succeeded') {
+        return refund.status === 'succeeded' || refund.status === 'pending';
+    } catch (error) {
+        if (error?.code === 'charge_already_refunded') {
             return true;
         }
-        else {
-            return false;
-        }
-    }
-    else {
-        return false;
+        throw error;
     }
 };
 module.exports.getPaymentByOrderID = (orderIDArr) => {

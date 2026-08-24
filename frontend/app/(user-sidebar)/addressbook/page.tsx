@@ -1,357 +1,324 @@
 "use client";
 import { useAppState } from "@/app/app-provider";
 import { CurrentActivePage } from "@/enums/global-enums";
-import { Button, Checkbox, Input, Link, Modal, ModalBody, ModalContent, ModalHeader, useDisclosure } from "@nextui-org/react";
-import { JSX, SVGProps, useEffect, useState } from "react";
-export default function Component() {
-    interface Address {
-        block_no: number;
-        address_id: number;
-        fullname: string;
-        phone: string;
-        street: string;
-        building: string;
-        unit_no: string;
-        postal_code: string;
-        is_default: boolean;
-    }
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from "@nextui-org/react";
+import { useEffect, useState } from "react";
+import { MapPin, Plus, Pencil, Trash2 } from "lucide-react";
+
+interface Address {
+    block_no: number;
+    address_id: number;
+    fullname: string;
+    phone: string;
+    street: string;
+    building: string;
+    unit_no: string;
+    postal_code: string;
+    is_default: boolean;
+}
+
+export default function AddressBookPage() {
     const { setCurrentActivePage } = useAppState();
-    const [fullname, setfullName] = useState("");
+    const [fullname, setFullname] = useState("");
     const [phone, setPhone] = useState("");
     const [block_no, setBlock] = useState("");
-    const [postal_code, setPostal_code] = useState("");
+    const [postal_code, setPostalCode] = useState("");
     const [street, setStreet] = useState("");
     const [building, setBuilding] = useState("");
-    const [unit_no, setUnit_no] = useState("");
-    const [region, setRegion] = useState("");
-    const [is_default, setDefault] = useState(false);
+    const [unit_no, setUnitNo] = useState("");
+    const [is_default, setIsDefault] = useState(false);
     const [addresses, setAddresses] = useState<Address[]>([]);
     const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
-    const [isAddMode, setAddMode] = useState(true);
-    const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+    const [isAddMode, setIsAddMode] = useState(true);
+    const [formError, setFormError] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isDeleting, setIsDeleting] = useState<number | null>(null);
+    const { isOpen, onOpen, onClose } = useDisclosure();
+
     useEffect(() => {
         setCurrentActivePage(CurrentActivePage.AddressBook);
-        fetchAddress();
-    }, []);
-    useEffect(() => {
-        if (!isOpen) {
-            if (!isAddMode) {
-                setEmpty();
-            }
-        }
-    }, [isOpen]);
-    const setEmpty = () => {
-        setfullName("");
+        fetchAddresses();
+    }, [setCurrentActivePage]);
+
+    const clearForm = () => {
+        setFullname("");
         setPhone("");
-        setPostal_code("");
+        setPostalCode("");
         setBlock("");
         setStreet("");
         setBuilding("");
-        setUnit_no("");
-        setRegion("");
-        setDefault(false);
+        setUnitNo("");
+        setIsDefault(false);
+        setFormError("");
+        setSelectedAddress(null);
     };
-    const addAddress = () => {
-        if (addresses.length >= 4) {
-            alert("You can only add up to four addresses.");
-            return;
-        }
-        if (!(fullname && phone && postal_code && street && block_no)) {
-            alert("Please fill in all field");
-            return;
-        }
-        if (!/^\d{6}$/.test(postal_code)) {
-            alert("Please enter a 6-digit postal code.");
-            return;
-        }
-        const blockNoInteger = parseInt(block_no);
-        if (isNaN(blockNoInteger)) {
-            alert("Block number must be an integer.");
-            return;
-        }
-        fetch(`${process.env.BACKEND_URL}/api/addAddress`, {
-            method: "POST",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ fullname, phone, postal_code, block_no, street, building, unit_no, region, is_default }),
-        })
-            .then((response) => {
-            return response.json();
-        })
-            .then((data) => {
-            if (data.error == "Address already exists") {
-                alert("Address already exists. Add a new one!");
-            }
-            console.log("Address added successfully:", data);
-            onClose();
-            fetchAddress();
-        })
-            .catch((error) => {
-            console.error("Error adding address:", error);
-            alert("Failed to add address. Please try again.");
-        });
+
+    const handleClose = () => {
+        clearForm();
+        onClose();
     };
-    const fetchAddress = () => {
+
+    const fetchAddresses = () => {
         fetch(`${process.env.BACKEND_URL}/api/getAllAddresses`, {
             method: "GET",
             credentials: "include",
         })
-            .then((response) => {
-            if (!response.ok) {
-                alert("Address Error");
-            }
-            return response.json();
-        })
-            .then((data) => {
-            console.log(data.addresses);
-            setAddresses(data.addresses);
-        })
-            .catch((error) => {
-            console.error("Error fetching addresses", error);
-        });
+            .then((r) => r.json())
+            .then((data) => setAddresses(data.addresses || []))
+            .catch(console.error);
     };
+
+    const openAdd = () => {
+        clearForm();
+        setIsAddMode(true);
+        onOpen();
+    };
+
+    const openEdit = (address: Address) => {
+        setIsAddMode(false);
+        setSelectedAddress(address);
+        setFullname(address.fullname);
+        setPhone(address.phone);
+        setPostalCode(address.postal_code);
+        setBlock(String(address.block_no));
+        setStreet(address.street);
+        setBuilding(address.building || "");
+        setUnitNo(address.unit_no || "");
+        setIsDefault(address.is_default);
+        setFormError("");
+        onOpen();
+    };
+
+    const validate = () => {
+        if (!fullname.trim() || !phone.trim() || !postal_code.trim() || !street.trim() || !block_no.trim()) {
+            setFormError("Please fill in all required fields.");
+            return false;
+        }
+        if (!/^\d{6}$/.test(postal_code)) {
+            setFormError("Postal code must be exactly 6 digits.");
+            return false;
+        }
+        if (isNaN(parseInt(block_no))) {
+            setFormError("Block number must be a number.");
+            return false;
+        }
+        return true;
+    };
+
+    const saveAddress = () => {
+        if (!validate()) return;
+        if (isAddMode && addresses.length >= 4) {
+            setFormError("You can only save up to 4 addresses.");
+            return;
+        }
+
+        setIsSubmitting(true);
+        setFormError("");
+
+        const payload = { fullname, phone, postal_code, block_no, street, building, unit_no, is_default };
+        const url = isAddMode
+            ? `${process.env.BACKEND_URL}/api/addAddress`
+            : `${process.env.BACKEND_URL}/api/editAddress`;
+        const method = isAddMode ? "POST" : "PUT";
+        const body = isAddMode ? payload : { ...payload, address_id: selectedAddress?.address_id };
+
+        fetch(url, {
+            method,
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+        })
+            .then((r) => r.json())
+            .then((data) => {
+                if (data.error) {
+                    setFormError(data.error);
+                    return;
+                }
+                handleClose();
+                fetchAddresses();
+            })
+            .catch(() => setFormError("Something went wrong. Please try again."))
+            .finally(() => setIsSubmitting(false));
+    };
+
     const deleteAddress = (address_id: number) => {
+        setIsDeleting(address_id);
         fetch(`${process.env.BACKEND_URL}/api/deleteAddress`, {
             method: "DELETE",
             credentials: "include",
-            headers: {
-                "Content-Type": "application/json",
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ address_id }),
         })
-            .then((response) => {
-            if (!response.ok) {
-                throw new Error("Failed to delete address");
-            }
-            return response.json();
-        })
-            .then((data) => {
-            console.log(data);
-            window.location.reload();
-        })
-            .catch((error) => {
-            console.error(error);
-        });
+            .then((r) => { if (!r.ok) throw new Error(); return r.json(); })
+            .then(() => fetchAddresses())
+            .catch(console.error)
+            .finally(() => setIsDeleting(null));
     };
-    const openEditModal = (address_id: number) => {
-        setAddMode(false);
-        onOpen();
-    };
-    const getAddress = (address_id: number) => {
-        console.log(address_id);
-        fetch(`${process.env.BACKEND_URL}/api/getAddress/${address_id}`, {
-            method: "GET",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        })
-            .then((response) => {
-            if (!response.ok) {
-                throw new Error("Failed to fetch address details");
-            }
-            return response.json();
-        })
-            .then((data) => {
-            console.log(data);
-            setSelectedAddress(data.address);
-            setfullName(data.address.fullname);
-            setPhone(data.address.phone);
-            setPostal_code(data.address.postal_code);
-            setBlock(data.address.block_no);
-            setStreet(data.address.street);
-            setUnit_no(data.address.unit_no);
-            setRegion(data.address.region);
-            setDefault(data.address.is_default);
-            if (data.address.is_default) {
-                setDefault(data.address.is_default);
-            }
-            if (data.address.building) {
-                console.log(data.address.building);
-                setBuilding(data.address.building);
-            }
-            else {
-                setBuilding("");
-            }
-        })
-            .catch((error) => {
-            console.error("Error fetching address details:", error);
-        });
-    };
-    const editAddress = () => {
-        if (!selectedAddress) {
-            console.error("No address selected for editing");
-            return;
-        }
-        if (!/^\d{6}$/.test(postal_code)) {
-            alert("Please enter a 6-digit postal code.");
-            return;
-        }
-        const blockNoInteger = parseInt(block_no);
-        if (isNaN(blockNoInteger)) {
-            alert("Block number must be an integer.");
-            return;
-        }
-        fetch(`${process.env.BACKEND_URL}/api/editAddress`, {
-            method: "PUT",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ address_id: selectedAddress.address_id, fullname, phone, postal_code, block_no, street, building, unit_no, region, is_default }),
-        })
-            .then((response) => {
-            return response.json();
-        })
-            .then((data) => {
-            if (data.error == "Address already exists") {
-                alert("Address already exists. Edit with new one!");
-            }
-            console.log("Address edited successfully:", data);
-            onClose();
-            fetchAddress();
-            setSelectedAddress(null);
-        })
-            .catch((error) => {
-            console.error("Error editing address:", error);
-        });
-    };
-    const addOrEditAddress = () => {
-        console.log("Inside addOrEditAddress");
-        if (isAddMode) {
-            addAddress();
-        }
-        else {
-            editAddress();
-        }
-    };
-    const renderAddress = (address: Address) => (<>
-      <div className="flex justify-between items-center mb-2">
-        <h4 className="text-lg font-semibold">{`${address.fullname} ${address.phone}`}</h4>
-        {address.is_default && <div className="text-blue-600">Default Address</div>}
-      </div>
-      <p>Block {`${address.block_no} ${address.street}`}</p>
-      <p>{`${address.unit_no ? address.unit_no : ""} ${address.building ? address.building : ""}`}</p>
-      <p>Singapore {`${address.postal_code}`}</p>
-      <div className="flex justify-end mt-4">
-        <Button className="mr-2 bg-red-500 text-white hover:bg-red-700" onClick={() => deleteAddress(address.address_id)}>
-          Delete
-        </Button>
-        <Button className="bg-black text-white" onClick={() => {
-            openEditModal(address.address_id);
-            setAddMode(false);
-            getAddress(address.address_id);
-        }}>
-          Edit
-        </Button>
-      </div>
-    </>);
-    const defaultAddress = addresses.find((address) => address.is_default);
-    return (<div className="container mx-auto pb-8">
-      <div className="grid grid-cols-4 gap-8">
-        <div className="col-span-3">
-          <div className=" p-4 rounded-lg">
-            <h2 className="text-2xl font-bold mb-4">MY ADDRESS BOOK</h2>
-            <Button className="mb-4" variant="bordered" onClick={() => {
-            onOpen();
-            setAddMode(true);
-        }}>
-              + ADD NEW ADDRESS
-            </Button>
 
-            {defaultAddress && <div className="border p-4 rounded-lg mb-4">{renderAddress(defaultAddress)}</div>}
-
-            {addresses
-            .filter((address) => !address.is_default)
-            .map((address) => (<div key={address.address_id} className="border p-4 rounded-lg mb-4">
-                  {renderAddress(address)}
-                </div>))}
+    return (
+        <div className="w-full pb-8">
+            {/* Header */}
+            <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <p className="text-xs font-semibold uppercase tracking-[0.26em] text-slate-400">Account</p>
+                        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">Address Book</h1>
+                        <p className="mt-2 text-sm text-slate-500">Save up to 4 delivery addresses for faster checkout.</p>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={openAdd}
+                        disabled={addresses.length >= 4}
+                        className="inline-flex h-11 items-center gap-2 rounded-full bg-slate-900 px-5 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+                    >
+                        <Plus className="h-4 w-4" />
+                        Add Address
+                    </button>
                 </div>
-              </div>
-            </div>
-            
-      {isOpen && (<>
-          <Modal size="4xl" isOpen={isOpen} onOpenChange={onOpenChange} backdrop="blur" scrollBehavior="inside">
-            <ModalContent>
-              {(onClose) => (<>
-                  <ModalHeader>Shipping Address</ModalHeader>
-                  <ModalBody>
-                    <form className="space-y-4 my-8">
-                      <div className="flex flex-col">
-                        <Input classNames={{ inputWrapper: "bg-white border-grey border-1 rounded-none" }} label="Location*" placeholder="Singapore" isReadOnly/>
-                      </div>
-                      <div className="flex flex-col">
-                        <Input classNames={{ inputWrapper: "bg-white border-grey border-1 rounded-none" }} value={fullname} onChange={(e) => setfullName(e.target.value)} label="Full Name*"/>
-                      </div>
-                      <div className="flex">
-                        <div className="flex flex-col">
-                          <Input classNames={{ inputWrapper: "bg-white border-grey border-1 w-24 rounded-md rounded-none" }} placeholder="SG +65" isReadOnly/>
-                        </div>
-                        <div className="flex flex-col w-full">
-                          <Input classNames={{ inputWrapper: "bg-white border-grey border-1 w-full rounded-none" }} value={phone} onChange={(e) => setPhone(e.target.value)} label="Phone Number*"/>
-                        </div>
-                      </div>
-                      <div className="flex flex-col">
-                        <Input classNames={{ inputWrapper: "bg-white border-grey border-1 rounded-none" }} value={postal_code} onChange={(e) => setPostal_code(e.target.value)} label="Postal Code*"/>
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="flex flex-col">
-                          <Input classNames={{ inputWrapper: "bg-white border-grey border-1 rounded-none" }} value={block_no} onChange={(e) => setBlock(e.target.value)} label="Block*"/>
-                        </div>
-                        <div className="flex flex-col">
-                          <Input classNames={{ inputWrapper: "bg-white border-grey border-1 rounded-none" }} value={street} onChange={(e) => setStreet(e.target.value)} label="Street Name*"/>
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                      <div className="flex flex-col">
-                        <Input classNames={{ inputWrapper: "bg-white border-grey border-1 rounded-none" }} value={building} onChange={(e) => setBuilding(e.target.value)} label="Building Name(Optional)"/>
-                      </div>
-                      <div className="flex flex-col">
-                        <Input classNames={{ inputWrapper: "bg-white border-grey border-1 rounded-none" }} value={unit_no} onChange={(e) => setUnit_no(e.target.value)} label="Unit No.(Optional)"/>
-                      </div>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                          
-                          <input className="ml-1" type="checkbox" id="makeDefault" checked={is_default} onChange={(e) => setDefault(e.target.checked)}/>
-                          <label className="font-medium">Make Default</label>
-                        </div>
-                        <div className="flex space-x-2 ">
-                          <Link className="text-blue-600 hover:underline" href="#">
-                            Privacy & Cookie Policy
-                          </Link>
-                        </div>
-                      </div>
-                      <div className="flex items-center" style={{ marginTop: "3xrem" }}>
-                        <ShieldCheckIcon className="w-6 h-6 text-green-600 mr-3"/>
-                        <p className="text-sm text-green-600">Security & Privacy</p>
-                      </div>
-                      <p className="text-sm text-gray-600 mt-2">We maintain industry-standard physical, technical, and administrative measures to safeguard your personal information.</p>
-                      <div className="flex justify-center">
-                        <Button className="w-52 h-10 bg-black text-white rounded-none text-lg" onClick={addOrEditAddress}>
-                          {isAddMode ? "Save" : "Edit"}
-                        </Button>
-                      </div>
-                    </form>
-                  </ModalBody>
-                </>)}
-            </ModalContent>
-          </Modal>
-        </>)}
-    </div>);
-}
-function ShieldCheckIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
-    return (<svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/>
-      <path d="m9 12 2 2 4-4"/>
-    </svg>);
-}
-function XIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
-    return (<svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M18 6 6 18"/>
-      <path d="m6 6 12 12"/>
-    </svg>);
-}
 
+                <div className="mt-4 flex items-center gap-2">
+                    <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-600">
+                        {addresses.length} / 4 saved
+                    </span>
+                </div>
+            </section>
+
+            {/* Address list */}
+            {addresses.length === 0 ? (
+                <div className="mt-4 rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center">
+                    <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-slate-100">
+                        <MapPin className="h-6 w-6 text-slate-400" />
+                    </div>
+                    <h3 className="mt-4 text-xl font-semibold text-slate-900">No addresses saved</h3>
+                    <p className="mt-2 text-sm text-slate-500">Add your first delivery address to speed up checkout.</p>
+                    <button
+                        type="button"
+                        onClick={openAdd}
+                        className="mt-5 inline-flex h-10 items-center gap-2 rounded-full bg-slate-900 px-5 text-sm font-semibold text-white"
+                    >
+                        <Plus className="h-4 w-4" />
+                        Add Address
+                    </button>
+                </div>
+            ) : (
+                <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                    {[...addresses].sort((a, b) => (b.is_default ? 1 : 0) - (a.is_default ? 1 : 0)).map((address) => (
+                        <div
+                            key={address.address_id}
+                            className={`overflow-hidden rounded-2xl border bg-white shadow-sm ${address.is_default ? "border-slate-900" : "border-slate-200"}`}
+                        >
+                            <div className={`flex items-center justify-between border-b px-5 py-3 ${address.is_default ? "border-slate-200 bg-slate-900" : "border-slate-100 bg-slate-50"}`}>
+                                <p className={`text-xs font-semibold uppercase tracking-[0.18em] ${address.is_default ? "text-slate-300" : "text-slate-400"}`}>
+                                    {address.is_default ? "Default Address" : "Saved Address"}
+                                </p>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => openEdit(address)}
+                                        className={`flex h-8 w-8 items-center justify-center rounded-full transition ${address.is_default ? "text-slate-300 hover:bg-white/10 hover:text-white" : "text-slate-400 hover:bg-white hover:text-slate-900"}`}
+                                    >
+                                        <Pencil className="h-3.5 w-3.5" />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => deleteAddress(address.address_id)}
+                                        disabled={isDeleting === address.address_id}
+                                        className={`flex h-8 w-8 items-center justify-center rounded-full transition ${address.is_default ? "text-red-300 hover:bg-white/10 hover:text-red-400" : "text-slate-400 hover:bg-red-50 hover:text-red-500"}`}
+                                    >
+                                        <Trash2 className="h-3.5 w-3.5" />
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="p-5">
+                                <p className="font-semibold text-slate-900">{address.fullname}</p>
+                                <p className="mt-0.5 text-sm text-slate-500">{address.phone}</p>
+                                <div className="mt-3 space-y-1 text-sm text-slate-600">
+                                    <p>Blk {address.block_no}, {address.street}</p>
+                                    {(address.unit_no || address.building) && (
+                                        <p>{[address.unit_no, address.building].filter(Boolean).join(", ")}</p>
+                                    )}
+                                    <p>Singapore {address.postal_code}</p>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {/* Add / Edit Modal */}
+            <Modal size="lg" isOpen={isOpen} onClose={handleClose} scrollBehavior="inside">
+                <ModalContent>
+                    {() => (
+                        <>
+                            <ModalHeader className="border-b border-slate-100">
+                                <div>
+                                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{isAddMode ? "New" : "Edit"}</p>
+                                    <p className="mt-1 text-lg font-semibold text-slate-900">{isAddMode ? "Add Address" : "Edit Address"}</p>
+                                </div>
+                            </ModalHeader>
+
+                            <ModalBody className="py-5">
+                                <div className="space-y-4">
+                                    {formError && (
+                                        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                                            {formError}
+                                        </div>
+                                    )}
+
+                                    {[
+                                        { label: "Full Name *", value: fullname, onChange: setFullname, placeholder: "e.g. John Tan" },
+                                        { label: "Phone Number *", value: phone, onChange: setPhone, placeholder: "e.g. 91234567" },
+                                        { label: "Postal Code *", value: postal_code, onChange: setPostalCode, placeholder: "6-digit postal code" },
+                                        { label: "Block No. *", value: block_no, onChange: setBlock, placeholder: "e.g. 123" },
+                                        { label: "Street Name *", value: street, onChange: setStreet, placeholder: "e.g. Orchard Road" },
+                                        { label: "Building Name (Optional)", value: building, onChange: setBuilding, placeholder: "e.g. The Atrium" },
+                                        { label: "Unit No. (Optional)", value: unit_no, onChange: setUnitNo, placeholder: "e.g. #08-08" },
+                                    ].map((field) => (
+                                        <label key={field.label} className="flex flex-col gap-1.5 text-xs font-semibold text-slate-500">
+                                            {field.label}
+                                            <input
+                                                type="text"
+                                                value={field.value}
+                                                onChange={(e) => field.onChange(e.target.value)}
+                                                placeholder={field.placeholder}
+                                                className="h-11 rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:bg-white"
+                                            />
+                                        </label>
+                                    ))}
+
+                                    <label className="flex cursor-pointer items-center gap-3">
+                                        <input
+                                            type="checkbox"
+                                            checked={is_default}
+                                            onChange={(e) => setIsDefault(e.target.checked)}
+                                            className="h-4 w-4 rounded border-slate-300 accent-slate-900"
+                                        />
+                                        <span className="text-sm font-medium text-slate-700">Set as default address</span>
+                                    </label>
+                                </div>
+                            </ModalBody>
+
+                            <ModalFooter className="border-t border-slate-100">
+                                <Button
+                                    className="rounded-full border border-slate-300 bg-white text-sm font-semibold text-slate-700"
+                                    onClick={handleClose}
+                                    isDisabled={isSubmitting}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    className="rounded-full bg-slate-900 text-sm font-semibold text-white"
+                                    onClick={saveAddress}
+                                    isDisabled={isSubmitting}
+                                >
+                                    {isSubmitting ? "Saving…" : isAddMode ? "Save Address" : "Update Address"}
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+        </div>
+    );
+}

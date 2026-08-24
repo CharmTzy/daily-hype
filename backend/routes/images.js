@@ -1,6 +1,7 @@
 const express = require("express");
 const multer = require("multer");
 const fs = require("fs");
+const os = require("os");
 const path = require("path");
 const sharp = require("sharp");
 const imagesModel = require("../models/images");
@@ -10,11 +11,18 @@ const refreshFn = require("../middlewares/refreshToken");
 const fileFn = require("../functions/file-functions");
 const { errorMessages, successMessages } = require("../errors");
 const router = express.Router();
+const isServerless = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+const uploadsRoot = isServerless
+    ? path.join(os.tmpdir(), "daily-hype-uploads")
+    : path.join(__dirname, "../uploads");
+function userUploadFolder(userid) {
+    return path.join(uploadsRoot, String(userid || "anonymous"));
+}
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        const folderPath = path.join(__dirname, "../uploads/" + req.headers.userid);
+        const folderPath = userUploadFolder(req.headers.userid);
         fileFn.createFolder(folderPath);
-        cb(null, path.join(__dirname, `../uploads/${req.headers.userid}/`));
+        cb(null, folderPath);
     },
     filename: (req, file, cb) => {
         cb(null, `${Date.now()}_${Math.ceil(Math.random() * 100000)}_${file.originalname}`);
@@ -24,7 +32,7 @@ const upload = multer({ storage: storage });
 router.post("/image/upload/multiple/:width/:height", validateFn.validateToken, refreshFn.refreshToken, upload.array("image"), async (req, res) => {
     const width = req.params.width;
     const height = req.params.height;
-    const userFolder = path.join(__dirname, "../uploads/" + req.headers.userid);
+    const userFolder = userUploadFolder(req.headers.userid);
     if (width === undefined || isNaN(width) || width < 100 || width > 1920 || height === undefined || isNaN(height) || height < 100 || height > 1920) {
         return res.json({ error: errorMessages.INVALID_DIMENSION });
     }
@@ -61,7 +69,7 @@ router.post("/image/upload/multiple/cloudinary/:width/:height", validateFn.valid
     }
     const width = req.params.width;
     const height = req.params.height;
-    const userFolder = path.join(__dirname, "../uploads/" + req.headers.userid);
+    const userFolder = userUploadFolder(req.headers.userid);
     if (width === undefined || isNaN(width) || width < 100 || width > 1920 || height === undefined || isNaN(height) || height < 100 || height > 1920) {
         return res.json({ error: errorMessages.INVALID_DIMENSION });
     }
@@ -125,7 +133,7 @@ router.get("/image/upload/:userid/:filename", (req, res) => {
     if (userid === undefined || isNaN(userid) || userid < 1) {
         return res.status(400).json({ error: errorMessages.INVALID_ID });
     }
-    const filePath = path.join(__dirname, "../uploads/" + userid + "/" + filename);
+    const filePath = path.join(uploadsRoot, String(userid), filename);
     if (fs.existsSync(filePath)) {
         return res.sendFile(filePath);
     }
@@ -141,7 +149,7 @@ router.delete("/image/upload/:filename", validateFn.validateToken, refreshFn.ref
         return res.status(403).send({ error: errorMessages.UNAURHOTIZED });
     }
     const filename = req.params.filename;
-    const userFolder = path.join(__dirname, "../uploads/" + req.headers.userid);
+    const userFolder = userUploadFolder(req.headers.userid);
     if (filename === undefined) {
         return res.status(400).json({ error: errorMessages.INVALID_INPUT });
     }

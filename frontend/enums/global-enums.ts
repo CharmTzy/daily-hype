@@ -19,6 +19,7 @@ export enum CurrentActivePage {
     CancelledOrder = "cancelled orders",
     ReturnedOrder = "returned orders",
     AllDelivery = "all deliveries",
+    SupportChat = "support chat",
     MyReviews = "my reviews",
     UserForm = "user form",
     ProductForm = "product form",
@@ -105,7 +106,7 @@ export enum URL {
     ReviewStat = "/stats/review",
     AddressBook = "/addressbook",
     CheckOut = "/checkout",
-    SupportChat = "/delivery"
+    SupportChat = "/chats"
 }
 export enum ErrorMessage {
     UNAURHOTIZED = "Unauthorized Access",

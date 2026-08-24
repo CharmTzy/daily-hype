@@ -30,7 +30,7 @@ export default function CartSummary({
 
     return (
         <div className="sticky bottom-4 z-10">
-            <div className="rounded-[28px] border border-[#ece5dc] bg-white/95 px-5 py-4 shadow-[0_18px_40px_rgba(15,23,42,0.08)] backdrop-blur sm:px-6">
+            <div className="rounded-2xl border border-slate-200 bg-white/95 px-5 py-4 shadow-[0_8px_30px_rgba(15,23,42,0.08)] backdrop-blur sm:px-6">
                 <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
                     <div className="flex flex-col gap-3">
                         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-400">Checkout Summary</p>

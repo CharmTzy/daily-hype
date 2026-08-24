@@ -478,6 +478,37 @@ async function upsertImage(client, image) {
   );
 }
 
+async function uploadUserAvatar(client, userKey, userName, avatarUrl) {
+  const imageId = `seed-user-${userKey}`;
+  const fallback = { imageid: imageId, imagename: `${userName} avatar`, url: avatarUrl };
+
+  if (!cloudinary.isConfigured || !avatarUrl) {
+    await upsertImage(client, fallback);
+    return imageId;
+  }
+
+  try {
+    const result = await cloudinary.uploader.upload(avatarUrl, {
+      public_id: imageId,
+      overwrite: true,
+      folder: cloudinary.getFolder("profile"),
+      resource_type: "image",
+      tags: ["daily-hype", "seed", "profile"],
+    });
+    const uploaded = {
+      imageid: result.public_id,
+      imagename: `${userName} avatar`,
+      url: result.secure_url,
+    };
+    await upsertImage(client, uploaded);
+    return result.public_id;
+  } catch (error) {
+    console.warn(`Avatar upload failed for ${userName}: ${error.message}`);
+    await upsertImage(client, fallback);
+    return imageId;
+  }
+}
+
 async function upsertProduct(client, product) {
   const existing = await client.query("SELECT productid FROM product WHERE productname = $1", [
     product.productname,
@@ -1006,6 +1037,11 @@ async function run() {
         method: userSeed.method,
         verified_email: userSeed.verified_email,
       });
+
+      if (userSeed.avatarUrl) {
+        const imageid = await uploadUserAvatar(client, userSeed.key, userSeed.name, userSeed.avatarUrl);
+        await client.query("UPDATE appuser SET imageid = $2 WHERE userid = $1", [userid, imageid]);
+      }
 
       const context = {
         ...userSeed,
